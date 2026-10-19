@@ -1,56 +1,39 @@
-// Background sampler for GPU Meter Modern (any GPU vendor), run hidden via wscript.exe:
-//   gpuhelper.js <outFile> <heartbeatFile> <gpuIndex> <intervalMs>
-// Reads the Windows GPU performance counters (the ones Task Manager uses) and, if
-// LibreHardwareMonitor / OpenHardwareMonitor is running, its sensors (temp, fan, power, clocks).
+// Background sampler for GPU Meter Modern (AMD, Intel, or NVIDIA without nvidia-smi), run
+// hidden via wscript.exe:
+//   gpuhelper.js <outFile> <heartbeatFile> <luid> <intervalMs> <lhmIndex>
+// luid ("0x00000000_0x000156AA") picks the card in the Windows GPU performance counters (the
+// ones Task Manager uses: load, engines, memory). Temperature, fan, power and clocks come from
+// ModernMetersGpu.dll (D3DKMT, also what Task Manager shows), and LibreHardwareMonitor /
+// OpenHardwareMonitor fills in what the driver doesn't report if it runs.
 // Enumerating ~1000 engine counters takes ~150 ms, which is why this lives outside the gadget.
 // Exits on its own once the gadget stops touching the heartbeat file.
 
 var args = WScript.Arguments;
-var outFile = args(0), hbFile = args(1), gpuIndex = parseInt(args(2), 10) || 0, interval = parseInt(args(3), 10) || 1000;
+var outFile = args(0), hbFile = args(1), luid = String(args(2)).toUpperCase().replace(/0X/g, "0x");
+var interval = parseInt(args(3), 10) || 1000, gpuIndex = parseInt(args(4), 10) || 0;
 var fso = new ActiveXObject("Scripting.FileSystemObject");
 var locator = new ActiveXObject("WbemScripting.SWbemLocator");
 var wmi = locator.ConnectServer(".", "root\\cimv2");
 
-var HKLM = 0x80000002;
-var CLASS_KEY = "SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}";
+// ---- D3DKMT (ModernMetersGpu.dll, registered by the gadget) ---------------
 
-function regCall(reg, method, sub, value) {
-    var p = reg.Methods_.Item(method).InParameters.SpawnInstance_();
-    p.hDefKey = HKLM;
-    p.sSubKeyName = sub;
-    if (value != null) p.sValueName = value;
-    return reg.ExecMethod_(method, p);
+var kmt = null;
+try {
+    kmt = new ActiveXObject("ModernMeters.GpuReader");
+    if (!kmt.Open(luid)) kmt = null;
+} catch (e) {
+    kmt = null;
 }
 
-// Display adapters that have dedicated memory, in registry order: [{name, vramMB}]
-function listAdapters() {
-    var out = [];
-    try {
-        var reg = locator.ConnectServer(".", "root\\default").Get("StdRegProv");
-        var keys = regCall(reg, "EnumKey", CLASS_KEY).sNames;
-        if (keys == null) return out;
-        keys = new VBArray(keys).toArray().sort();
-        for (var i = 0; i < keys.length; i++) {
-            if (!/^\d{4}$/.test(keys[i])) continue;
-            var sub = CLASS_KEY + "\\" + keys[i];
-            var name = regCall(reg, "GetStringValue", sub, "DriverDesc").sValue;
-            var mem = parseFloat(regCall(reg, "GetQWORDValue", sub, "HardwareInformation.qwMemorySize").uValue);
-            if (!mem) {
-                var dw = regCall(reg, "GetDWORDValue", sub, "HardwareInformation.MemorySize").uValue;
-                mem = parseFloat(dw);
-            }
-            if (name && mem > 0) out.push({ name: name, vramMB: mem / 1048576 });
-        }
-    } catch (e) { }
-    return out;
-}
-
-function driverVersion(name) {
-    try {
-        var e = new Enumerator(wmi.ExecQuery("SELECT Name,DriverVersion FROM Win32_VideoController"));
-        for (; !e.atEnd(); e.moveNext()) if (e.item().Name == name) return e.item().DriverVersion;
-    } catch (e2) { }
-    return "";
+function readKmt(rec) {
+    if (!kmt || !kmt.Refresh()) return;
+    rec.push("kmt=1");
+    if (kmt.Temperature >= 0) rec.push("temp=" + kmt.Temperature);
+    if (kmt.PowerPct >= 0) rec.push("powerpct=" + kmt.PowerPct);
+    if (kmt.FanRpm >= 0) rec.push("fanrpm=" + kmt.FanRpm);
+    if (kmt.FanPct >= 0) rec.push("fan=" + kmt.FanPct);
+    if (kmt.CoreMHz > 0) rec.push("clock=" + kmt.CoreMHz);
+    if (kmt.MemMHz > 0) rec.push("mclock=" + kmt.MemMHz);
 }
 
 // ---- LibreHardwareMonitor / OpenHardwareMonitor ---------------------------
@@ -94,6 +77,7 @@ function readHw(rec) {
             else if (type == "Clock" && name == "GPU Core") clk = v;
             else if (type == "Clock" && name == "GPU Memory") mclk = v;
         }
+        rec.push("lhm=1");
         if (temp != null) rec.push("temp=" + temp);
         if (power != null) rec.push("power=" + power);
         if (fanRpm != null) rec.push("fanrpm=" + fanRpm);
@@ -111,22 +95,6 @@ var refresher = new ActiveXObject("WbemScripting.SWbemRefresher");
 var engines = refresher.AddEnum(wmi, "Win32_PerfFormattedData_GPUPerformanceCounters_GPUEngine").ObjectSet;
 var memory = refresher.AddEnum(wmi, "Win32_PerfFormattedData_GPUPerformanceCounters_GPUAdapterMemory").ObjectSet;
 refresher.Refresh();
-
-var adapters = listAdapters();
-var info = adapters[gpuIndex] || adapters[0] || { name: "GPU", vramMB: 0 };
-var driver = driverVersion(info.name);
-var luid = null;
-
-// Picks the adapter LUID: the gpuIndex-th adapter that has dedicated memory in use
-function pickLuid() {
-    var list = [];
-    for (var e = new Enumerator(memory); !e.atEnd(); e.moveNext()) {
-        var it = e.item(), m = /^luid_(\w+?_\w+?)_phys_0$/.exec(it.Name);
-        if (m && parseFloat(it.DedicatedUsage) > 0) list.push(m[1]);
-    }
-    list.sort();
-    return list[gpuIndex] || list[0] || null;
-}
 
 function heartbeatAlive() {
     try {
@@ -147,14 +115,13 @@ function writeAtomic(text) {
 while (heartbeatAlive()) {
     WScript.Sleep(interval);
     refresher.Refresh();
-    if (!luid) luid = pickLuid();
 
-    var byType = {}, tag = "luid_" + luid + "_";
+    var byType = {}, tag = ("luid_" + luid + "_").toUpperCase();
     for (var e = new Enumerator(engines); !e.atEnd(); e.moveNext()) {
         var it = e.item(), u = it.UtilizationPercentage;
         if (u == 0) continue;
         var name = it.Name;
-        if (name.indexOf(tag) < 0) continue;
+        if (name.toUpperCase().indexOf(tag) < 0) continue;
         var type = name.substring(name.indexOf("engtype_") + 8);
         byType[type] = (byType[type] || 0) + parseFloat(u);
     }
@@ -168,19 +135,21 @@ while (heartbeatAlive()) {
 
     var ded = 0, shared = 0;
     for (e = new Enumerator(memory); !e.atEnd(); e.moveNext())
-        if (e.item().Name == "luid_" + luid + "_phys_0") {
+        if (e.item().Name.toUpperCase() == tag + "PHYS_0") {
             ded = parseFloat(e.item().DedicatedUsage);
             shared = parseFloat(e.item().SharedUsage);
         }
 
     var rec = [
-        "name=" + info.name, "driver=" + driver, "usage=" + Math.round(usage),
+        "usage=" + Math.round(usage),
         "td=" + Math.round(byType["3D"] || 0), "copy=" + Math.round(byType["Copy"] || 0),
         "enc=" + Math.round(enc), "dec=" + Math.round(dec),
-        "vram=" + Math.round(ded / 1048576), "vramtotal=" + Math.round(info.vramMB),
-        "shared=" + Math.round(shared / 1048576)
+        "vram=" + Math.round(ded / 1048576), "shared=" + Math.round(shared / 1048576)
     ];
+    // LibreHardwareMonitor first: the driver's own readings (D3DKMT) win where both exist,
+    // LHM adds what the driver leaves out (watts, or temperature on many integrated GPUs)
     readHw(rec);
+    readKmt(rec);
     writeAtomic(rec.join("\r\n") + "\r\nend=1\r\n");
 }
 try { fso.DeleteFile(outFile, true); } catch (e) { }

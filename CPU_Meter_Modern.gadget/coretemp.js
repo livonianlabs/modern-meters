@@ -1,33 +1,14 @@
 // Loads ModernMetersCoreTemp.dll (our .NET 4 COM class over Core Temp's shared memory, source in
-// tools/coretemp). The class is registered per-user, pointing at the DLL inside this gadget folder.
+// tools/coretemp).
 
-var CT_CLSID = "{5b0f6f5e-3c1d-4a7e-9a52-8d3c6e1f2a47}";
 var CT_CLASS = "ModernMeters.CoreTempReader";
-var CT_ASM = "ModernMetersCoreTemp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
-
-function registerCoreTemp(shell) {
-    var codeBase = "file:///" + System.Gadget.path.replace(/\\/g, "/") + "/ModernMetersCoreTemp.dll";
-    var cls = "HKCU\\Software\\Classes\\" + CT_CLASS + "\\";
-    var clsid = "HKCU\\Software\\Classes\\CLSID\\" + CT_CLSID + "\\";
-    var inproc = clsid + "InprocServer32\\";
-    shell.RegWrite(cls, CT_CLASS, "REG_SZ");
-    shell.RegWrite(cls + "CLSID\\", CT_CLSID, "REG_SZ");
-    shell.RegWrite(clsid, CT_CLASS, "REG_SZ");
-    shell.RegWrite(clsid + "ProgId\\", CT_CLASS, "REG_SZ");
-    shell.RegWrite(inproc, "mscoree.dll", "REG_SZ");
-    shell.RegWrite(inproc + "ThreadingModel", "Both", "REG_SZ");
-    shell.RegWrite(inproc + "Class", CT_CLASS, "REG_SZ");
-    shell.RegWrite(inproc + "Assembly", CT_ASM, "REG_SZ");
-    shell.RegWrite(inproc + "RuntimeVersion", "v4.0.30319", "REG_SZ");
-    shell.RegWrite(inproc + "CodeBase", codeBase, "REG_SZ");
-}
 
 function openCoreTemp() {
     if (!IS_GADGET) {
         try { return new ActiveXObject(CT_CLASS); } catch (e) { return null; }
     }
     try {
-        registerCoreTemp(new ActiveXObject("WScript.Shell"));
+        registerDotNet("{5b0f6f5e-3c1d-4a7e-9a52-8d3c6e1f2a47}", CT_CLASS, "ModernMetersCoreTemp");
         return new ActiveXObject(CT_CLASS);
     } catch (e) {
         return null;

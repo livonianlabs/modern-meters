@@ -2,18 +2,21 @@
 // so the Sidebar never blocks:
 //  - nvidia-smi: launched hidden (one at a time), writes one CSV line read on the next tick
 //    (full data: clocks, temperature, power, fan, memory controller).
-//  - Windows counters (any vendor): gpuhelper.js runs hidden in the background and writes
-//    key=value records; temperature/fan/power come from LibreHardwareMonitor if it runs.
+//  - Windows (any vendor): gpuhelper.js runs hidden in the background and writes key=value
+//    records from the GPU performance counters and D3DKMT (ModernMetersGpu.dll), the sources
+//    Task Manager uses; LibreHardwareMonitor adds what the driver doesn't report if it runs.
 
 var W, IW, accent, unit, graphH, interval, gpuIndex, source, showDetails, narrow;
 var ui = null, timer = null;
 var shell, fso, wmi, smiPath = null, provider = null, misses = 0;
+var gpus = [], card = null;   // listGpus() (defaults.js), and the one picked in the settings
 
 function init() {
     shell = new ActiveXObject("WScript.Shell");
     fso = new ActiveXObject("Scripting.FileSystemObject");
     wmi = new ActiveXObject("WbemScripting.SWbemLocator").ConnectServer(".", "root\\cimv2");
     smiPath = findSmi();
+    gpus = listGpus();
     hookSettings(rebuild);
     watchUpdates(rebuild);
     rebuild();
@@ -111,7 +114,7 @@ SmiProvider.prototype.launch = function () {
     }
     this.launched = now;
     try {
-        shell.Run("\"" + smiPath + "\" -i " + gpuIndex + " --query-gpu=" + SMI_FIELDS.join(",") +
+        shell.Run("\"" + smiPath + "\" -i " + smiIndex() + " --query-gpu=" + SMI_FIELDS.join(",") +
             " --format=csv,noheader,nounits -f \"" + this.out + "\"", 0, false);
     } catch (e) { }
 };
@@ -152,11 +155,28 @@ SmiProvider.prototype.poll = function () {
     };
 };
 
-// ---- provider: Windows GPU counters (gpuhelper.js) ------------------------
+// nvidia-smi numbers only the NVIDIA cards
+function smiIndex() {
+    if (!card) return gpuIndex;
+    var n = 0;
+    for (var i = 0; i < gpus.length && gpus[i] != card; i++) if (gpus[i].vendor == "10DE") n++;
+    return n;
+}
+
+// ---- provider: Windows (gpuhelper.js) -------------------------------------
 
 function CounterProvider() {
     this.out = tempPath("wmi.txt");
     this.hb = tempPath("alive");
+    this.driver = driverVersion(card.name);
+}
+
+function driverVersion(name) {
+    try {
+        var e = new Enumerator(wmi.ExecQuery("SELECT Name,DriverVersion FROM Win32_VideoController"));
+        for (; !e.atEnd(); e.moveNext()) if (e.item().Name == name) return e.item().DriverVersion;
+    } catch (err) { }
+    return "";
 }
 
 // Kills helpers left over from a previous gadget instance writing to the same file
@@ -179,10 +199,12 @@ CounterProvider.prototype.touch = function () {
 CounterProvider.prototype.start = function () {
     this.stop();
     this.touch();
+    // The helper creates the D3DKMT reader through COM; without it it still has the counters
+    if (IS_GADGET) try { registerDotNet("{8c41d7a2-6f0e-4b9d-b3a5-2e7f19c4d860}", "ModernMeters.GpuReader", "ModernMetersGpu"); } catch (e) { }
     var script = IS_GADGET ? System.Gadget.path + "\\gpuhelper.js" :
         unescape(location.pathname.replace(/^\/+/, "").replace(/[^\\\/]*$/, "")).replace(/\//g, "\\") + "gpuhelper.js";
     shell.Run("wscript.exe //B //Nologo \"" + script + "\" \"" + this.out + "\" \"" + this.hb + "\" " +
-        gpuIndex + " " + Math.max(interval, 1000), 0, false);
+        card.luid + " " + Math.max(interval, 1000) + " " + gpuIndex, 0, false);
 };
 
 CounterProvider.prototype.poll = function () {
@@ -199,41 +221,44 @@ CounterProvider.prototype.poll = function () {
         mclk == null ? mhz(clk) + " " + T("MHz") :
         narrow ? mhz(clk) + " / " + mhz(mclk) + " " + T("MHz") :
         mhz(clk) + " " + T("MHz") + "  ·  " + T("mem") + " " + mhz(mclk) + " " + T("MHz");
-    var shared = num(r.shared);
-    return {
-        name: r.name,
+    var ded = num(r.vram), shared = num(r.shared), temp = num(r.temp);
+    var gb = function (mb) { return (mb / 1024).toFixed(1); };
+    var d = {
+        name: card.name,
         usage: num(r.usage),
-        vramUsed: num(r.vram),
-        vramTotal: num(r.vramtotal),
-        row2: { label: T("shared"), val: shared == null ? "" : (shared / 1024).toFixed(1) + " " + T("GB"), pct: null, noPct: true },
-        temp: num(r.temp),
+        temp: temp,
         power: num(r.power),
         powerLimit: null,
+        powerPct: num(r.powerpct),
         fan: fan,
-        fanText: rpm != null ? Math.round(rpm) + " " + T("RPM") : (fan == null ? T("na") : ""),
+        // Narrow: the percentage alone, the RPM text would run into the label
+        fanText: rpm != null && rpm == 0 && fan != null ? T("stopped") :
+            fan != null && narrow ? "" : rpm != null ? Math.round(rpm) + " " + T("RPM") : (fan == null ? T("na") : ""),
         sub: sub,
         enc: num(r.enc),
         dec: num(r.dec),
-        link: T(r.temp != null ? "lhm" : "noSensors"),
-        footer: T("driver") + " " + r.driver + "  ·  " + T("counters")
+        link: temp == null ? T("noSensors") : T(r.lhm && !r.kmt ? "lhm" : "winSensors"),
+        footer: T("driver") + " " + this.driver + (narrow ? "" : "  ·  " + T("counters"))
     };
+    var sharedLabel = T(narrow ? "sharedShort" : "shared");
+    if (card.integrated) {
+        // Integrated graphics work out of shared system memory; their own carve-out is a footnote
+        d.memLabel = sharedLabel;
+        d.vramUsed = shared;
+        d.vramTotal = card.sharedMB;
+        d.row2 = { label: T("vram"), val: ded == null ? "" : fmtPair(gb(ded), gb(card.dedicatedMB), "GB", narrow), pct: pctOf(ded, card.dedicatedMB) };
+    } else {
+        d.vramUsed = ded;
+        d.vramTotal = card.dedicatedMB;
+        d.row2 = { label: sharedLabel, val: shared == null ? "" : gb(shared) + " " + T("GB"), pct: null, noPct: true };
+    }
+    return d;
 };
 
 function pickProvider() {
-    if (source == "smi" || (source == "auto" && smiPath && isNvidia()))
+    if (source == "smi" || (source == "auto" && smiPath && (!card || card.vendor == "10DE")))
         return smiPath ? new SmiProvider() : null;
-    return new CounterProvider();
-}
-
-function isNvidia() {
-    try {
-        var e = new Enumerator(wmi.ExecQuery("SELECT Name FROM Win32_VideoController"));
-        var names = [];
-        for (; !e.atEnd(); e.moveNext()) if (!/Microsoft|Remote|Virtual|Parsec/i.test(e.item().Name)) names.push(e.item().Name);
-        return /NVIDIA/i.test(names[gpuIndex] || names[0] || "");
-    } catch (err) {
-        return true;
-    }
+    return card ? new CounterProvider() : null;
 }
 
 // ---- layout ---------------------------------------------------------------
@@ -249,6 +274,7 @@ function readSettings() {
     graphH = parseInt(getSetting("graph"), 10);
     interval = parseInt(getSetting("interval"), 10);
     gpuIndex = parseInt(getSetting("gpu"), 10) || 0;
+    card = gpus[gpuIndex] || gpus[0] || null;
     source = getSetting("source");
     showDetails = getSetting("details") != "off";
 }
@@ -285,7 +311,7 @@ function rebuild() {
     var y = header(root, 10, "gpu", "GPU");
 
     ui.name = label(root, PAD, y + 3, IW - 44, narrow ? 12 : 13, THEME.text, "left", true);
-    setText(ui.name, provider ? "GPU" : T("smiMissing"));
+    setText(ui.name, provider ? "GPU" : T(card ? "smiMissing" : "noGpu"));
     ui.usage = label(root, W - PAD - 60, y - 3, 60, narrow ? 19 : 22, accent, "right", true);
     y += 22;
     ui.sub = label(root, PAD, y, IW - 50, 11, THEME.dim);
@@ -352,7 +378,7 @@ function rebuild() {
 // ---- update ---------------------------------------------------------------
 
 function pctOf(a, b) {
-    return (a == null || !b) ? null : a / b * 100;
+    return (a == null || !b) ? null : Math.min(100, a / b * 100);
 }
 
 function show(r, val, pct, noPct) {
@@ -395,13 +421,19 @@ function tick() {
             d.temp == null ? "–" : fmtTemp(d.temp, unit) + unit);
     }
 
+    setText(ui.vram.name, d.memLabel || T("vram"));
     show(ui.vram, d.vramUsed == null ? "" :
         fmtPair((d.vramUsed / 1024).toFixed(1), (d.vramTotal / 1024).toFixed(1), "GB", narrow), vramPct);
     setText(ui.row2.name, d.row2.label);
     show(ui.row2, d.row2.val, d.row2.pct, d.row2.noPct);
-    show(ui.power, d.power == null ? T("na") :
-        d.powerLimit ? fmtPair(Math.round(d.power), Math.round(d.powerLimit), "W", narrow) : Math.round(d.power) + " " + T("W"),
-        pctOf(d.power, d.powerLimit), !d.powerLimit);
+    if (d.power == null && d.powerPct != null) {
+        // The driver reports power as a share of the card's limit, without watts
+        show(ui.power, narrow ? "" : T("ofLimit"), d.powerPct);
+    } else {
+        show(ui.power, d.power == null ? T("na") :
+            d.powerLimit ? fmtPair(Math.round(d.power), Math.round(d.powerLimit), "W", narrow) : Math.round(d.power) + " " + T("W"),
+            pctOf(d.power, d.powerLimit), !d.powerLimit);
+    }
     show(ui.fan, d.fanText, d.fan);
 
     if (ui.codec) {

@@ -7,7 +7,7 @@ Four desktop gadgets for the Windows Sidebar from 8GadgetPack:
 | Gadget | Shows |
 |---|---|
 | **CPU Meter Modern** | Load of every thread or core (P-cores and E-cores grouped), clock speed, temperature, RAM and commit, history graph |
-| **GPU Meter Modern** | GPU load, VRAM, memory controller or shared memory, power, fan, clocks, encoder/decoder, temperature, history graph. NVIDIA, AMD and Intel |
+| **GPU Meter Modern** | GPU load, VRAM, memory controller or shared memory, power, fan, clocks, encoder/decoder, temperature, history graph. NVIDIA, AMD and Intel, discrete and integrated, with the same sensors Task Manager uses |
 | **Network Meter Modern** | Download and upload speed with an auto-scaled graph, Wi-Fi network and signal, IP addresses (hidden until clicked), firewall, traffic totals |
 | **Drives Meter Modern** | Physical disks with their partitions, SMART health, SSD life left, temperature, read/write speed, activity graph |
 
@@ -45,7 +45,7 @@ Everything works without them. They add data that Windows only gives to drivers 
 | For | What to do |
 |---|---|
 | CPU temperature | Install [Core Temp](https://www.alcpu.com/CoreTemp/) and keep it running (it can start with Windows). Clicking "Core Temp off" on the gadget starts it, or opens the download page if it isn't installed. |
-| AMD/Intel GPU temperature, fan, power | Run [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases). NVIDIA cards don't need it. |
+| GPU temperature on integrated graphics, watts on AMD/Intel | Discrete cards report temperature, fan, clocks and power (as % of the limit) by themselves. Integrated graphics often don't report temperature; run [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases) to fill it in. NVIDIA cards don't need it. |
 | SSD life and temperature | Drives Meter settings → **SSD life & temperature** → **Turn on**, then approve the administrator prompt. This adds the scheduled task "ModernMeters Disk Health". It reads SSDs every 5 minutes and leaves hard drives alone so they can sleep. **Turn off** removes it. |
 
 ## Network access
@@ -74,7 +74,7 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 | Гаджет | Что показывает |
 |---|---|
 | **CPU Meter Modern** | Загрузку каждого потока или ядра (P- и E-ядра сгруппированы), частоту, температуру, ОЗУ и выделенную память, график |
-| **GPU Meter Modern** | Загрузку GPU, видеопамять, контроллер памяти или общую память, мощность, вентилятор, частоты, кодер/декодер, температуру, график. NVIDIA, AMD и Intel |
+| **GPU Meter Modern** | Загрузку GPU, видеопамять, контроллер памяти или общую память, мощность, вентилятор, частоты, кодер/декодер, температуру, график. NVIDIA, AMD и Intel, дискретные и встроенные, по тем же датчикам, что и Диспетчер задач |
 | **Network Meter Modern** | Скорость загрузки и отдачи с автомасштабом графика, Wi-Fi сеть и сигнал, IP-адреса (скрыты, пока не кликнуть), брандмауэр, счётчики трафика |
 | **Drives Meter Modern** | Физические диски с разделами, состояние SMART, остаток ресурса SSD, температуру, скорость чтения/записи, график активности |
 
@@ -94,7 +94,7 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 | Для чего | Что сделать |
 |---|---|
 | Температура процессора | Установите [Core Temp](https://www.alcpu.com/CoreTemp/) и держите запущенным (может стартовать с Windows). Клик по «нет Core Temp» на гаджете запускает его, а если он не установлен — открывает страницу загрузки. |
-| Температура, вентилятор и мощность AMD/Intel | Запустите [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases). Картам NVIDIA он не нужен. |
+| Температура встроенной графики, ватты AMD/Intel | Дискретные видеокарты сами сообщают температуру, вентилятор, частоты и мощность (в % от лимита). Встроенная графика часто не сообщает температуру — её добавит запущенный [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases). Картам NVIDIA он не нужен. |
 | Ресурс и температура SSD | Настройки Drives Meter → **Ресурс и температура SSD** → **Включить**, затем подтвердите запрос администратора. Это добавит задачу Планировщика «ModernMeters Disk Health». Она опрашивает SSD раз в 5 минут, а жёсткие диски не трогает, чтобы они могли спать. **Выключить** удаляет её. |
 
 ## Обращения в интернет

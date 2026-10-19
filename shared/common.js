@@ -65,6 +65,7 @@ var STRINGS = {
         stopped: "stopped", na: "n/a", mem: "mem", enc: "Enc", dec: "Dec", driver: "Driver",
         waiting: "waiting for data…", nodata: "no data", smiMissing: "nvidia-smi not found",
         counters: "Windows counters", lhm: "sensors: LHM", noSensors: "no temp sensors",
+        winSensors: "sensors: Windows", ofLimit: "of limit", noGpu: "no graphics card found", sharedShort: "Shared",
         ctHint: "CPU temperatures come from Core Temp. Click to download it, then keep it running (it can start with Windows).",
         ctNotRunning: "Core Temp not running ›",
         ctStart: "CPU temperatures come from Core Temp. Click to start it (or to download it if it isn't installed). In Core Temp, Options → Settings → \"Start Core Temp with Windows\" keeps it running.",
@@ -97,6 +98,10 @@ var STRINGS = {
         counters: "счётчики Windows",
         lhm: "датчики: LHM",
         noSensors: "нет датчиков t°",
+        winSensors: "датчики: Windows",
+        ofLimit: "от лимита",
+        noGpu: "видеокарта не найдена",
+        sharedShort: "Общая",
         ctHint: "Температуру процессора даёт Core Temp. Нажмите, чтобы скачать, и держите его запущенным (может стартовать с Windows).",
         ctNotRunning: "Core Temp не запущен ›",
         ctStart: "Температуру процессора даёт Core Temp. Нажмите, чтобы запустить его (или скачать, если он не установлен). В Core Temp: Options → Settings → «Start Core Temp with Windows» — и он будет запускаться сам.",
@@ -407,6 +412,25 @@ function setHint(el, tip, action) {
     el.title = action ? tip : "";
     el.style.cursor = action ? "hand" : "default";
     el.onclick = !action ? null : (typeof action == "function" ? action : function () { openUrl(action); });
+}
+
+// Registers a COM-visible .NET 4 class from <assembly>.dll in this gadget's folder for the
+// current user (no admin needed), so new ActiveXObject(cls) works here and in helper scripts
+function registerDotNet(clsid, cls, assembly) {
+    var shell = new ActiveXObject("WScript.Shell");
+    var keyCls = "HKCU\\Software\\Classes\\" + cls + "\\";
+    var keyId = "HKCU\\Software\\Classes\\CLSID\\" + clsid + "\\";
+    var inproc = keyId + "InprocServer32\\";
+    shell.RegWrite(keyCls, cls, "REG_SZ");
+    shell.RegWrite(keyCls + "CLSID\\", clsid, "REG_SZ");
+    shell.RegWrite(keyId, cls, "REG_SZ");
+    shell.RegWrite(keyId + "ProgId\\", cls, "REG_SZ");
+    shell.RegWrite(inproc, "mscoree.dll", "REG_SZ");
+    shell.RegWrite(inproc + "ThreadingModel", "Both", "REG_SZ");
+    shell.RegWrite(inproc + "Class", cls, "REG_SZ");
+    shell.RegWrite(inproc + "Assembly", assembly + ", Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "REG_SZ");
+    shell.RegWrite(inproc + "RuntimeVersion", "v4.0.30319", "REG_SZ");
+    shell.RegWrite(inproc + "CodeBase", "file:///" + System.Gadget.path.replace(/\\/g, "/") + "/" + assembly + ".dll", "REG_SZ");
 }
 
 function openUrl(url) {
