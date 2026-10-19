@@ -1,0 +1,33 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Settings</title>
+<style>
+/* The Sidebar's settings dialog doesn't scroll and caps its height, so the page scrolls itself */
+body { width: 300px; margin: 0; padding: 0; font-family: 'Segoe UI'; font-size: 12px; }
+#scroll { width: 300px; overflow-x: hidden; overflow-y: auto; }
+#inner { padding: 6px 4px; }
+/* Fixed layout: labels get their own column and wrap, selects take the rest (quirks mode also
+   needs the font repeated on the table) */
+table { border-collapse: collapse; width: 100%; table-layout: fixed; font-family: 'Segoe UI'; font-size: 14px; }
+td { padding: 3px 2px; }
+td.k { color: #444; }
+td.sec { color: #1a6fb0; font-weight: bold; padding-top: 10px; border-bottom: 1px solid #dde3ea; }
+select { width: 100%; font-family: 'Segoe UI'; font-size: 13px; }
+select.withPlay { width: 112px; }
+button { margin-left: 3px; width: 24px; font-family: 'Segoe UI Symbol','Segoe UI'; font-size: 10px; }
+td.info { white-space: nowrap; }
+button.act { width: auto; margin: 0 4px 0 0; padding: 0 8px; font-family: 'Segoe UI'; font-size: 11px; }
+#note { color: #777; font-size: 12px; padding-top: 10px; }
+</style>
+<script type="text/javascript" src="defaults.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<script type="text/javascript" src="settings.js"></script>
+</head>
+<body onload="settingsInit()">
+<div id="scroll"><div id="inner">
+<table id="form"><colgroup><col width="122"><col></colgroup></table>
+<div id="note"></div>
+</div></div>
+</body>
+</html>

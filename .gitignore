@@ -1,0 +1,11 @@
+# Build output (build.ps1)
+dist/
+*_Modern.gadget/img/
+*_Modern.gadget/icon.png
+*_Modern.gadget/ModernMetersCoreTemp.dll
+
+# Copied from shared/ by build.ps1
+*_Modern.gadget/common.js
+*_Modern.gadget/settings.js
+*_Modern.gadget/settings.html
+*_Modern.gadget/flyout.html

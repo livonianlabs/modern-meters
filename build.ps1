@@ -1,0 +1,56 @@
+# Assembles the gadgets, packs them into dist\*.gadget and (with -Install) copies them into the
+# per-user Sidebar gadgets folder so they appear in the gadget gallery.
+# $Version is the single version number: it goes into every gadget.xml and into common.js, which
+# compares it with the latest GitHub release.
+param([switch]$Install)
+$ErrorActionPreference = 'Stop'
+$Version = '1.0.0'
+$root = $PSScriptRoot
+$names = 'CPU_Meter_Modern.gadget', 'GPU_Meter_Modern.gadget', 'Network_Meter_Modern.gadget', 'Drives_Meter_Modern.gadget'
+$utf8 = New-Object System.Text.UTF8Encoding $false
+$utf8Bom = New-Object System.Text.UTF8Encoding $true
+
+function Set-Text($path, $pattern, $replacement) {
+    $text = [IO.File]::ReadAllText($path)
+    [IO.File]::WriteAllText($path, ($text -replace $pattern, $replacement), $utf8)
+}
+
+& (Join-Path $root 'tools\make-images.ps1') -Root $root | Out-Null
+
+# Core Temp reader for CPU Meter (csc.exe of .NET Framework 4 ships with Windows)
+$csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+if (-not (Test-Path $csc)) { $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe' }
+& $csc /nologo /target:library /optimize "/out:$(Join-Path $root 'CPU_Meter_Modern.gadget\ModernMetersCoreTemp.dll')" (Join-Path $root 'tools\coretemp\CoreTempReader.cs')
+if ($LASTEXITCODE) { throw "csc failed" }
+
+Set-Text (Join-Path $root 'shared\common.js') 'var VERSION = "[^"]*";' "var VERSION = `"$Version`";"
+foreach ($n in $names) {
+    $dir = Join-Path $root $n
+    Set-Text (Join-Path $dir 'gadget.xml') '<version>[^<]*</version>' "<version>$Version</version>"
+    Copy-Item (Join-Path $root 'shared\*') $dir -Force
+    # The Sidebar reads HTML without a BOM as ANSI, which garbles Cyrillic
+    Get-ChildItem $dir -Filter *.html | ForEach-Object {
+        $text = [IO.File]::ReadAllText($_.FullName)
+        [IO.File]::WriteAllText($_.FullName, $text, $utf8Bom)
+    }
+}
+
+$dist = Join-Path $root 'dist'
+New-Item -ItemType Directory -Force $dist | Out-Null
+Copy-Item (Join-Path $root 'README.md') $dist -Force
+foreach ($n in $names) {
+    $zip = Join-Path $dist ($n -replace '\.gadget$', '.zip')
+    Compress-Archive -Path (Join-Path $root "$n\*") -DestinationPath $zip -Force
+    Move-Item $zip (Join-Path $dist $n) -Force
+}
+
+if ($Install) {
+    $target = Join-Path $env:LOCALAPPDATA 'Microsoft\Windows Sidebar\Gadgets'
+    foreach ($n in $names) {
+        $dst = Join-Path $target $n
+        New-Item -ItemType Directory -Force $dst | Out-Null
+        Copy-Item (Join-Path $root "$n\*") $dst -Recurse -Force
+    }
+    "Installed to $target"
+}
+"Version $Version, packages: $dist"
