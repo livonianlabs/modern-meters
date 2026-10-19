@@ -2,7 +2,7 @@
 <gadget>
   <name>GPU Meter Modern</name>
   <namespace>ModernMeters</namespace>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <author name="Silverenio">
     <info url="https://github.com/Silverenio/modern-meters" text="github.com/Silverenio/modern-meters" />
     <logo src="icon.png" />

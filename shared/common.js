@@ -664,7 +664,7 @@ function cimDate(s) {
 // %APPDATA%\ModernMeters\update.txt, where the others pick it up. A newer version only shows a
 // line linking to its release page; nothing is downloaded.
 
-var VERSION = "1.0.0";   // set by build.ps1
+var VERSION = "1.1.0";   // set by build.ps1
 var REPO = "Silverenio/modern-meters";
 var KOFI_URL = "https://ko-fi.com/silverenio";
 var UPDATE_EVERY = 24 * 3600 * 1000;
