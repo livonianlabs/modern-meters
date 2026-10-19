@@ -11,6 +11,24 @@ Four desktop gadgets for the Windows Sidebar from 8GadgetPack:
 
 All of them have English and Russian, five widths, accent colors, and a five-step color scale for load and temperature.
 
+### Glass style
+
+<table><tr valign="top">
+<td><img src="docs/cpu-glass.png" width="200" alt="CPU Meter, glass"></td>
+<td><img src="docs/gpu-glass.png" width="200" alt="GPU Meter, glass"></td>
+<td><img src="docs/network-glass.png" width="200" alt="Network Meter, glass"></td>
+<td><img src="docs/drives-glass.png" width="200" alt="Drives Meter, glass"></td>
+</tr></table>
+
+### Classic style
+
+<table><tr valign="top">
+<td><img src="docs/cpu-classic.png" width="200" alt="CPU Meter, classic"></td>
+<td><img src="docs/gpu-classic.png" width="200" alt="GPU Meter, classic"></td>
+<td><img src="docs/network-classic.png" width="200" alt="Network Meter, classic"></td>
+<td><img src="docs/drives-classic.png" width="200" alt="Drives Meter, classic"></td>
+</tr></table>
+
 ## Install
 
 1. Install [8GadgetPack](https://8gadgetpack.net/) if you don't have the Sidebar yet.
@@ -54,7 +72,7 @@ Run `build.ps1` in PowerShell. It draws the images, compiles the small Core Temp
 | **Network Meter Modern** | Скорость загрузки и отдачи с автомасштабом графика, Wi-Fi сеть и сигнал, IP-адреса (скрыты, пока не кликнуть), брандмауэр, счётчики трафика |
 | **Drives Meter Modern** | Физические диски с разделами, состояние SMART, остаток ресурса SSD, температуру, скорость чтения/записи, график активности |
 
-У всех есть английский и русский язык, пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры.
+У всех есть английский и русский язык, пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: стиль «Стекло» и классический.
 
 ## Установка
 
