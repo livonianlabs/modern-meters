@@ -78,7 +78,9 @@ function aboutRows() {
         // Only shows a link on the gadget; nothing is downloaded
         { key: "updates", label: { en: "New versions", ru: "Новые версии" }, options: [
             ["on", { en: "Let me know", ru: "Сообщать" }],
-            ["off", { en: "Don't check", ru: "Не проверять" }]] }
+            ["off", { en: "Don't check", ru: "Не проверять" }]] },
+        { label: { en: "Like them?", ru: "Нравятся?" }, buttons: [
+            { label: { en: "☕ Buy me a coffee", ru: "☕ Угостить кофе" }, run: function () { openUrl(KOFI_URL); } }] }
     ];
 }
 

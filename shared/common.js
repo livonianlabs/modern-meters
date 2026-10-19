@@ -406,8 +406,11 @@ function setHint(el, tip, action) {
     el._action = action;
     el.title = action ? tip : "";
     el.style.cursor = action ? "hand" : "default";
-    el.onclick = !action ? null : (typeof action == "function" ? action :
-        function () { try { new ActiveXObject("WScript.Shell").Run(action); } catch (e) { } });
+    el.onclick = !action ? null : (typeof action == "function" ? action : function () { openUrl(action); });
+}
+
+function openUrl(url) {
+    try { new ActiveXObject("WScript.Shell").Run(url); } catch (e) { }
 }
 
 var CORETEMP_URL = "https://www.alcpu.com/CoreTemp/";
@@ -639,6 +642,7 @@ function cimDate(s) {
 
 var VERSION = "1.0.0";   // set by build.ps1
 var REPO = "Silverenio/modern-meters";
+var KOFI_URL = "https://ko-fi.com/silverenio";
 var UPDATE_EVERY = 24 * 3600 * 1000;
 var updates = { timer: null, req: null, sent: 0, shown: false };
 

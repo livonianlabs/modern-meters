@@ -1,5 +1,7 @@
 # Modern Meters
 
+[![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/silverenio)
+
 Four desktop gadgets for the Windows Sidebar from 8GadgetPack:
 
 | Gadget | Shows |
@@ -55,6 +57,10 @@ Everything works without them. They add data that Windows only gives to drivers 
 
 Run `build.ps1` in PowerShell. It draws the images, compiles the small Core Temp reader (`tools/coretemp`, with the C# compiler that comes with Windows), and puts the packages in `dist`. `build.ps1 -Install` also copies the gadgets into your Sidebar.
 
+## Support
+
+The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https://ko-fi.com/silverenio). It's also in every gadget's settings under **About**.
+
 ## License
 
 [MIT](LICENSE) © 2026 Silverenio
@@ -99,6 +105,10 @@ Run `build.ps1` in PowerShell. It draws the images, compiles the small Core Temp
 ## Сборка из исходников
 
 Запустите `build.ps1` в PowerShell. Он нарисует картинки, скомпилирует маленькую библиотеку для чтения Core Temp (`tools/coretemp`, компилятором C#, который есть в Windows) и положит пакеты в `dist`. `build.ps1 -Install` заодно установит гаджеты в боковую панель.
+
+## Поддержать
+
+Гаджеты бесплатные. Если они вам нравятся, можно [угостить меня кофе на Ko-fi](https://ko-fi.com/silverenio). Эта же ссылка есть в настройках каждого гаджета, в разделе **О гаджете**.
 
 ## Лицензия
 

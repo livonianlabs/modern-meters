@@ -18,10 +18,16 @@ function Set-Text($path, $pattern, $replacement) {
 & (Join-Path $root 'tools\make-images.ps1') -Root $root | Out-Null
 
 # Core Temp reader for CPU Meter (csc.exe of .NET Framework 4 ships with Windows)
-$csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
-if (-not (Test-Path $csc)) { $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe' }
-& $csc /nologo /target:library /optimize "/out:$(Join-Path $root 'CPU_Meter_Modern.gadget\ModernMetersCoreTemp.dll')" (Join-Path $root 'tools\coretemp\CoreTempReader.cs')
-if ($LASTEXITCODE) { throw "csc failed" }
+# Rebuilt only when the source changes: every build gets a new timestamp, and the Sidebar keeps
+# the installed copy locked while CPU Meter runs
+$dll = Join-Path $root 'CPU_Meter_Modern.gadget\ModernMetersCoreTemp.dll'
+$cs = Join-Path $root 'tools\coretemp\CoreTempReader.cs'
+if (-not (Test-Path $dll) -or (Get-Item $cs).LastWriteTime -gt (Get-Item $dll).LastWriteTime) {
+    $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+    if (-not (Test-Path $csc)) { $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe' }
+    & $csc /nologo /target:library /optimize "/out:$dll" $cs
+    if ($LASTEXITCODE) { throw "csc failed" }
+}
 
 Set-Text (Join-Path $root 'shared\common.js') 'var VERSION = "[^"]*";' "var VERSION = `"$Version`";"
 foreach ($n in $names) {
@@ -49,7 +55,14 @@ if ($Install) {
     foreach ($n in $names) {
         $dst = Join-Path $target $n
         New-Item -ItemType Directory -Force $dst | Out-Null
-        Copy-Item (Join-Path $root "$n\*") $dst -Recurse -Force
+        Copy-Item (Join-Path $root "$n\*") $dst -Recurse -Force -Exclude '*.dll'
+        # A DLL in use can't be replaced, so only copy it when it differs
+        Get-ChildItem (Join-Path $root $n) -Filter *.dll | ForEach-Object {
+            $to = Join-Path $dst $_.Name
+            if (-not (Test-Path $to) -or (Get-FileHash $_.FullName).Hash -ne (Get-FileHash $to).Hash) {
+                try { Copy-Item $_.FullName $to -Force } catch { Write-Warning "$($_.Exception.Message) Close the Sidebar and run again." }
+            }
+        }
     }
     "Installed to $target"
 }
