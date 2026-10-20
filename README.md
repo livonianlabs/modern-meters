@@ -2,7 +2,7 @@
 
 [![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/silverenio)
 
-Four desktop gadgets for the Windows Sidebar from 8GadgetPack:
+Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
 
 | Gadget | Shows |
 |---|---|
@@ -10,31 +10,34 @@ Four desktop gadgets for the Windows Sidebar from 8GadgetPack:
 | **GPU Meter Modern** | GPU load, VRAM, memory controller or shared memory, power, fan, clocks, encoder/decoder, temperature, history graph. NVIDIA, AMD and Intel, discrete and integrated, with the same sensors Task Manager uses |
 | **Network Meter Modern** | Download and upload speed with an auto-scaled graph, Wi-Fi network and signal, IP addresses (hidden until clicked), firewall, traffic totals |
 | **Drives Meter Modern** | Physical disks with their partitions, SMART health, SSD life left, temperature, read/write speed, activity graph |
+| **Weather Meter Modern** | Current weather and a colored hourly chart of temperature, precipitation, wind or pressure (switched by tabs), 3 or 5 days ahead. Follows you from town to town through Windows location |
 
 All of them have English and Russian, five widths, accent colors, and a five-step color scale for load and temperature.
 
 ### Glass style
 
 <table><tr valign="top">
-<td><img src="docs/cpu-glass.png" width="200" alt="CPU Meter, glass"></td>
-<td><img src="docs/gpu-glass.png" width="200" alt="GPU Meter, glass"></td>
-<td><img src="docs/network-glass.png" width="200" alt="Network Meter, glass"></td>
-<td><img src="docs/drives-glass.png" width="200" alt="Drives Meter, glass"></td>
+<td><img src="docs/cpu-glass.png" width="160" alt="CPU Meter, glass"></td>
+<td><img src="docs/gpu-glass.png" width="160" alt="GPU Meter, glass"></td>
+<td><img src="docs/network-glass.png" width="160" alt="Network Meter, glass"></td>
+<td><img src="docs/drives-glass.png" width="160" alt="Drives Meter, glass"></td>
+<td><img src="docs/weather-glass.png" width="160" alt="Weather Meter, glass"></td>
 </tr></table>
 
 ### Classic style
 
 <table><tr valign="top">
-<td><img src="docs/cpu-classic.png" width="200" alt="CPU Meter, classic"></td>
-<td><img src="docs/gpu-classic.png" width="200" alt="GPU Meter, classic"></td>
-<td><img src="docs/network-classic.png" width="200" alt="Network Meter, classic"></td>
-<td><img src="docs/drives-classic.png" width="200" alt="Drives Meter, classic"></td>
+<td><img src="docs/cpu-classic.png" width="160" alt="CPU Meter, classic"></td>
+<td><img src="docs/gpu-classic.png" width="160" alt="GPU Meter, classic"></td>
+<td><img src="docs/network-classic.png" width="160" alt="Network Meter, classic"></td>
+<td><img src="docs/drives-classic.png" width="160" alt="Drives Meter, classic"></td>
+<td><img src="docs/weather-classic.png" width="160" alt="Weather Meter, classic"></td>
 </tr></table>
 
 ## Install
 
 1. Install [8GadgetPack](https://8gadgetpack.net/) if you don't have the Sidebar yet.
-2. Download the `.gadget` files from [Releases](https://github.com/Silverenio/modern-meters/releases/latest) and double-click each one you want. You don't need all four.
+2. Download the `.gadget` files from [Releases](https://github.com/Silverenio/modern-meters/releases/latest) and double-click each one you want. You don't need all five.
 3. Right-click the desktop → **Gadgets**, and drag the gadget onto the desktop.
 4. Settings: hover over the gadget and click the wrench icon.
 
@@ -55,6 +58,7 @@ Everything works without them. They add data that Windows only gives to drivers 
 ## Network access
 
 - Network Meter looks up your external IP at api.ipify.org every 30 minutes and when the network changes. You can switch this off in its settings.
+- Weather Meter gets the forecast from [Open-Meteo](https://open-meteo.com/) every 30 minutes. In Auto mode it asks the Windows location service where you are (Settings → Privacy → Location; if that's off, it uses your IP address via get.geojs.io) and gets the place name from OpenStreetMap. Coordinates are rounded to about 1 km before they leave your PC. Pick a city by clicking the place name to turn all of this off.
 - Once a day one of the gadgets asks GitHub whether a newer release exists. If so, a "New version ›" line appears at the bottom of the gadgets and opens the release page. Nothing is downloaded or installed by itself. Settings → **About** → **New versions** → **Don't check** turns this off.
 
 ## Building from source
@@ -73,7 +77,7 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 
 # Modern Meters (по-русски)
 
-Четыре гаджета для боковой панели Windows из 8GadgetPack:
+Пять гаджетов для боковой панели Windows из 8GadgetPack:
 
 | Гаджет | Что показывает |
 |---|---|
@@ -81,13 +85,14 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 | **GPU Meter Modern** | Загрузку GPU, видеопамять, контроллер памяти или общую память, мощность, вентилятор, частоты, кодер/декодер, температуру, график. NVIDIA, AMD и Intel, дискретные и встроенные, по тем же датчикам, что и Диспетчер задач |
 | **Network Meter Modern** | Скорость загрузки и отдачи с автомасштабом графика, Wi-Fi сеть и сигнал, IP-адреса (скрыты, пока не кликнуть), брандмауэр, счётчики трафика |
 | **Drives Meter Modern** | Физические диски с разделами, состояние SMART, остаток ресурса SSD, температуру, скорость чтения/записи, график активности |
+| **Weather Meter Modern** | Погоду сейчас и цветной почасовой график температуры, осадков, ветра или давления (вкладки), прогноз на 3 или 5 дней. Следует за вами из города в город через определение местоположения Windows |
 
 У всех есть английский и русский язык, пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: стиль «Стекло» и классический.
 
 ## Установка
 
 1. Установите [8GadgetPack](https://8gadgetpack.net/), если боковой панели ещё нет.
-2. Скачайте `.gadget`-файлы со страницы [Releases](https://github.com/Silverenio/modern-meters/releases/latest) и дважды щёлкните каждый нужный. Ставить все четыре не обязательно.
+2. Скачайте `.gadget`-файлы со страницы [Releases](https://github.com/Silverenio/modern-meters/releases/latest) и дважды щёлкните каждый нужный. Ставить все пять не обязательно.
 3. Правый клик по рабочему столу → **Гаджеты**, перетащите гаджет на рабочий стол.
 4. Настройки: наведите мышь на гаджет и нажмите на значок гаечного ключа.
 
@@ -108,6 +113,7 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 ## Обращения в интернет
 
 - Network Meter узнаёт внешний IP у api.ipify.org раз в 30 минут и при смене сети. Это отключается в его настройках.
+- Weather Meter раз в 30 минут берёт прогноз у [Open-Meteo](https://open-meteo.com/). В режиме «Авто» он спрашивает у службы местоположения Windows, где вы (Параметры → Конфиденциальность → Расположение; если она выключена — определяет по IP через get.geojs.io), а название места берёт у OpenStreetMap. Координаты перед отправкой округляются примерно до 1 км. Если выбрать город кликом по названию места, всё это отключается.
 - Раз в сутки один из гаджетов спрашивает у GitHub, не вышла ли новая версия. Если вышла, внизу гаджетов появляется строка «Новая версия ›», которая открывает страницу выпуска. Сами гаджеты ничего не скачивают и не устанавливают. Отключается в настройках: **О гаджете** → **Новые версии** → **Не проверять**.
 
 ## Сборка из исходников

@@ -543,7 +543,9 @@ function drawChart() {
     else { base = lo - 2; span = Math.max(hi - lo + 3, 6); }
     var yOf = function (val) { return top + gh - Math.round(clamp((val - base) / span, 0, 1) * gh); };
 
-    rect(box0, 0, top + gh, IW, 1, THEME.sep);
+    // Plot background with quarter lines, like the graphs of the other gadgets
+    var plot = rect(box0, 0, top, IW, gh, THEME.plot);
+    for (i = 1; i < 4; i++) rect(plot, 0, Math.round(gh * i / 4), IW, 1, THEME.grid);
     for (i = 0; i < n; i++) {
         v = vals[i];
         var x = x0 + i * bw, yy = yOf(v), color;
@@ -565,7 +567,7 @@ function drawChart() {
             color = scale(TEMP_COLORS, v);
         }
         var bar = rect(box0, x, yy, bw - gap, top + gh - yy, color);
-        if (THEME.glass) gradient(bar, color, mix(color, THEME.panel, 0.6));
+        if (THEME.glass) gradient(bar, color, mix(color, THEME.plot, 0.6));
     }
 
     // Range or total in the top corner
