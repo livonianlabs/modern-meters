@@ -264,7 +264,7 @@ function pickProvider() {
 // ---- layout ---------------------------------------------------------------
 
 function readSettings() {
-    LANG = getSetting("lang");
+    LANG = langCode(getSetting("lang"));
     applyTheme(getSetting("theme"));
     W = parseInt(getSetting("width"), 10);
     IW = W - 2 * PAD;

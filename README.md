@@ -12,7 +12,7 @@ Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
 | **Drives Meter Modern** | Physical disks with their partitions, SMART health, SSD life left, temperature, read/write speed, activity graph |
 | **Weather Meter Modern** | Current weather and a colored hourly chart of temperature, precipitation, wind or pressure (switched by tabs), 3 or 5 days ahead. Follows you from town to town through Windows location |
 
-All of them have English and Russian, five widths, accent colors, and a five-step color scale for load and temperature.
+All of them speak 12 languages (English, Українська, Русский, Deutsch, Español, Français, Italiano, Polski, Português, Türkçe, 中文, 日本語) and pick yours from Windows, and have five widths, accent colors, and a five-step color scale for load and temperature. Translations live in `shared/lang/`, one file per language; corrections are welcome.
 
 ### Glass style
 
@@ -87,7 +87,7 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 | **Drives Meter Modern** | Физические диски с разделами, состояние SMART, остаток ресурса SSD, температуру, скорость чтения/записи, график активности |
 | **Weather Meter Modern** | Погоду сейчас и цветной почасовой график температуры, осадков, ветра или давления (вкладки), прогноз на 3 или 5 дней. Следует за вами из города в город через определение местоположения Windows |
 
-У всех есть английский и русский язык, пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: стиль «Стекло» и классический.
+У всех 12 языков (английский, украинский, русский, немецкий, испанский, французский, итальянский, польский, португальский, турецкий, китайский, японский), язык берётся из Windows; пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: стиль «Стекло» и классический.
 
 ## Установка
 

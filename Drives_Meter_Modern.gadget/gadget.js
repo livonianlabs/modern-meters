@@ -18,7 +18,7 @@ addStrings({
         dModel: "Model", dSerial: "Serial number", dFirmware: "Firmware", dBus: "Interface", dType: "Type",
         dCapacity: "Capacity", dSector: "Sector size", dDiskNo: "Disk number", dHealthSec: "Health",
         dHealth: "SMART status", dLife: "Life left", dTemp: "Temperature", dHours: "Powered on",
-        dVolumes: "Partitions", hoursUnit: "h", ofTotal: "free of"
+        dVolumes: "Partitions", hoursUnit: "h"
     },
     ru: {
         healthy: "Исправен", warning: "Внимание", unhealthy: "Отказ", unknown: "Неизвестно",
@@ -31,7 +31,7 @@ addStrings({
         dModel: "Модель", dSerial: "Серийный номер", dFirmware: "Прошивка", dBus: "Интерфейс", dType: "Тип",
         dCapacity: "Ёмкость", dSector: "Размер сектора", dDiskNo: "Номер диска", dHealthSec: "Состояние",
         dHealth: "SMART", dLife: "Остаток ресурса", dTemp: "Температура", dHours: "Наработка",
-        dVolumes: "Разделы", hoursUnit: "ч", ofTotal: "свободно из"
+        dVolumes: "Разделы", hoursUnit: "ч"
     }
 });
 
@@ -152,7 +152,7 @@ function diskDetails(d) {
     for (var i = 0; i < d.letters.length; i++) {
         var v = lastVols[d.letters[i]];
         if (v) vols.push([d.letters[i] + " " + v.label.replace(/\s*\(\w\)$/, ""),
-            fmtBytes(v.free) + " " + T("ofTotal") + " " + fmtBytes(v.size) + (v.fs ? " · " + v.fs : "")]);
+            T("freeOf").replace("{f}", fmtBytes(v.free)).replace("{t}", fmtBytes(v.size)) + (v.fs ? " · " + v.fs : "")]);
     }
     return [
         { title: d.name, rows: [
@@ -176,7 +176,7 @@ function diskDetails(d) {
 // ---- layout ---------------------------------------------------------------
 
 function readSettings() {
-    LANG = getSetting("lang");
+    LANG = langCode(getSetting("lang"));
     applyTheme(getSetting("theme"));
     W = parseInt(getSetting("width"), 10);
     IW = W - 2 * PAD;

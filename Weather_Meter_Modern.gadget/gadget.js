@@ -127,7 +127,7 @@ function parseJson(text) {
 // ---- settings ----------------------------------------------------------------
 
 function readSettings() {
-    LANG = getSetting("lang");
+    LANG = langCode(getSetting("lang"));
     applyTheme(getSetting("theme"));
     W = parseInt(getSetting("width"), 10);
     IW = W - 2 * PAD;
@@ -139,7 +139,7 @@ function readSettings() {
     tUnit = getSetting("unit");
     wUnit = getSetting("wind");
     pUnit = getSetting("pressure");
-    if (pUnit == "auto") pUnit = LANG == "ru" ? "mmhg" : "hpa";
+    if (pUnit == "auto") pUnit = LANG == "ru" || LANG == "uk" ? "mmhg" : "hpa";
     showMap = getSetting("map") != "off";
     tab = getSetting("tab");
     if (tab == "map" && !showMap) tab = "temp";
@@ -433,15 +433,22 @@ function rebuild() {
     setHint(ui.time, "Weather data by Open-Meteo.com (CC BY 4.0)", "https://open-meteo.com/");
     y += 20;
 
-    // Tabs, as wide as their names (five short words barely fit 146 px)
+    // Tabs as wide as their names plus an equal share of the rest; a smaller font when the
+    // names of this language don't fit side by side
     var tabs = [["temp", "tabTemp"], ["rain", "tabRain"], ["wind", "tabWind"], ["press", "tabPress"]];
     if (showMap) tabs.push(["map", "tabMap"]);
-    var chars = 0, tx = PAD;
-    for (var i = 0; i < tabs.length; i++) chars += T(tabs[i][1]).length + 2;
+    var fs = narrow ? 9 : 10, widths, sum, tx = PAD, i;
+    for (; ; fs--) {
+        widths = [];
+        sum = 0;
+        for (i = 0; i < tabs.length; i++) { widths.push(textWidth(T(tabs[i][1]), fs, true)); sum += widths[i]; }
+        if (sum + 2 * tabs.length <= IW || fs <= 7) break;
+    }
+    var spare = Math.max(0, IW - sum) / tabs.length;
     ui.tabs = [];
     for (i = 0; i < tabs.length; i++) {
-        var tw = i == tabs.length - 1 ? PAD + IW - tx : Math.round(IW * (T(tabs[i][1]).length + 2) / chars);
-        var t = label(root, tx, y, tw, narrow ? 9 : 10, THEME.faint, "center", true);
+        var tw = i == tabs.length - 1 ? PAD + IW - tx : Math.round(widths[i] + spare);
+        var t = label(root, tx, y, tw, fs, THEME.faint, "center", true);
         setText(t, T(tabs[i][1]));
         t.style.cursor = "hand";
         t.onclick = (function (key) { return function () { setSetting("tab", key); tab = key; drawTabs(); drawChart(); }; })(tabs[i][0]);

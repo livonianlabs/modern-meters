@@ -117,13 +117,54 @@ var STRINGS = {
 
 // Gadget-specific strings: { en: {...}, ru: {...} }
 function addStrings(table) {
-    for (var lang in table)
+    for (var lang in table) {
+        if (!STRINGS[lang]) STRINGS[lang] = {};
         for (var k in table[lang]) STRINGS[lang][k] = table[lang][k];
+    }
 }
 
 function T(key) {
     var s = (STRINGS[LANG] || STRINGS.en)[key];
     return s == null ? STRINGS.en[key] : s;
+}
+
+// More languages come from lang/<code>.js, one file each: the T() strings of all gadgets plus
+// the settings page phrases, keyed by their English text ("Alarm %d": %d stands for a number).
+// A string a file leaves out shows in English.
+var LANGUAGES = [["en", "English"], ["ru", "Русский"]];
+var LANG_FILES = ["uk", "de", "es", "fr", "it", "pl", "pt", "tr", "zh", "ja"];
+var PHRASES = {};
+
+function addLanguage(code, name, strings, phrases) {
+    LANGUAGES.push([code, name]);
+    STRINGS[code] = STRINGS[code] || {};
+    for (var k in strings) STRINGS[code][k] = strings[k];
+    PHRASES[code] = phrases || {};
+}
+
+for (var li = 0; li < LANG_FILES.length; li++)
+    document.write("<script type='text/javascript' src='lang/" + LANG_FILES[li] + ".js'><\/script>");
+
+// The "lang" setting to a language code: "auto" follows the Windows display language
+function langCode(setting) {
+    var code = String(setting || "auto");
+    if (code == "auto") {
+        try { code = navigator.browserLanguage || navigator.userLanguage || "en"; } catch (e) { code = "en"; }
+    }
+    code = code.toLowerCase().substring(0, 2);   // pt-BR -> pt, zh-CN -> zh
+    return STRINGS[code] ? code : "en";
+}
+
+// A settings phrase { en, ru } in the current language: its own text, else the language file's
+// translation of the English text, matched as is or with its numbers as %d
+function phrase(v) {
+    if (typeof v == "string") return v;
+    if (v[LANG]) return v[LANG];
+    var table = PHRASES[LANG], en = String(v.en);
+    if (!table) return en;
+    if (table[en] != null) return table[en];
+    var nums = en.match(/\d+/g), pattern = table[en.replace(/\d+/g, "%d")], i = 0;
+    return pattern != null && nums ? pattern.replace(/%d/g, function () { return nums[i++]; }) : en;
 }
 
 // "used / total unit"; narrow gadgets drop the spaces around the slash, unitKey null drops the unit
@@ -217,6 +258,18 @@ function label(parent, x, y, w, size, color, align, bold) {
         ";text-align:" + (align || "left") + ";" +
         (bold ? "font-family:'Segoe UI Semibold','Segoe UI';" : ""));
     return d;
+}
+
+// Rendered width of a label's text, for layouts that depend on the language
+function textWidth(text, size, bold) {
+    var s = document.createElement("span");
+    s.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;font-size:" + size + "px;" +
+        (bold ? "font-family:'Segoe UI Semibold','Segoe UI';" : "");
+    s.innerText = text;
+    document.body.appendChild(s);
+    var w = s.offsetWidth;
+    document.body.removeChild(s);
+    return w;
 }
 
 function setText(el, s) {

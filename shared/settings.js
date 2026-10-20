@@ -4,7 +4,8 @@
 
 var OPT = {
     onOff: [["on", { en: "On", ru: "Вкл" }], ["off", { en: "Off", ru: "Выкл" }]],
-    lang: [["en", "English"], ["ru", "Русский"]],
+    // Auto, then every language with a file in lang/ (see LANGUAGES in common.js)
+    lang: [["auto", { en: "Auto (as Windows)", ru: "Авто (как в Windows)" }]].concat(LANGUAGES),
     accent: [
         ["blue", { en: "Blue", ru: "Голубой" }], ["teal", { en: "Teal", ru: "Бирюзовый" }],
         ["green", { en: "Green", ru: "Зелёный" }], ["purple", { en: "Purple", ru: "Фиолетовый" }],
@@ -88,7 +89,7 @@ var rows;
 var SETTINGS_MAX_H = 390;
 
 function tr(v) {
-    return typeof v == "string" ? v : (v[LANG] || v.en);
+    return phrase(v);
 }
 
 function selected(key) {
@@ -97,7 +98,7 @@ function selected(key) {
 }
 
 function settingsInit() {
-    LANG = getSetting("lang");
+    LANG = langCode(getSetting("lang"));
     rows = settingsSpec().concat(aboutRows());
     var table = $("form");
     for (var i = 0; i < rows.length; i++) {
@@ -144,7 +145,7 @@ function settingsInit() {
         }
     }
     $("lang").onchange = function () {
-        LANG = selected("lang");
+        LANG = langCode(selected("lang"));
         relabel();
     };
     relabel();

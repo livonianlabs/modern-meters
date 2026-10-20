@@ -1,5 +1,5 @@
 var DEFAULTS = {
-    lang: "en",
+    lang: "auto",
     updates: "on",
     theme: "classic",
     accent: "teal",

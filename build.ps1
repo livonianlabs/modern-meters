@@ -39,7 +39,7 @@ Set-Text (Join-Path $root 'shared\common.js') 'var VERSION = "[^"]*";' "var VERS
 foreach ($n in $names) {
     $dir = Join-Path $root $n
     Set-Text (Join-Path $dir 'gadget.xml') '<version>[^<]*</version>' "<version>$Version</version>"
-    Copy-Item (Join-Path $root 'shared\*') $dir -Force
+    Copy-Item (Join-Path $root 'shared\*') $dir -Recurse -Force
     # The Sidebar reads HTML without a BOM as ANSI, which garbles Cyrillic
     Get-ChildItem $dir -Filter *.html | ForEach-Object {
         $text = [IO.File]::ReadAllText($_.FullName)
