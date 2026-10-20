@@ -59,8 +59,8 @@ addLanguage("zh", "中文", {
     wx80: "阵雨", wx82: "强阵雨", wx85: "阵雪", wx95: "雷暴", wx96: "雷暴伴冰雹"
 }, {
     "Language": "语言", "Auto (as Windows)": "自动（同 Windows）", "Display": "外观", "Style": "样式",
-    "Classic (flat)": "经典（扁平）", "Glass": "玻璃", "Accent color": "强调色",
-    "Blue": "蓝色", "Teal": "青色", "Green": "绿色", "Purple": "紫色", "Orange": "橙色", "Pink": "粉色",
+    "Classic (flat)": "经典（扁平）", "Glass": "玻璃", "Colored glass": "彩色玻璃", "Light": "浅色", "Retro terminal": "复古终端", "Accent color": "强调色",
+    "Blue": "蓝色", "Teal": "青色", "Green": "绿色", "Purple": "紫色", "Orange": "橙色", "Pink": "粉色", "Red": "红色", "Yellow": "黄色",
     "Width": "宽度", "Classic (%d)": "经典 (%d)", "Medium (%d)": "中等 (%d)", "Wide (%d)": "宽 (%d)",
     "Wider (%d)": "更宽 (%d)", "Widest (%d)": "最宽 (%d)",
     "Graph": "图表", "Hidden": "隐藏", "Low": "低", "Medium": "中", "Tall": "高", "Huge": "特高",

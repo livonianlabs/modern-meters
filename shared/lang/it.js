@@ -59,8 +59,8 @@ addLanguage("it", "Italiano", {
     wx80: "Rovesci", wx82: "Forti rovesci", wx85: "Rovesci di neve", wx95: "Temporale", wx96: "Temporale con grandine"
 }, {
     "Language": "Lingua", "Auto (as Windows)": "Auto (come Windows)", "Display": "Aspetto", "Style": "Stile",
-    "Classic (flat)": "Classico (piatto)", "Glass": "Vetro", "Accent color": "Colore d'accento",
-    "Blue": "Blu", "Teal": "Turchese", "Green": "Verde", "Purple": "Viola", "Orange": "Arancione", "Pink": "Rosa",
+    "Classic (flat)": "Classico (piatto)", "Glass": "Vetro", "Colored glass": "Vetro colorato", "Light": "Chiaro", "Retro terminal": "Terminale retrò", "Accent color": "Colore d'accento",
+    "Blue": "Blu", "Teal": "Turchese", "Green": "Verde", "Purple": "Viola", "Orange": "Arancione", "Pink": "Rosa", "Red": "Rosso", "Yellow": "Giallo",
     "Width": "Larghezza", "Classic (%d)": "Classica (%d)", "Medium (%d)": "Media (%d)", "Wide (%d)": "Larga (%d)",
     "Wider (%d)": "Più larga (%d)", "Widest (%d)": "Larghissima (%d)",
     "Graph": "Grafico", "Hidden": "Nascosto", "Low": "Basso", "Medium": "Medio", "Tall": "Alto", "Huge": "Molto alto",

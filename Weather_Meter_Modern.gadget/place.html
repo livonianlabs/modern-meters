@@ -14,6 +14,11 @@ span.sub { color: #9aa3ad; font-size: 11px; }
 input { width: 168px; font-family: 'Segoe UI'; font-size: 12px; }
 button { font-family: 'Segoe UI'; font-size: 12px; }
 #status { color: #9aa3ad; padding: 3px 4px; }
+#box.light { color: #1d232b; }
+#box.light div.t, #box.light div.on { color: #e06c00; }
+#box.light div.t { border-bottom-color: #e1e6eb; }
+#box.light div.item:hover { background-color: #e6eaef; }
+#box.light span.sub, #box.light #status { color: #5d6773; }
 </style>
 <script type="text/javascript">
 // Location flyout of Weather Meter Modern: Auto, city search (Open-Meteo geocoding) and the
@@ -23,8 +28,12 @@ var req = null, poll = null;
 
 function init() {
     var s = G.placeState();
-    document.getElementById("box").className = s.glass ? "glass" : "";
-    document.body.style.backgroundColor = s.glass ? "#0f1a2c" : "#15181d";
+    var box = document.getElementById("box");
+    box.className = s.light ? "light" : (s.glass ? "glass" : "");
+    // Colors of the gadget's theme (the colored glass has its own)
+    box.style.backgroundColor = s.panel;
+    if (s.edge) box.style.borderColor = s.edge;
+    document.body.style.backgroundColor = s.panel;
     var h = "<div class='t'>" + G.esc(G.T("plTitle")) + "</div>";
     h += "<div class='item" + (s.mode != "pick" ? " on" : "") + "' onclick='G.useAuto()'>" +
         (s.mode != "pick" ? "● " : "○ ") + G.esc(G.T("plAuto")) +

@@ -59,8 +59,8 @@ addLanguage("ja", "日本語", {
     wx80: "にわか雨", wx82: "強いにわか雨", wx85: "にわか雪", wx95: "雷雨", wx96: "雷雨・ひょう"
 }, {
     "Language": "言語", "Auto (as Windows)": "自動（Windows と同じ）", "Display": "表示", "Style": "スタイル",
-    "Classic (flat)": "クラシック（フラット）", "Glass": "ガラス", "Accent color": "アクセントカラー",
-    "Blue": "ブルー", "Teal": "ティール", "Green": "グリーン", "Purple": "パープル", "Orange": "オレンジ", "Pink": "ピンク",
+    "Classic (flat)": "クラシック（フラット）", "Glass": "ガラス", "Colored glass": "カラーガラス", "Light": "ライト", "Retro terminal": "レトロ端末", "Accent color": "アクセントカラー",
+    "Blue": "ブルー", "Teal": "ティール", "Green": "グリーン", "Purple": "パープル", "Orange": "オレンジ", "Pink": "ピンク", "Red": "レッド", "Yellow": "イエロー",
     "Width": "幅", "Classic (%d)": "クラシック (%d)", "Medium (%d)": "中 (%d)", "Wide (%d)": "広い (%d)",
     "Wider (%d)": "より広い (%d)", "Widest (%d)": "最大 (%d)",
     "Graph": "グラフ", "Hidden": "非表示", "Low": "低", "Medium": "中", "Tall": "高", "Huge": "特大",

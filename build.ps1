@@ -17,14 +17,16 @@ function Set-Text($path, $pattern, $replacement) {
 
 & (Join-Path $root 'tools\make-images.ps1') -Root $root | Out-Null
 
-# .NET helpers: Core Temp reader for CPU Meter, D3DKMT sensor reader for GPU Meter (csc.exe of
+# .NET helpers: Core Temp reader for CPU Meter, D3DKMT sensor reader for GPU Meter, and the panel
+# painter for the colored themes, which every gadget gets through shared\ (csc.exe of
 # .NET Framework 4 ships with Windows). Rebuilt only when the source changes: every build gets a
 # new timestamp, and the Sidebar keeps the installed copy locked while the gadget runs.
 $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 if (-not (Test-Path $csc)) { $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe' }
 $libs = @(
     @{ Source = 'tools\coretemp\CoreTempReader.cs'; Out = 'CPU_Meter_Modern.gadget\ModernMetersCoreTemp.dll' },
-    @{ Source = 'tools\gpu\GpuReader.cs'; Out = 'GPU_Meter_Modern.gadget\ModernMetersGpu.dll' }
+    @{ Source = 'tools\gpu\GpuReader.cs'; Out = 'GPU_Meter_Modern.gadget\ModernMetersGpu.dll' },
+    @{ Source = 'tools\panel\PanelPainter.cs'; Out = 'shared\ModernMetersPanel.dll' }
 )
 foreach ($lib in $libs) {
     $dll = Join-Path $root $lib.Out

@@ -84,10 +84,28 @@ function SmiProvider() {
 SmiProvider.prototype.start = function () {
     this.kill();
     try { fso.DeleteFile(this.out, true); } catch (e) { }
+    // nvidia-smi only has the fan in percent; the D3DKMT reader adds its RPM
+    this.kmt = null;
+    if (!card) return;
+    try {
+        if (IS_GADGET) registerDotNet("{8c41d7a2-6f0e-4b9d-b3a5-2e7f19c4d860}", "ModernMeters.GpuReader", "ModernMetersGpu");
+        var k = new ActiveXObject("ModernMeters.GpuReader");
+        if (k.Open(card.luid)) this.kmt = k;
+    } catch (e2) { }
 };
 
 SmiProvider.prototype.stop = function () {
     this.kill();
+    try { if (this.kmt) this.kmt.Close(); } catch (e) { }
+    this.kmt = null;
+};
+
+// Fan speed in RPM from D3DKMT, or null
+SmiProvider.prototype.fanRpm = function () {
+    try {
+        if (this.kmt && this.kmt.Refresh() && this.kmt.FanRpm >= 0) return this.kmt.FanRpm;
+    } catch (e) { }
+    return null;
 };
 
 // Terminates nvidia-smi instances writing to our file; returns how many were still alive
@@ -134,7 +152,7 @@ SmiProvider.prototype.poll = function () {
     var r = {};
     for (var i = 0; i < SMI_FIELDS.length; i++) r[SMI_FIELDS[i]] = trim(parts[i]);
 
-    var fan = num(r["fan.speed"]), clk = mhz(num(r["clocks.gr"])), mclk = mhz(num(r["clocks.mem"]));
+    var fan = num(r["fan.speed"]), rpm = this.fanRpm(), clk = mhz(num(r["clocks.gr"])), mclk = mhz(num(r["clocks.mem"]));
     return {
         name: r.name,
         usage: num(r["utilization.gpu"]),
@@ -145,7 +163,7 @@ SmiProvider.prototype.poll = function () {
         power: num(r["power.draw"]),
         powerLimit: num(r["power.limit"]),
         fan: fan,
-        fanText: fan == null ? T("na") : (fan == 0 ? T("stopped") : ""),
+        fanText: fan == null ? T("na") : (fan == 0 ? T("stopped") : fanRpmText(rpm)),
         sub: narrow ? clk + " / " + mclk + " " + T("MHz") :
             clk + " " + T("MHz") + "  ·  " + T("mem") + " " + mclk + " " + T("MHz"),
         enc: num(r["utilization.encoder"]),
@@ -154,6 +172,12 @@ SmiProvider.prototype.poll = function () {
         footer: T("driver") + " " + r.driver_version + "  ·  nvidia-smi"
     };
 };
+
+// "1250 RPM"; narrow gadgets drop the unit, which would run into the label
+function fanRpmText(rpm) {
+    if (rpm == null) return "";
+    return Math.round(rpm) + (narrow ? "" : " " + T("RPM"));
+}
 
 // nvidia-smi numbers only the NVIDIA cards
 function smiIndex() {
@@ -231,9 +255,8 @@ CounterProvider.prototype.poll = function () {
         powerLimit: null,
         powerPct: num(r.powerpct),
         fan: fan,
-        // Narrow: the percentage alone, the RPM text would run into the label
         fanText: rpm != null && rpm == 0 && fan != null ? T("stopped") :
-            fan != null && narrow ? "" : rpm != null ? Math.round(rpm) + " " + T("RPM") : (fan == null ? T("na") : ""),
+            rpm != null ? fanRpmText(rpm) : (fan == null ? T("na") : ""),
         sub: sub,
         enc: num(r.enc),
         dec: num(r.dec),

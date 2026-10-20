@@ -8,35 +8,111 @@ var PAD = 12;
 
 // classic: flat dark panel. glass: navy gradient panel with a glowing border, a title bar with
 // an icon, gradient bars and graphs. Panel images for both come from tools/make-images.ps1.
+// tinted: glass in the hue of the accent color. light: the glass layout on a light panel.
+// terminal: a retro CRT in the accent's hue. Their panels are drawn on first use (themeImage).
+// auto: light or glass as Windows' app mode.
+// THEME.glass means the glass layout (title bar, icons, axes), whatever the colors.
 var THEMES = {
     classic: {
         text: "#e8eaed", dim: "#9aa3ad", faint: "#646d78", track: "#2c3239", grid: "#232930",
-        plot: "#121519", panel: "#15181d", sep: "#2c3239", hot: "#ff5f56", glass: false
+        plot: "#121519", panel: "#15181d", sep: "#2c3239", hot: "#ff5f56", live: "#d8dee6", glass: false
     },
     glass: {
         text: "#e6eefb", dim: "#8da2bf", faint: "#5a6d88", track: "#1a2840", grid: "#14223a",
         plot: "#0a1322", panel: "#0f1a2c", panelTop: "#14223a", panelBottom: "#0a111e",
-        sep: "#1e304a", hot: "#ff5f56", glass: true
+        sep: "#1e304a", hot: "#ff5f56", live: "#d8dee6", edge: "#5096f0", glow: "230,90,45,20", gloss: 22,
+        glass: true
+    },
+    light: {
+        text: "#1d232b", dim: "#5d6773", faint: "#98a1ab", track: "#dfe4ea", grid: "#e6eaef",
+        plot: "#f1f4f7", panel: "#f7f9fb", panelTop: "#ffffff", panelBottom: "#eef1f5",
+        sep: "#e1e6eb", hot: "#e03131", live: "#7d8794", edge: "#8a94a1", glow: "150,50,22,10", gloss: 0,
+        glass: true, light: true
+    },
+    // Retro-futuristic CRT: phosphor on near black, monospace, scanlines, a blinking cursor.
+    // Drawn green here and turned to the accent's hue like the tinted glass.
+    terminal: {
+        text: "#b8ffd0", dim: "#5fbf85", faint: "#347a50", track: "#0f2a1b", grid: "#0c2016",
+        plot: "#040d08", panel: "#06120b", panelTop: "#0a1a10", panelBottom: "#040b07",
+        sep: "#123d26", hot: "#ff4d4d", live: "#b8ffd0", edge: "#33ff88", glow: "210,80,35,14", gloss: 10,
+        font: "Consolas,'Lucida Console',monospace", glass: true, terminal: true
     }
+};
+
+var ACCENTS = {}, LEVELS = [];
+
+// Accent colors on the dark themes and, readable on white, on the light one
+var ACCENT_SETS = {
+    dark: { blue: "#4cc2ff", teal: "#2ee6c5", green: "#76c442", purple: "#b18cff", orange: "#ff9f43",
+        pink: "#ff6fb5", red: "#ff6b6b", yellow: "#ffd43b" },
+    light: { blue: "#0a7fd0", teal: "#0b9c86", green: "#3f9a1e", purple: "#7f56e0", orange: "#e06c00",
+        pink: "#d63384", red: "#d63a3a", yellow: "#b58900" }
+};
+
+// Five-step status scale: below normal, normal, above normal, loaded, overloaded
+var LEVEL_SETS = {
+    dark: ["#4cc2ff", "#7ee787", "#f5d547", "#ff9f43", "#ff5f56"],
+    light: ["#0a7fd0", "#2f9e44", "#c99700", "#e8590c", "#e03131"]
 };
 
 var THEME = {};
 
+// "auto" -> "light" or "glass" as Windows' app mode is set
+function themeName(name) {
+    if (name != "auto") return THEMES[name] || name == "tinted" ? name : "classic";
+    try {
+        return new ActiveXObject("WScript.Shell").RegRead(
+            "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize\\AppsUseLightTheme") == 1 ? "light" : "glass";
+    } catch (e) {
+        return "glass";
+    }
+}
+
+// Sets THEME, ACCENTS and LEVELS. The accent setting picks the hue of the tinted theme.
 function applyTheme(name) {
-    var t = THEMES[name] || THEMES.classic;
-    for (var k in t) THEME[k] = t[k];
+    var k;
+    name = themeName(name);
+    for (k in THEME) delete THEME[k];
+    var t = THEMES[name == "tinted" ? "glass" : name];
+    for (k in t) THEME[k] = t[k];
+    THEME.name = name;
+    var set = THEME.light ? "light" : "dark";
+    for (k in ACCENT_SETS[set]) ACCENTS[k] = ACCENT_SETS[set][k];
+    LEVELS.length = 0;
+    for (k = 0; k < 5; k++) LEVELS.push(LEVEL_SETS[set][k]);
+    if (name == "tinted" || name == "terminal") {
+        // Every glass color keeps its saturation and lightness and takes the accent's hue
+        var hue = hsl(ACCENTS[accentName()])[0];
+        for (k in THEME)
+            if (/^#[0-9a-f]{6}$/i.test(THEME[k]) && k != "hot") THEME[k] = withHue(THEME[k], hue);
+    }
+}
+
+// #rrggbb -> [hue 0..360, saturation 0..1, lightness 0..1]
+function hsl(c) {
+    var r = parseInt(c.substr(1, 2), 16) / 255, g = parseInt(c.substr(3, 2), 16) / 255, b = parseInt(c.substr(5, 2), 16) / 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min, h = 0, s = 0;
+    if (d > 0) {
+        s = d / (1 - Math.abs(2 * l - 1));
+        h = max == r ? ((g - b) / d + 6) % 6 : (max == g ? (b - r) / d + 2 : (r - g) / d + 4);
+    }
+    return [h * 60, s, l];
+}
+
+function withHue(c, hue) {
+    var v = hsl(c), s = v[1], l = v[2];
+    var ch = (1 - Math.abs(2 * l - 1)) * s, x = ch * (1 - Math.abs((hue / 60) % 2 - 1)), m = l - ch / 2;
+    var seg = Math.floor(hue / 60) % 6;
+    var rgb = [[ch, x, 0], [x, ch, 0], [0, ch, x], [0, x, ch], [x, 0, ch], [ch, 0, x]][seg];
+    var out = "#";
+    for (var i = 0; i < 3; i++) {
+        var n = Math.round((rgb[i] + m) * 255);
+        out += (n < 16 ? "0" : "") + n.toString(16);
+    }
+    return out;
 }
 
 applyTheme("classic");
-
-var ACCENTS = {
-    blue: "#4cc2ff",
-    teal: "#2ee6c5",
-    green: "#76c442",
-    purple: "#b18cff",
-    orange: "#ff9f43",
-    pink: "#ff6fb5"
-};
 
 // ---- settings -------------------------------------------------------------
 
@@ -212,8 +288,7 @@ function fmtTemp(c, unit) {
     return (unit == "F" ? Math.round(c * 9 / 5 + 32) : Math.round(c)) + "°";
 }
 
-// Five-step status scale: below normal, normal, above normal, loaded, overloaded
-var LEVELS = ["#4cc2ff", "#7ee787", "#f5d547", "#ff9f43", "#ff5f56"];
+// Thresholds of the LEVELS colors
 var LOAD_STEPS = [25, 50, 75, 90];   // percent
 var TEMP_STEPS = [45, 65, 78, 88];   // degrees Celsius
 
@@ -254,17 +329,27 @@ function rect(parent, x, y, w, h, color) {
 
 function label(parent, x, y, w, size, color, align, bold) {
     var d = box(parent, x, y, w, size + 6,
-        "font-size:" + size + "px;line-height:" + (size + 6) + "px;white-space:nowrap;color:" + color +
-        ";text-align:" + (align || "left") + ";" +
-        (bold ? "font-family:'Segoe UI Semibold','Segoe UI';" : ""));
+        "font-size:" + fontSize(size) + "px;line-height:" + (size + 6) + "px;white-space:nowrap;color:" + color +
+        ";text-align:" + (align || "left") + ";" + fontCss(bold));
     return d;
+}
+
+// The terminal's monospace runs wider than Segoe UI, so its text is set a little smaller in the
+// same boxes
+function fontSize(size) {
+    return THEME.font ? Math.round(size * 0.88) : size;
+}
+
+// The theme's font (the terminal's monospace) or Segoe UI
+function fontCss(bold) {
+    if (THEME.font) return "font-family:" + THEME.font + ";" + (bold ? "font-weight:bold;" : "");
+    return bold ? "font-family:'Segoe UI Semibold','Segoe UI';" : "";
 }
 
 // Rendered width of a label's text, for layouts that depend on the language
 function textWidth(text, size, bold) {
     var s = document.createElement("span");
-    s.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;font-size:" + size + "px;" +
-        (bold ? "font-family:'Segoe UI Semibold','Segoe UI';" : "");
+    s.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;font-size:" + fontSize(size) + "px;" + fontCss(bold);
     s.innerText = text;
     document.body.appendChild(s);
     var w = s.offsetWidth;
@@ -398,14 +483,13 @@ Graph.prototype.draw = function () {
 // seconds sampled every LIVE_MS, stretched, so short spikes and motion stay visible. The rest is
 // the normal history. Without the live zone it is a plain Graph.
 var LIVE_MS = 200;
-var LIVE_LINE = "#d8dee6";
 
 function LiveGraph(parent, x, y, w, h, series, live) {
     var lw = live ? Math.round(w / 8) * 2 : 0;
     this.histW = lw ? w - lw - 1 : w;
     this.hist = new Graph(parent, x, y, this.histW, h, series);
     this.live = lw ? new Graph(parent, x + w - lw, y, lw, h, series) : null;
-    if (lw) rect(parent, x + this.histW, y, 1, h, LIVE_LINE);
+    if (lw) rect(parent, x + this.histW, y, 1, h, THEME.live);
 }
 
 LiveGraph.prototype.push = function (values) { this.hist.push(values); };
@@ -447,7 +531,18 @@ function paintFrame(w, h) {
         var alpha = function (y) { var v = gloss(y); return "#" + (v < 16 ? "0" : "") + v.toString(16) + "FFFFFF"; };
         gradient(box(panel, r, inset, w - 2 * r, r - inset), alpha(inset), alpha(r));
         gradient(box(panel, inset, r, w - 2 * inset, 70 + inset - r), alpha(r), alpha(70 + inset));
+        // CRT scanlines (img/scan.png, translucent), kept off the bare corners like the gloss
+        if (THEME.terminal) {
+            // Each piece offsets the pattern by its own top so the lines run on across them
+            var scan = function (x, y, wd, ht) {
+                box(panel, x, y, wd, ht, "background-image:url(img/scan.png);background-position:0 " + (-y) + "px;");
+            };
+            scan(r, inset, w - 2 * r, r - inset);
+            scan(inset, r, w - 2 * inset, h - 2 * r);
+            scan(r, h - r, w - 2 * r, r - inset);
+        }
     }
+    document.body.style.fontFamily = THEME.font || "'Segoe UI'";
 
     if (!IS_GADGET) {
         // Preview outside the Sidebar (e.g. mshta)
@@ -460,8 +555,15 @@ function paintFrame(w, h) {
         } catch (e) { }
         return;
     }
-    var bg = $("bg");
-    bg.src = "img/" + (THEME.glass ? "glass_" : "bg_") + w + "_" + h + ".png";
+    var bg = $("bg"), file = w + "_" + h + ".png";
+    // Panels in the theme's own colors are drawn on first use; the bundled navy glass stands in
+    // if that fails
+    var src = null;
+    if (THEME.name == "classic") src = "img/bg_" + file;
+    else if (THEME.name != "glass") src = themeImage(themeKey() + "_" + file, function (p, path) {
+        return p.Glass(path, w, h, THEME.panelTop, THEME.panelBottom, GLASS_GRADIENT_H, THEME.edge, THEME.glow, THEME.gloss);
+    });
+    bg.src = src || "img/glass_" + file;
     bg.style.width = w + "px";
     bg.style.height = h + "px";
 }
@@ -495,6 +597,42 @@ function registerDotNet(clsid, cls, assembly) {
     shell.RegWrite(inproc + "CodeBase", "file:///" + System.Gadget.path.replace(/\\/g, "/") + "/" + assembly + ".dll", "REG_SZ");
 }
 
+// ---- images in the theme's colors -----------------------------------------
+
+var painter;   // ModernMetersPanel.dll (tools/panel), created on first use; false if it can't be
+var themeImages = {};   // files known to exist
+
+// Names the cached images of the current theme: the tinted ones have a set per accent. The "1"
+// changes whenever the colors or the drawing change, so old files are never reused.
+function themeKey() {
+    return THEME.name + (THEME.name == "tinted" || THEME.name == "terminal" ? "-" + accentName() : "") + "1";
+}
+
+// "img/gen/<file>" once it exists, drawing it with draw(painter, fullPath) the first time; null
+// when it can't be drawn
+function themeImage(file, draw) {
+    if (!IS_GADGET) return null;
+    if (themeImages[file]) return "img/gen/" + file;
+    try {
+        var path = System.Gadget.path + "\\img\\gen\\" + file;
+        if (!new ActiveXObject("Scripting.FileSystemObject").FileExists(path)) {
+            if (painter == null) {
+                try {
+                    registerDotNet("{8e3c2a71-5d4b-4f19-b6a0-2c7e9f41d385}", "ModernMeters.PanelPainter", "ModernMetersPanel");
+                    painter = new ActiveXObject("ModernMeters.PanelPainter");
+                } catch (e) {
+                    painter = false;
+                }
+            }
+            if (!painter || !draw(painter, path)) return null;
+        }
+        themeImages[file] = true;
+        return "img/gen/" + file;
+    } catch (e2) {
+        return null;
+    }
+}
+
 function openUrl(url) {
     try { new ActiveXObject("WScript.Shell").Run(url); } catch (e) { }
 }
@@ -517,24 +655,42 @@ function icon(root, x, y, size, file) {
     return img;
 }
 
+// Glyph files in the accent colors of the theme (make-images.ps1): hdr_/row_ on dark panels,
+// hdrl_/rowl_ in the darker accents of the light theme
+function glyph(prefix) {
+    return prefix + (THEME.light ? "l_" : "_");
+}
+
 // Icon and title above the content, with an accent line fading out.
 // kind: cpu, gpu, net or disk (img/hdr_<kind>_<accent>.png). Returns the y below it.
 function header(root, y, kind, title) {
+    if (cursor.timer) clearInterval(cursor.timer);
+    cursor.timer = null;
     if (!THEME.glass) return y;
-    icon(root, PAD, y + 1, 14, "hdr_" + kind + "_" + accentName());
+    icon(root, PAD, y + 1, 14, glyph("hdr") + kind + "_" + accentName());
     var t = label(root, PAD + 21, y - 1, W - 2 * PAD - 21, 11, THEME.text, "left", true);
     t.style.letterSpacing = "1px";
     setText(t, title);
     var c = ACCENTS[accentName()];
     gradient(rect(root, PAD, y + 20, W - 2 * PAD, 1, c), c, THEME.panel, true);
+    // Terminal: a block cursor blinking after the title
+    if (THEME.terminal) {
+        var cur = rect(root, PAD + 21 + textWidth(title, 11, true) + title.length + 3, y + 3, 7, 11, c);
+        cursor.timer = setInterval(function () {
+            cursor.on = !cursor.on;
+            cur.style.visibility = cursor.on ? "visible" : "hidden";
+        }, 530);
+    }
     return y + 26;
 }
+
+var cursor = { timer: null, on: true };
 
 // A 13px icon at the start of a row (img/row_<kind>_<accent>.png); returns how far the row's
 // label has to move right
 function rowIcon(root, x, y, kind) {
     if (!THEME.glass) return 0;
-    icon(root, x, y + 2, 13, "row_" + kind + "_" + accentName());
+    icon(root, x, y + 2, 13, glyph("row") + kind + "_" + accentName());
     return 18;
 }
 
@@ -571,9 +727,17 @@ function Gauge(parent, x, y, caption) {
     this.frame = -1;
 }
 
+// Bundled for the navy glass, drawn in the theme's colors for the others
+function gaugeImage(level) {
+    var bundled = "img/gauge_" + level + ".png";
+    if (THEME.name == "glass" || THEME.name == "classic") return bundled;
+    return themeImage(themeKey() + "_gauge_" + level + ".png",
+        function (p, path) { return p.Gauge(path, LEVELS[level], THEME.track); }) || bundled;
+}
+
 // frac 0..1 fills the ring; level 0..4 picks the color
 Gauge.prototype.set = function (frac, level, text) {
-    var src = "img/gauge_" + level + ".png", f = Math.round(clamp(frac || 0, 0, 1) * 50);
+    var src = gaugeImage(level), f = Math.round(clamp(frac || 0, 0, 1) * 50);
     if (src != this.src) { this.img.src = src; this.src = src; }
     if (f != this.frame) { this.img.style.top = (-f * this.size) + "px"; this.frame = f; }
     setText(this.val, text);
@@ -710,7 +874,8 @@ function toggleDetails(sections) {
     if (!IS_GADGET) return;
     var f = System.Gadget.Flyout;
     if (f.show) { f.show = false; return; }
-    flyoutHtml = "<div class='" + (THEME.glass ? "glass" : "classic") + "'>" + detailsHtml(sections) + "</div>";
+    flyoutHtml = "<div class='" + (THEME.light ? "light" : (THEME.glass ? "glass" : "classic")) + "' style='background-color:" + THEME.panel +
+        (THEME.edge ? ";border-color:" + THEME.edge : "") + "'>" + detailsHtml(sections) + "</div>";
     f.file = "flyout.html";
     f.show = true;
 }
@@ -793,7 +958,7 @@ function updateBadge(root) {
 }
 
 // Checks once a minute whether the daily request is due; onChange (the gadget's rebuild) runs
-// when the update badge has to appear or go away
+// when the update badge has to appear or go away, or the auto theme has to switch
 function watchUpdates(onChange) {
     if (!IS_GADGET || updates.timer) return;
     var poll = function () {
@@ -839,6 +1004,10 @@ function watchUpdates(onChange) {
     };
     updates.timer = setInterval(poll, 60000);
     setTimeout(poll, 10000);
+    // The auto theme follows Windows switching between light and dark mode
+    setInterval(function () {
+        if (getSetting("theme") == "auto" && themeName("auto") != THEME.name) onChange();
+    }, 15000);
 }
 
 function hookSettings(onCommit) {

@@ -14,6 +14,10 @@ Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
 
 All of them speak 12 languages (English, Українська, Русский, Deutsch, Español, Français, Italiano, Polski, Português, Türkçe, 中文, 日本語) and pick yours from Windows, and have five widths, accent colors, and a five-step color scale for load and temperature. Translations live in `shared/lang/`, one file per language; corrections are welcome.
 
+Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your accent color: blue, teal, green, purple, orange, pink, red or yellow), **Retro terminal** (a CRT screen with scanlines in your accent color) and **Auto**, which switches between Light and Glass with Windows' light/dark mode. Panels for the colored styles are drawn once on your PC the first time they're needed.
+
+<img src="docs/themes.png" width="660" alt="Light, colored glass and retro terminal styles">
+
 ### Glass style
 
 <table><tr valign="top">
@@ -88,6 +92,8 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 | **Weather Meter Modern** | Погоду сейчас и цветной почасовой график температуры, осадков, ветра или давления (вкладки), прогноз на 3 или 5 дней. Следует за вами из города в город через определение местоположения Windows |
 
 У всех 12 языков (английский, украинский, русский, немецкий, испанский, французский, итальянский, польский, португальский, турецкий, китайский, японский), язык берётся из Windows; пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: стиль «Стекло» и классический.
+
+Стили: «Стекло», «Классический», «Светлый», «Цветное стекло» (стекло в цвете акцента: голубой, бирюзовый, зелёный, фиолетовый, оранжевый, розовый, красный или жёлтый), «Ретро-терминал» (ЭЛТ-экран со строками развёртки в цвете акцента) и «Авто» — переключается между светлым и стеклом вслед за светлым/тёмным режимом Windows. Фон для цветных стилей рисуется один раз на вашем компьютере, когда впервые понадобится.
 
 ## Установка
 

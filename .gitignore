@@ -3,6 +3,7 @@ dist/
 *_Modern.gadget/img/
 *_Modern.gadget/icon.png
 *_Modern.gadget/*.dll
+shared/*.dll
 
 # Copied from shared/ by build.ps1
 *_Modern.gadget/common.js

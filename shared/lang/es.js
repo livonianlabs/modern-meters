@@ -59,8 +59,8 @@ addLanguage("es", "Español", {
     wx80: "Chubascos", wx82: "Chubascos fuertes", wx85: "Chubascos de nieve", wx95: "Tormenta", wx96: "Tormenta con granizo"
 }, {
     "Language": "Idioma", "Auto (as Windows)": "Auto (como Windows)", "Display": "Aspecto", "Style": "Estilo",
-    "Classic (flat)": "Clásico (plano)", "Glass": "Cristal", "Accent color": "Color de acento",
-    "Blue": "Azul", "Teal": "Turquesa", "Green": "Verde", "Purple": "Morado", "Orange": "Naranja", "Pink": "Rosa",
+    "Classic (flat)": "Clásico (plano)", "Glass": "Cristal", "Colored glass": "Cristal de color", "Light": "Claro", "Retro terminal": "Terminal retro", "Accent color": "Color de acento",
+    "Blue": "Azul", "Teal": "Turquesa", "Green": "Verde", "Purple": "Morado", "Orange": "Naranja", "Pink": "Rosa", "Red": "Rojo", "Yellow": "Amarillo",
     "Width": "Ancho", "Classic (%d)": "Clásico (%d)", "Medium (%d)": "Medio (%d)", "Wide (%d)": "Ancho (%d)",
     "Wider (%d)": "Más ancho (%d)", "Widest (%d)": "Muy ancho (%d)",
     "Graph": "Gráfico", "Hidden": "Oculto", "Low": "Bajo", "Medium": "Medio", "Tall": "Alto", "Huge": "Enorme",

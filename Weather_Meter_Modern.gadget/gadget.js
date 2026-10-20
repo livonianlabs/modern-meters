@@ -252,7 +252,7 @@ function updateName() {
 
 // Called from the location flyout
 function placeState() {
-    return { mode: getSetting("mode"), name: place ? place.name : "", recent: recentPlaces(), glass: THEME.glass };
+    return { mode: getSetting("mode"), name: place ? place.name : "", recent: recentPlaces(), glass: THEME.glass, light: THEME.light, panel: THEME.panel, edge: THEME.edge };
 }
 
 function pickPlace(lat, lon, name) {
@@ -370,6 +370,16 @@ function scale(stops, v) {
     return stops[stops.length - 1][1];
 }
 
+// The scales' pastel colors, a little deeper on the light panel
+function tone(c) {
+    return THEME.light ? mix(c, "#000000", 0.18) : c;
+}
+
+// Weather icon file prefix: wx_/wxs_, or wxl_/wxsl_ with darker clouds for the light theme
+function wxIcon(prefix) {
+    return prefix + (THEME.light ? "l_" : "_");
+}
+
 var TEMP_COLORS = [[-25, "#9b5de5"], [-10, "#3a86ff"], [0, "#4cc2ff"], [10, "#7ee787"], [20, "#f5d547"], [28, "#ff9f43"], [35, "#ff5f56"]];
 var WIND_COLORS = [[0, "#3a86ff"], [3, "#4cc2ff"], [6, "#7ee787"], [10, "#f5d547"], [15, "#ff9f43"], [20, "#ff5f56"], [28, "#b18cff"]];
 var RAIN_COLORS = [[0, "#9ad0ff"], [1, "#4cc2ff"], [4, "#3a86ff"], [10, "#9b5de5"]];
@@ -418,7 +428,7 @@ function rebuild() {
     var y = header(root, 10, "sky", T("hdrWeather"));
 
     // Current conditions: icon, temperature, feels-like, description, place
-    ui.icon = icon(root, PAD - 2, y, 48, "wx_cloudy");
+    ui.icon = icon(root, PAD - 2, y, 48, wxIcon("wx") + "cloudy");
     ui.icon.style.display = "none";
     ui.temp = label(root, PAD + 50, y - 2, IW - 50, narrow ? 26 : 30, THEME.text, "right", true);
     ui.feels = label(root, PAD + 50, y + (narrow ? 32 : 36), IW - 50, 10, THEME.dim, "right");
@@ -528,7 +538,7 @@ function draw() {
         return;
     }
     var c = f.current;
-    ui.icon.src = "img/wx_" + wxKind(c.weather_code, c.is_day) + ".png";
+    ui.icon.src = "img/" + wxIcon("wx") + wxKind(c.weather_code, c.is_day) + ".png";
     ui.icon.style.display = "";
     setText(ui.temp, temp(c.temperature_2m));
     setColor(ui.temp, scale(TEMP_COLORS, c.temperature_2m));
@@ -578,17 +588,17 @@ function drawChart() {
             var prob = h.precipitation_probability ? h.precipitation_probability[start + i] || 0 : 0;
             if (prob > 0) rect(box0, x, top + gh - Math.round(prob / 100 * gh), bw - gap, Math.round(prob / 100 * gh), THEME.track);
             if (v <= 0) continue;
-            color = (h.snowfall && h.snowfall[start + i] > 0) ? "#eaf0f7" : scale(RAIN_COLORS, v);
+            color = (h.snowfall && h.snowfall[start + i] > 0) ? (THEME.light ? "#a9b4c2" : "#eaf0f7") : tone(scale(RAIN_COLORS, v));
             yy = Math.min(yy, top + gh - 2);
         } else if (tab == "wind") {
-            color = scale(WIND_COLORS, v);
+            color = tone(scale(WIND_COLORS, v));
             var gy = yOf(h.wind_gusts_10m[start + i] || v);
-            rect(box0, x, gy, bw - gap, 2, mix(color, "#ffffff", 0.5));
+            rect(box0, x, gy, bw - gap, 2, THEME.light ? mix(color, "#000000", 0.3) : mix(color, "#ffffff", 0.5));
         } else if (tab == "press") {
             rect(box0, x, yy, bw - gap, 3, accent);
             continue;
         } else {
-            color = scale(TEMP_COLORS, v);
+            color = tone(scale(TEMP_COLORS, v));
         }
         var bar = rect(box0, x, yy, bw - gap, top + gh - yy, color);
         if (THEME.glass) gradient(bar, color, mix(color, THEME.plot, 0.6));
@@ -683,10 +693,10 @@ function drawMap(box0) {
     var view = box(box0, 0, top, IW, mh, "overflow:hidden;background-color:" + THEME.plot + ";cursor:hand;");
     view.title = T("mapHint");
     view.onclick = function () { openUrl("https://www.windy.com/?radar," + place.lat + "," + place.lon + ",8"); };
-    // Esri's dark gray canvas (no key needed): land and water below the radar, place names above it
+    // Esri's gray canvas, dark or light as the theme (no key needed): land and water below the radar, place names above it
     var tiles = viewTiles(worldXY(place.lat, place.lon, z), IW, mh, z), i, j;
     var esri = function (layer, t) {
-        return "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_" + layer +
+        return "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_" + (THEME.light ? "Light" : "Dark") + "_Gray_" + layer +
             "/MapServer/tile/" + z + "/" + t.y + "/" + t.x;
     };
     for (i = 0; i < tiles.length; i++) tileImg(view, tiles[i], esri("Base", tiles[i]));
@@ -742,7 +752,7 @@ function drawDays() {
         var x = i * cw, p = String(dl.time[i]).split("-");
         var wd = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)).getDay();
         setText(label(box0, x, 0, cw, 9, THEME.dim, "center"), i == 0 && n <= 3 ? T("today") : T("days")[wd]);
-        icon(box0, x + Math.floor((cw - 22) / 2), 12, 22, "wxs_" + wxKind(dl.weather_code[i], true));
+        icon(box0, x + Math.floor((cw - 22) / 2), 12, 22, wxIcon("wxs") + wxKind(dl.weather_code[i], true));
         var hi = label(box0, x, 35, cw, 10, scale(TEMP_COLORS, dl.temperature_2m_max[i]), "center", true);
         if (cw < 44) {
             setText(hi, temp(dl.temperature_2m_max[i]));

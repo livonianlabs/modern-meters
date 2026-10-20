@@ -93,10 +93,17 @@ function Save-Panels([string]$dir) {
     }
 }
 
-# Glass theme glyphs, drawn at 2x (32px) once per accent color: <prefix>_<kind>_<accent>.png.
-# Title icons: cpu, gpu, net, disk. Row icons: ram, commit, bus, power, fan, ip, globe, shield, pulse.
-function Save-Glyphs([string]$dir, [string]$prefix, [string[]]$kinds) {
-    $accents = @{ blue = '4cc2ff'; teal = '2ee6c5'; green = '76c442'; purple = 'b18cff'; orange = 'ff9f43'; pink = 'ff6fb5' }
+# Glass layout glyphs, drawn at 2x (32px) once per accent color: <prefix>_<kind>_<accent>.png, and with
+# -Light in the light theme's accents as <prefix>l_<kind>_<accent>.png (ACCENT_SETS in common.js).
+# Only strokes and fills in the accent, so they sit on any panel color.
+# Title icons: cpu, gpu, net, disk, sky. Row icons: ram, commit, bus, power, fan, ip, globe, shield, pulse.
+function Save-Glyphs([string]$dir, [string]$prefix, [string[]]$kinds, [switch]$Light) {
+    $accents = if ($Light) {
+        @{ blue = '0a7fd0'; teal = '0b9c86'; green = '3f9a1e'; purple = '7f56e0'; orange = 'e06c00'; pink = 'd63384'; red = 'd63a3a'; yellow = 'b58900' }
+    } else {
+        @{ blue = '4cc2ff'; teal = '2ee6c5'; green = '76c442'; purple = 'b18cff'; orange = 'ff9f43'; pink = 'ff6fb5'; red = 'ff6b6b'; yellow = 'ffd43b' }
+    }
+    if ($Light) { $prefix += 'l' }
     foreach ($kind in $kinds) {
         foreach ($name in $accents.Keys) {
             $c = [System.Drawing.ColorTranslator]::FromHtml('#' + $accents[$name])
@@ -139,8 +146,10 @@ function Save-Glyphs([string]$dir, [string]$prefix, [string[]]$kinds) {
                     foreach ($q in 8, 13, 18, 23) { $g.DrawLine($pen, $q, 22, $q, 26) }
                 }
                 'commit' {
+                    # The back sheet stops where the front one covers it
+                    $g.SetClip((New-Object System.Drawing.RectangleF 2.5, 10.5, 21, 16), [System.Drawing.Drawing2D.CombineMode]::Exclude)
                     $g.DrawRectangle($pen, 10, 5, 18, 13)
-                    $g.FillRectangle((New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 15, 26, 44))), 4, 12, 18, 13)
+                    $g.ResetClip()
                     $g.DrawRectangle($pen, 4, 12, 18, 13)
                 }
                 'bus' {
@@ -174,18 +183,23 @@ function Save-Glyphs([string]$dir, [string]$prefix, [string[]]$kinds) {
                     $g.DrawLines($pen, [System.Drawing.PointF[]]@((& $pt 3 17), (& $pt 10 17), (& $pt 13 8), (& $pt 18 26), (& $pt 21 17), (& $pt 29 17)))
                 }
                 'sky' {
-                    # Sun peeking out from behind a cloud
-                    $g.DrawArc($pen, 13, 4, 14, 14, 160, 230)
-                    foreach ($ang in 0, 45, 90, 135) {
-                        $rad = $ang * [Math]::PI / 180
-                        $g.DrawLine($pen, 20 + 10 * [Math]::Cos($rad), 11 - 10 * [Math]::Sin($rad), 20 + 12.5 * [Math]::Cos($rad), 11 - 12.5 * [Math]::Sin($rad))
-                    }
+                    # Sun peeking out from behind a cloud (the cloud is drawn first only to clip the sun)
                     $cloud = New-Object System.Drawing.Drawing2D.GraphicsPath ([System.Drawing.Drawing2D.FillMode]::Winding)
                     $cloud.AddArc(3, 17, 10, 10, 90, 180)
                     $cloud.AddArc(8, 11, 12, 12, 180, 180)
                     $cloud.AddArc(16, 15, 12, 12, 270, 180)
                     $cloud.CloseFigure()
-                    $g.FillPath((New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 15, 26, 44))), $cloud)
+                    $outline = $cloud.Clone()
+                    $outline.Widen((New-Object System.Drawing.Pen ([System.Drawing.Color]::Black), 4))
+                    $behind = New-Object System.Drawing.Region $cloud
+                    $behind.Union($outline)
+                    $g.SetClip($behind, [System.Drawing.Drawing2D.CombineMode]::Exclude)
+                    $g.DrawArc($pen, 13, 4, 14, 14, 160, 230)
+                    foreach ($ang in 0, 45, 90, 135) {
+                        $rad = $ang * [Math]::PI / 180
+                        $g.DrawLine($pen, 20 + 10 * [Math]::Cos($rad), 11 - 10 * [Math]::Sin($rad), 20 + 12.5 * [Math]::Cos($rad), 11 - 12.5 * [Math]::Sin($rad))
+                    }
+                    $g.ResetClip()
                     $g.DrawPath($pen, $cloud)
                 }
             }
@@ -197,15 +211,25 @@ function Save-Glyphs([string]$dir, [string]$prefix, [string[]]$kinds) {
 }
 
 # Weather icons in their own colors (the same in every theme): wx_<kind>.png at 96px for the
-# current conditions (shown at 48) and wxs_<kind>.png at 44px for the day strip (shown at 22).
+# current conditions (shown at 48) and wxs_<kind>.png at 44px for the day strip (shown at 22); with
+# -Light wxl_/wxsl_ with darker clouds and moon for the light theme.
 # Kinds match wxKind() in Weather Meter's gadget.js.
-function Save-WeatherIcons([string]$dir) {
+function Save-WeatherIcons([string]$dir, [switch]$Light) {
     $sunC = [System.Drawing.Color]::FromArgb(255, 255, 201, 60)
-    $moonC = [System.Drawing.Color]::FromArgb(255, 222, 230, 245)
-    $light = [System.Drawing.Color]::FromArgb(255, 234, 240, 247)
-    $mid = [System.Drawing.Color]::FromArgb(255, 176, 188, 204)
-    $dark = [System.Drawing.Color]::FromArgb(255, 112, 126, 146)
-    $rainC = [System.Drawing.Color]::FromArgb(255, 76, 194, 255)
+    if ($Light) {
+        $moonC = [System.Drawing.Color]::FromArgb(255, 132, 146, 168)
+        $pale = [System.Drawing.Color]::FromArgb(255, 184, 194, 207)
+        $mid = [System.Drawing.Color]::FromArgb(255, 146, 158, 174)
+        $dark = [System.Drawing.Color]::FromArgb(255, 95, 107, 122)
+        $rainC = [System.Drawing.Color]::FromArgb(255, 10, 127, 208)
+    } else {
+        $moonC = [System.Drawing.Color]::FromArgb(255, 222, 230, 245)
+        $pale = [System.Drawing.Color]::FromArgb(255, 234, 240, 247)
+        $mid = [System.Drawing.Color]::FromArgb(255, 176, 188, 204)
+        $dark = [System.Drawing.Color]::FromArgb(255, 112, 126, 146)
+        $rainC = [System.Drawing.Color]::FromArgb(255, 76, 194, 255)
+    }
+    $suffix = if ($Light) { 'l' } else { '' }
     $kinds = 'clear_d', 'clear_n', 'partly_d', 'partly_n', 'cloudy', 'fog', 'drizzle', 'rain', 'snow', 'sleet', 'thunder'
     foreach ($size in 96, 44) {
         $k = $size / 96   # everything below is laid out on a 96px grid
@@ -256,7 +280,7 @@ function Save-WeatherIcons([string]$dir) {
             }
             $flakes = {
                 param($xs, $y)
-                $p = New-Object System.Drawing.Pen $light, 3.5
+                $p = New-Object System.Drawing.Pen $pale, 3.5
                 $p.StartCap = 'Round'; $p.EndCap = 'Round'
                 foreach ($x in $xs) {
                     for ($a = 0; $a -lt 180; $a += 60) {
@@ -268,18 +292,18 @@ function Save-WeatherIcons([string]$dir) {
             switch ($kind) {
                 'clear_d' { & $sun 48 48 20 }
                 'clear_n' { & $moon 48 48 26 }
-                'partly_d' { & $sun 60 34 15; & $cloud 10 78 64 $light }
-                'partly_n' { & $moon 62 32 18; & $cloud 10 78 64 $light }
-                'cloudy' { & $cloud 30 62 56 $mid; & $cloud 8 80 64 $light }
+                'partly_d' { & $sun 60 34 15; & $cloud 10 78 64 $pale }
+                'partly_n' { & $moon 62 32 18; & $cloud 10 78 64 $pale }
+                'cloudy' { & $cloud 30 62 56 $mid; & $cloud 8 80 64 $pale }
                 'fog' {
                     & $cloud 16 56 64 $mid
-                    $p = New-Object System.Drawing.Pen $light, 6
+                    $p = New-Object System.Drawing.Pen $pale, 6
                     $p.StartCap = 'Round'; $p.EndCap = 'Round'
                     $g.DrawLine($p, 14, 68, 82, 68); $g.DrawLine($p, 22, 82, 74, 82)
                 }
-                'drizzle' { & $cloud 14 60 68 $light; & $drops 2 70 }
+                'drizzle' { & $cloud 14 60 68 $pale; & $drops 2 70 }
                 'rain' { & $cloud 14 60 68 $mid; & $drops 3 70 }
-                'snow' { & $cloud 14 60 68 $light; & $flakes @(30, 50, 70) 78 }
+                'snow' { & $cloud 14 60 68 $pale; & $flakes @(30, 50, 70) 78 }
                 'sleet' { & $cloud 14 60 68 $mid; & $drops 1 70; & $flakes @(62) 78 }
                 'thunder' {
                     & $cloud 14 60 68 $dark
@@ -292,7 +316,7 @@ function Save-WeatherIcons([string]$dir) {
                 }
             }
             $g.Dispose()
-            $bmp.Save((Join-Path $dir "$(if ($size -eq 96) { 'wx' } else { 'wxs' })_$kind.png"), [System.Drawing.Imaging.ImageFormat]::Png)
+            $bmp.Save((Join-Path $dir "$(if ($size -eq 96) { 'wx' } else { 'wxs' })${suffix}_$kind.png"), [System.Drawing.Imaging.ImageFormat]::Png)
             $bmp.Dispose()
         }
     }
@@ -329,6 +353,18 @@ function Save-Gauges([string]$dir) {
         $bmp.Dispose()
     }
 }
+# Terminal theme scanlines: scan.png, tiled over the panel; one dark translucent row in three
+function Save-Scanlines([string]$dir) {
+    $bmp = New-Object System.Drawing.Bitmap 4, 3
+    for ($x = 0; $x -lt 4; $x++) {
+        $bmp.SetPixel($x, 0, [System.Drawing.Color]::FromArgb(110, 0, 0, 0))
+        $bmp.SetPixel($x, 1, [System.Drawing.Color]::FromArgb(0, 0, 0, 0))
+        $bmp.SetPixel($x, 2, [System.Drawing.Color]::FromArgb(25, 0, 0, 0))
+    }
+    $bmp.Save((Join-Path $dir 'scan.png'), [System.Drawing.Imaging.ImageFormat]::Png)
+    $bmp.Dispose()
+}
+
 $MinH = 150; $MaxH = 1100   # must match BG_MIN_H / BG_MAX_H in common.js
 $GradH = 300                # must match GLASS_GRADIENT_H in common.js
 # Panels are the same for every gadget: render once, then copy
@@ -341,10 +377,13 @@ foreach ($name in $gadgets.Keys) {
     if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
     New-Item -ItemType Directory -Force $dir | Out-Null
     Copy-Item (Join-Path $cache '*') $dir
-    Save-Glyphs $dir 'hdr' @($gadgets[$name])
-    Save-Glyphs $dir 'row' @('ram', 'commit', 'bus', 'power', 'fan', 'ip', 'globe', 'shield', 'pulse')
+    Save-Scanlines $dir
+    foreach ($light in $false, $true) {
+        Save-Glyphs $dir 'hdr' @($gadgets[$name]) -Light:$light
+        Save-Glyphs $dir 'row' @('ram', 'commit', 'bus', 'power', 'fan', 'ip', 'globe', 'shield', 'pulse') -Light:$light
+    }
     if ($name -eq 'GPU_Meter_Modern.gadget') { Save-Gauges $dir }
-    if ($name -eq 'Weather_Meter_Modern.gadget') { Save-WeatherIcons $dir }
+    if ($name -eq 'Weather_Meter_Modern.gadget') { Save-WeatherIcons $dir; Save-WeatherIcons $dir -Light }
 }
 Remove-Item $cache -Recurse -Force
 Save-Icon (Join-Path $Root 'CPU_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 76, 194, 255)) 'CPU'

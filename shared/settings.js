@@ -9,7 +9,8 @@ var OPT = {
     accent: [
         ["blue", { en: "Blue", ru: "Голубой" }], ["teal", { en: "Teal", ru: "Бирюзовый" }],
         ["green", { en: "Green", ru: "Зелёный" }], ["purple", { en: "Purple", ru: "Фиолетовый" }],
-        ["orange", { en: "Orange", ru: "Оранжевый" }], ["pink", { en: "Pink", ru: "Розовый" }]],
+        ["orange", { en: "Orange", ru: "Оранжевый" }], ["pink", { en: "Pink", ru: "Розовый" }],
+        ["red", { en: "Red", ru: "Красный" }], ["yellow", { en: "Yellow", ru: "Жёлтый" }]],
     width: [
         ["170", { en: "Classic (170)", ru: "Как старые (170)" }], ["220", { en: "Medium (220)", ru: "Средний (220)" }],
         ["260", { en: "Wide (260)", ru: "Широкий (260)" }], ["320", { en: "Wider (320)", ru: "Шире (320)" }],
@@ -43,7 +44,10 @@ function generalRows(noTemp, graphOpts) {
         { key: "lang", label: { en: "Language", ru: "Язык" }, options: OPT.lang },
         { section: { en: "Display", ru: "Вид" } },
         { key: "theme", label: { en: "Style", ru: "Стиль" }, options: [
-            ["classic", { en: "Classic (flat)", ru: "Классический" }], ["glass", { en: "Glass", ru: "Стекло" }]] },
+            ["classic", { en: "Classic (flat)", ru: "Классический" }], ["glass", { en: "Glass", ru: "Стекло" }],
+            ["tinted", { en: "Colored glass", ru: "Цветное стекло" }], ["light", { en: "Light", ru: "Светлый" }],
+            ["terminal", { en: "Retro terminal", ru: "Ретро-терминал" }],
+            ["auto", OPT.lang[0][1]]] },
         { key: "accent", label: { en: "Accent color", ru: "Цвет акцента" }, options: OPT.accent },
         { key: "width", label: { en: "Width", ru: "Ширина" }, options: OPT.width },
         { key: "graph", label: { en: "Graph", ru: "График" }, options: graphOpts || OPT.graph },

@@ -59,8 +59,8 @@ addLanguage("tr", "Türkçe", {
     wx80: "Sağanak", wx82: "Kuvvetli sağanak", wx85: "Kar sağanağı", wx95: "Gök gürültülü fırtına", wx96: "Dolulu fırtına"
 }, {
     "Language": "Dil", "Auto (as Windows)": "Otomatik (Windows gibi)", "Display": "Görünüm", "Style": "Stil",
-    "Classic (flat)": "Klasik (düz)", "Glass": "Cam", "Accent color": "Vurgu rengi",
-    "Blue": "Mavi", "Teal": "Turkuaz", "Green": "Yeşil", "Purple": "Mor", "Orange": "Turuncu", "Pink": "Pembe",
+    "Classic (flat)": "Klasik (düz)", "Glass": "Cam", "Colored glass": "Renkli cam", "Light": "Açık", "Retro terminal": "Retro terminal", "Accent color": "Vurgu rengi",
+    "Blue": "Mavi", "Teal": "Turkuaz", "Green": "Yeşil", "Purple": "Mor", "Orange": "Turuncu", "Pink": "Pembe", "Red": "Kırmızı", "Yellow": "Sarı",
     "Width": "Genişlik", "Classic (%d)": "Klasik (%d)", "Medium (%d)": "Orta (%d)", "Wide (%d)": "Geniş (%d)",
     "Wider (%d)": "Daha geniş (%d)", "Widest (%d)": "En geniş (%d)",
     "Graph": "Grafik", "Hidden": "Gizli", "Low": "Alçak", "Medium": "Orta", "Tall": "Yüksek", "Huge": "Çok yüksek",
