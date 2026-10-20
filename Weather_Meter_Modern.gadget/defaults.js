@@ -10,6 +10,7 @@ var DEFAULTS = {
     pressure: "auto",
     hours: "24",
     days: "3",
+    map: "on",
     tab: "temp",
     // Location: "auto" (Windows location, else IP) or "pick" (a place chosen in the flyout,
     // stored as "lat;lon;name"); recent: up to 5 "name;lat;lon" joined by "|"
@@ -35,11 +36,12 @@ function settingsSpec() {
         { key: "hours", label: { en: "Chart", ru: "График на" }, options: [
             ["24", { en: "24 hours", ru: "24 часа" }], ["48", { en: "48 hours", ru: "48 часов" }]] },
         { key: "days", label: { en: "Days ahead", ru: "Дней вперёд" }, options: [
-            ["3", "3"], ["5", "5"]] }
+            ["3", "3"], ["5", "5"]] },
+        { key: "map", label: { en: "Radar map tab", ru: "Вкладка «Карта»" }, options: OPT.onOff }
     ]);
 }
 
 var SETTINGS_NOTE = {
-    en: "Click the place name on the gadget to search for a city or go back to Auto, which follows you through Windows location (or your IP address when it's off). Click the tabs to switch the chart. Weather data by Open-Meteo.com.",
-    ru: "Клик по названию места на гаджете — поиск города или возврат к режиму «Авто», который следует за вами через определение местоположения Windows (или по IP, если оно выключено). Вкладки переключают график. Данные о погоде: Open-Meteo.com."
+    en: "Click the place name on the gadget to search for a city or go back to Auto, which follows you through Windows location (or your IP address when it's off). Click the tabs to switch the chart. The map shows the rain radar of the last 80 minutes (RainViewer, on an Esri/OpenStreetMap map) and is only downloaded while its tab is open; click it to open Windy. Weather data by Open-Meteo.com.",
+    ru: "Клик по названию места на гаджете — поиск города или возврат к режиму «Авто», который следует за вами через определение местоположения Windows (или по IP, если оно выключено). Вкладки переключают график. Карта показывает радар осадков за последние 80 минут (RainViewer, на карте Esri/OpenStreetMap) и загружается, только пока её вкладка открыта; клик открывает Windy. Данные о погоде: Open-Meteo.com."
 };

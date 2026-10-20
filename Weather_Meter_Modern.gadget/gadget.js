@@ -5,12 +5,15 @@
 //    town to town), else the IP address (get.geojs.io); named via OpenStreetMap Nominatim.
 //    Coordinates are rounded to ~1 km before they leave the PC.
 //  - Or a place picked in the location flyout (place.html), with a short list of recent ones.
+//  - Map tab (can be turned off): RainViewer rain radar of the last 80 minutes, looped over a
+//    dark Esri map; downloaded only while the tab is open.
 // All requests are asynchronous and polled by a 1 s timer, so the Sidebar never blocks.
 
 addStrings({
     en: {
         hdrWeather: "WEATHER", feels: "feels like", locating: "locating…", noWeather: "no weather data",
-        tabTemp: "Temp", tabRain: "Rain", tabWind: "Wind", tabPress: "Pressure",
+        tabTemp: "Temp", tabRain: "Rain", tabWind: "Wind", tabPress: "Pressure", tabMap: "Map",
+        mapHint: "Rain radar. Click to open Windy for this place", radarWait: "loading radar…",
         today: "Today", isThis: "Is this %s?", yes: "Yes", change: "change", placeHint: "Click to pick another place",
         auto: "auto", gusts: "gusts", mm: "mm", ms: "m/s", kmh: "km/h", mph: "mph", kn: "kn",
         hpa: "hPa", mmhg: "mmHg", inhg: "inHg", updated: "updated", herePlace: "current location",
@@ -25,7 +28,8 @@ addStrings({
     },
     ru: {
         hdrWeather: "ПОГОДА", feels: "ощущается", locating: "определяю место…", noWeather: "нет данных о погоде",
-        tabTemp: "Темп.", tabRain: "Осадки", tabWind: "Ветер", tabPress: "Давл.",
+        tabTemp: "Темп.", tabRain: "Осадки", tabWind: "Ветер", tabPress: "Давл.", tabMap: "Карта",
+        mapHint: "Радар осадков. Нажмите, чтобы открыть Windy для этого места", radarWait: "загружаю радар…",
         today: "Сегодня", isThis: "Это %s?", yes: "Да", change: "сменить", placeHint: "Нажмите, чтобы выбрать другое место",
         auto: "авто", gusts: "порывы", mm: "мм", ms: "м/с", kmh: "км/ч", mph: "миль/ч", kn: "уз",
         hpa: "гПа", mmhg: "мм рт. ст.", inhg: "дюйм рт. ст.", updated: "обновлено", herePlace: "текущее место",
@@ -40,7 +44,7 @@ addStrings({
     }
 });
 
-var W, IW, accent, graphH, narrow, hours, days, tUnit, wUnit, pUnit, tab;
+var W, IW, accent, graphH, narrow, hours, days, tUnit, wUnit, pUnit, tab, showMap;
 var ui = null, timer = null, shell, fso;
 var instanceId = Math.floor(Math.random() * 1e9);
 
@@ -50,7 +54,11 @@ var SOURCE_W = 56;   // "Open-Meteo" credit at the end of the place line
 // place: { lat, lon, name, src: "win" | "ip" | "pick" }
 var place = null, forecast = null, forecastAt = 0, forecastFor = "";
 var loc = { running: 0, next: 0, ipNext: 0, ip: null };
-var http = { fc: new Http(), ip: new Http(), name: new Http() };
+var http = { fc: new Http(), ip: new Http(), name: new Http(), radar: new Http() };
+
+// Radar frames from RainViewer: [{ time, path }], refreshed every 10 minutes while the map shows
+var RADAR_EVERY = 10 * 60000, RADAR_FRAMES = 9, MAP_ZOOM = 7;
+var radar = { host: "", frames: [], at: 0, anim: null, idx: 0, hold: 0, layers: [] };
 
 function init() {
     shell = new ActiveXObject("WScript.Shell");
@@ -64,6 +72,7 @@ function init() {
 
 function shutdown() {
     if (timer) clearInterval(timer);
+    stopMapAnim();
 }
 
 function now() { return new Date().getTime(); }
@@ -131,7 +140,9 @@ function readSettings() {
     wUnit = getSetting("wind");
     pUnit = getSetting("pressure");
     if (pUnit == "auto") pUnit = LANG == "ru" ? "mmhg" : "hpa";
+    showMap = getSetting("map") != "off";
     tab = getSetting("tab");
+    if (tab == "map" && !showMap) tab = "temp";
 }
 
 function pickedPlace() {
@@ -332,6 +343,7 @@ function tick() {
         updateLocation();
         updateName();
         updateForecast();
+        updateRadar();
     } catch (e) {
         reportError(ui.desc, "tick", e);
     }
@@ -421,17 +433,20 @@ function rebuild() {
     setHint(ui.time, "Weather data by Open-Meteo.com (CC BY 4.0)", "https://open-meteo.com/");
     y += 20;
 
-    // Tabs
-    ui.tabsY = y;
+    // Tabs, as wide as their names (five short words barely fit 146 px)
     var tabs = [["temp", "tabTemp"], ["rain", "tabRain"], ["wind", "tabWind"], ["press", "tabPress"]];
-    var tw = Math.floor(IW / tabs.length);
+    if (showMap) tabs.push(["map", "tabMap"]);
+    var chars = 0, tx = PAD;
+    for (var i = 0; i < tabs.length; i++) chars += T(tabs[i][1]).length + 2;
     ui.tabs = [];
-    for (var i = 0; i < tabs.length; i++) {
-        var t = label(root, PAD + i * tw, y, tw, narrow ? 9 : 10, THEME.faint, "center", true);
+    for (i = 0; i < tabs.length; i++) {
+        var tw = i == tabs.length - 1 ? PAD + IW - tx : Math.round(IW * (T(tabs[i][1]).length + 2) / chars);
+        var t = label(root, tx, y, tw, narrow ? 9 : 10, THEME.faint, "center", true);
         setText(t, T(tabs[i][1]));
         t.style.cursor = "hand";
         t.onclick = (function (key) { return function () { setSetting("tab", key); tab = key; drawTabs(); drawChart(); }; })(tabs[i][0]);
-        ui.tabs.push({ key: tabs[i][0], el: t, line: rect(root, PAD + i * tw + 4, y + 15, tw - 8, 2, accent) });
+        ui.tabs.push({ key: tabs[i][0], el: t, line: rect(root, tx + 3, y + 15, tw - 6, 2, accent) });
+        tx += tw;
     }
     rect(root, PAD, y + 17, IW, 1, THEME.sep);
     y += 22;
@@ -521,7 +536,9 @@ function draw() {
 
 function drawChart() {
     var f = forecast, box0 = ui.chart;
+    stopMapAnim();
     box0.innerHTML = "";
+    if (tab == "map") { drawMap(box0); return; }
     if (!f || !f.hourly) return;
     var h = f.hourly, start = hourIndex(f), n = Math.min(hours, h.time.length - start);
     if (n <= 0) return;
@@ -605,6 +622,108 @@ function drawChart() {
         var hh = String(h.time[start + i]).substring(11, 13);
         setText(label(box0, lx, rowY + 12, lw, 8, THEME.faint, "center"), hh);
     }
+}
+
+// ---- radar map ----------------------------------------------------------------
+
+function updateRadar() {
+    if (tab != "map" || !ui) return;
+    if (http.radar.busy()) {
+        var d = http.radar.poll();
+        if (d && d.radar && d.radar.past) {
+            radar.host = d.host;
+            radar.frames = d.radar.past.slice(-RADAR_FRAMES);
+            drawChart();
+        }
+        return;
+    }
+    if (now() - radar.at < RADAR_EVERY) return;
+    radar.at = now();
+    http.radar.get("https://api.rainviewer.com/public/weather-maps.json");
+}
+
+// Web Mercator pixel position at zoom z (256 px tiles)
+function worldXY(lat, lon, z) {
+    var n = 256 * Math.pow(2, z), s = Math.sin(lat * Math.PI / 180);
+    return { x: (lon + 180) / 360 * n, y: (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n };
+}
+
+// Tiles covering a w x h view centered on the place: [{ x, y, left, top }] (x wrapped around)
+function viewTiles(c, w, h, z) {
+    var out = [], left = Math.round(c.x - w / 2), top = Math.round(c.y - h / 2), n = Math.pow(2, z);
+    for (var ty = Math.floor(top / 256); ty <= Math.floor((top + h - 1) / 256); ty++)
+        for (var tx = Math.floor(left / 256); tx <= Math.floor((left + w - 1) / 256); tx++)
+            if (ty >= 0 && ty < n) out.push({ x: ((tx % n) + n) % n, y: ty, left: tx * 256 - left, top: ty * 256 - top });
+    return out;
+}
+
+function tileImg(parent, t, src) {
+    var img = document.createElement("img");
+    img.src = src;
+    // Radar tiles come at 512 px and are shown at 256, so they stay sharp on high-DPI screens
+    img.style.cssText = "position:absolute;left:" + t.left + "px;top:" + t.top + "px;width:256px;height:256px;";
+    parent.appendChild(img);
+}
+
+function drawMap(box0) {
+    // Same space as the charts: their value and time rows become map, plus a line for the credits
+    var top = 12, mh = graphH + 12, z = MAP_ZOOM;
+    var info = label(box0, 0, -1, IW, 9, THEME.dim, "right");
+    var credit = label(box0, 0, top + mh + 1, IW, 8, THEME.faint, "right");
+    setText(credit, "© Esri, OpenStreetMap · RainViewer");
+    if (!place) { setText(info, T("locating")); return; }
+
+    var view = box(box0, 0, top, IW, mh, "overflow:hidden;background-color:" + THEME.plot + ";cursor:hand;");
+    view.title = T("mapHint");
+    view.onclick = function () { openUrl("https://www.windy.com/?radar," + place.lat + "," + place.lon + ",8"); };
+    // Esri's dark gray canvas (no key needed): land and water below the radar, place names above it
+    var tiles = viewTiles(worldXY(place.lat, place.lon, z), IW, mh, z), i, j;
+    var esri = function (layer, t) {
+        return "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_" + layer +
+            "/MapServer/tile/" + z + "/" + t.y + "/" + t.x;
+    };
+    for (i = 0; i < tiles.length; i++) tileImg(view, tiles[i], esri("Base", tiles[i]));
+
+    // One layer of radar tiles per frame; the animation shows them in turn
+    radar.layers = [];
+    for (j = 0; j < radar.frames.length; j++) {
+        var layer = box(view, 0, 0, IW, mh, "display:none;");
+        for (i = 0; i < tiles.length; i++)
+            tileImg(layer, tiles[i], radar.host + radar.frames[j].path + "/512/" + z + "/" + tiles[i].x + "/" + tiles[i].y + "/2/1_1.png");
+        radar.layers.push(layer);
+    }
+    for (i = 0; i < tiles.length; i++) tileImg(view, tiles[i], esri("Reference", tiles[i]));
+    // You are here
+    rect(view, Math.round(IW / 2) - 3, Math.round(mh / 2) - 3, 6, 6, "#ffffff");
+    rect(view, Math.round(IW / 2) - 2, Math.round(mh / 2) - 2, 4, 4, accent);
+
+    ui.mapInfo = info;
+    if (!radar.layers.length) { setText(info, T("radarWait")); return; }
+    radar.idx = radar.layers.length - 1;
+    showFrame();
+    radar.anim = setInterval(stepFrame, 500);
+}
+
+// Loops through the frames and rests on the newest one for a moment
+function stepFrame() {
+    if (radar.hold > 0) { radar.hold--; return; }
+    radar.layers[radar.idx].style.display = "none";
+    radar.idx = (radar.idx + 1) % radar.layers.length;
+    showFrame();
+}
+
+function showFrame() {
+    radar.layers[radar.idx].style.display = "";
+    if (radar.idx == radar.layers.length - 1) radar.hold = 4;
+    var d = new Date(radar.frames[radar.idx].time * 1000);
+    setText(ui.mapInfo, d.getHours() + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes());
+    setColor(ui.mapInfo, radar.idx == radar.layers.length - 1 ? THEME.text : THEME.dim);
+}
+
+function stopMapAnim() {
+    if (radar.anim) clearInterval(radar.anim);
+    radar.anim = null;
+    radar.layers = [];
 }
 
 function drawDays() {
