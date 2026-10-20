@@ -38,6 +38,10 @@ All of them have English and Russian, five widths, accent colors, and a five-ste
 3. Right-click the desktop → **Gadgets**, and drag the gadget onto the desktop.
 4. Settings: hover over the gadget and click the wrench icon.
 
+## Fitting them on the screen
+
+The Sidebar doesn't move gadgets out of each other's way, so a column that is too tall overlaps. The quickest fix is the **Graph** setting: **Low** makes each gadget 15–25 px shorter. Drives Meter can also hide its graph, and CPU Meter can list cores instead of threads. With 175% scaling on a 1440p or 4K screen, all five fit in two columns (for example Weather, Drives and Network in one, GPU and CPU in the other) with Network and Weather graphs on Low.
+
 ## Optional extras
 
 Everything works without them. They add data that Windows only gives to drivers or administrators.
@@ -86,6 +90,10 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 2. Скачайте `.gadget`-файлы со страницы [Releases](https://github.com/Silverenio/modern-meters/releases/latest) и дважды щёлкните каждый нужный. Ставить все четыре не обязательно.
 3. Правый клик по рабочему столу → **Гаджеты**, перетащите гаджет на рабочий стол.
 4. Настройки: наведите мышь на гаджет и нажмите на значок гаечного ключа.
+
+## Как уместить их на экране
+
+Боковая панель не раздвигает гаджеты, поэтому слишком высокая колонка налезает сама на себя. Быстрее всего помогает настройка **График**: **Низкий** делает каждый гаджет на 15–25 px короче. В Drives Meter график можно скрыть совсем, а CPU Meter может показывать ядра вместо потоков. При масштабе 175% на экране 1440p или 4K все пять помещаются в две колонки (например, погода, диски и сеть в одной, GPU и CPU в другой), если у сети и погоды график «Низкий».
 
 ## Необязательные дополнения
 

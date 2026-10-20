@@ -67,10 +67,13 @@ function Save-Panels([string]$dir) {
                     $g.DrawPath($pen, $path)
                 } else {
                     $path = New-RoundPath 0 0 $W2 $H2 (12 * $k)
-                    $grad = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, 0, $W2, $H2), $top, $bottom, 90
-                    $g.FillPath($grad, $path)
-                    # Gloss: white fading out over the top 70px below the rim
+                    # Darkens over the top $GradH px, then stays flat (GLASS_GRADIENT_H in common.js)
+                    $g.FillPath((New-Object System.Drawing.SolidBrush $bottom), $path)
                     $g.SetClip($path)
+                    $gh = [Math]::Min($GradH, $h) * $k
+                    $grad = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, 0, $W2, $gh), $top, $bottom, 90
+                    $g.FillRectangle($grad, 0, 0, $W2, $gh - 1)
+                    # Gloss: white fading out over the top 70px below the rim
                     $gl = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, (4 * $k), $W2, (70 * $k)),
                         ([System.Drawing.Color]::FromArgb(22, 255, 255, 255)), ([System.Drawing.Color]::FromArgb(0, 255, 255, 255)), 90
                     # A little short of the brush, which would otherwise wrap around to its start color
@@ -327,6 +330,7 @@ function Save-Gauges([string]$dir) {
     }
 }
 $MinH = 150; $MaxH = 1100   # must match BG_MIN_H / BG_MAX_H in common.js
+$GradH = 300                # must match GLASS_GRADIENT_H in common.js
 # Panels are the same for every gadget: render once, then copy
 $cache = Join-Path $env:TEMP 'modern_meters_panels'
 if (Test-Path $cache) { Remove-Item $cache -Recurse -Force }
