@@ -7,10 +7,10 @@ Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
 | Gadget | Shows |
 |---|---|
 | **CPU Meter Modern** | Load of every thread or core (P-cores and E-cores grouped), clock speed, temperature, RAM and commit, history graph |
-| **GPU Meter Modern** | GPU load, VRAM, memory controller or shared memory, power, fan, clocks, encoder/decoder, temperature, history graph. NVIDIA, AMD and Intel, discrete and integrated, with the same sensors Task Manager uses |
+| **GPU Meter Modern** | GPU load, VRAM, memory controller or shared memory, power, fan (RPM and %), clocks, encoder/decoder, temperature, history graph. NVIDIA, AMD and Intel, discrete and integrated, with the same sensors Task Manager uses |
 | **Network Meter Modern** | Download and upload speed with an auto-scaled graph, Wi-Fi network and signal, IP addresses (hidden until clicked), firewall, traffic totals |
 | **Drives Meter Modern** | Physical disks with their partitions, SMART health, SSD life left, temperature, read/write speed, activity graph |
-| **Weather Meter Modern** | Current weather and a colored hourly chart of temperature, precipitation, wind or pressure (switched by tabs), 3 or 5 days ahead. Follows you from town to town through Windows location |
+| **Weather Meter Modern** | Current weather and a colored hourly chart of temperature, precipitation, wind or pressure (switched by tabs), a rain radar map of the last 80 minutes, 3 or 5 days ahead. Follows you from town to town through Windows location |
 
 All of them speak 12 languages (English, Українська, Русский, Deutsch, Español, Français, Italiano, Polski, Português, Türkçe, 中文, 日本語) and pick yours from Windows, and have five widths, accent colors, and a five-step color scale for load and temperature. Translations live in `shared/lang/`, one file per language; corrections are welcome.
 
@@ -45,6 +45,8 @@ Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your acce
 3. Right-click the desktop → **Gadgets**, and drag the gadget onto the desktop.
 4. Settings: hover over the gadget and click the wrench icon.
 
+To update, install the new `.gadget` files over the old ones the same way. Coming from 1.1.0 or older, restart the Sidebar once afterwards (right-click its tray icon → Exit, then start it again); newer versions reload by themselves when you press OK in their settings.
+
 ## Fitting them on the screen
 
 The Sidebar doesn't move gadgets out of each other's way, so a column that is too tall overlaps. The quickest fix is the **Graph** setting: **Low** makes each gadget 15–25 px shorter. Drives Meter can also hide its graph, and CPU Meter can list cores instead of threads. With 175% scaling on a 1440p or 4K screen, all five fit in two columns (for example Weather, Drives and Network in one, GPU and CPU in the other) with Network and Weather graphs on Low.
@@ -62,12 +64,12 @@ Everything works without them. They add data that Windows only gives to drivers 
 ## Network access
 
 - Network Meter looks up your external IP at api.ipify.org every 30 minutes and when the network changes. You can switch this off in its settings.
-- Weather Meter gets the forecast from [Open-Meteo](https://open-meteo.com/) every 30 minutes. In Auto mode it asks the Windows location service where you are (Settings → Privacy → Location; if that's off, it uses your IP address via get.geojs.io) and gets the place name from OpenStreetMap. Coordinates are rounded to about 1 km before they leave your PC. Pick a city by clicking the place name to turn all of this off.
-- Once a day one of the gadgets asks GitHub whether a newer release exists. If so, a "New version ›" line appears at the bottom of the gadgets and opens the release page. Nothing is downloaded or installed by itself. Settings → **About** → **New versions** → **Don't check** turns this off.
+- Weather Meter gets the forecast from [Open-Meteo](https://open-meteo.com/) every 30 minutes. In Auto mode it asks the Windows location service where you are (Settings → Privacy → Location; if that's off, it uses your IP address via get.geojs.io) and gets the place name from OpenStreetMap. Coordinates are rounded to about 1 km before they leave your PC. Pick a city by clicking the place name to turn all of this off. The radar map loads its tiles from Esri (map) and RainViewer (rain), only while its tab is open; the tab can be turned off in the settings.
+- Once a day one of the gadgets asks GitHub whether a newer release exists. If so, a small "↑ 1.x.x" badge appears in the top right corner of the gadgets and opens the release page when clicked. Nothing is downloaded or installed by itself. Settings → **About** → **New versions** → **Don't check** turns this off.
 
 ## Building from source
 
-Run `build.ps1` in PowerShell. It draws the images, compiles the small Core Temp reader (`tools/coretemp`, with the C# compiler that comes with Windows), and puts the packages in `dist`. `build.ps1 -Install` also copies the gadgets into your Sidebar.
+Run `build.ps1` in PowerShell. It draws the images, compiles the small .NET helpers (the Core Temp reader in `tools/coretemp`, the GPU sensor reader in `tools/gpu` and the panel painter for the colored styles in `tools/panel`, with the C# compiler that comes with Windows), and puts the packages in `dist`. `build.ps1 -Install` also copies the gadgets into your Sidebar.
 
 ## Support
 
@@ -86,12 +88,12 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 | Гаджет | Что показывает |
 |---|---|
 | **CPU Meter Modern** | Загрузку каждого потока или ядра (P- и E-ядра сгруппированы), частоту, температуру, ОЗУ и выделенную память, график |
-| **GPU Meter Modern** | Загрузку GPU, видеопамять, контроллер памяти или общую память, мощность, вентилятор, частоты, кодер/декодер, температуру, график. NVIDIA, AMD и Intel, дискретные и встроенные, по тем же датчикам, что и Диспетчер задач |
+| **GPU Meter Modern** | Загрузку GPU, видеопамять, контроллер памяти или общую память, мощность, вентилятор (обороты и %), частоты, кодер/декодер, температуру, график. NVIDIA, AMD и Intel, дискретные и встроенные, по тем же датчикам, что и Диспетчер задач |
 | **Network Meter Modern** | Скорость загрузки и отдачи с автомасштабом графика, Wi-Fi сеть и сигнал, IP-адреса (скрыты, пока не кликнуть), брандмауэр, счётчики трафика |
 | **Drives Meter Modern** | Физические диски с разделами, состояние SMART, остаток ресурса SSD, температуру, скорость чтения/записи, график активности |
-| **Weather Meter Modern** | Погоду сейчас и цветной почасовой график температуры, осадков, ветра или давления (вкладки), прогноз на 3 или 5 дней. Следует за вами из города в город через определение местоположения Windows |
+| **Weather Meter Modern** | Погоду сейчас и цветной почасовой график температуры, осадков, ветра или давления (вкладки), радарную карту осадков за последние 80 минут, прогноз на 3 или 5 дней. Следует за вами из города в город через определение местоположения Windows |
 
-У всех 12 языков (английский, украинский, русский, немецкий, испанский, французский, итальянский, польский, португальский, турецкий, китайский, японский), язык берётся из Windows; пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: стиль «Стекло» и классический.
+У всех 12 языков (английский, украинский, русский, немецкий, испанский, французский, итальянский, польский, португальский, турецкий, китайский, японский), язык берётся из Windows; пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: светлый, цветное стекло, ретро-терминал, «Стекло» и классический.
 
 Стили: «Стекло», «Классический», «Светлый», «Цветное стекло» (стекло в цвете акцента: голубой, бирюзовый, зелёный, фиолетовый, оранжевый, розовый, красный или жёлтый), «Ретро-терминал» (ЭЛТ-экран со строками развёртки в цвете акцента) и «Авто» — переключается между светлым и стеклом вслед за светлым/тёмным режимом Windows. Фон для цветных стилей рисуется один раз на вашем компьютере, когда впервые понадобится.
 
@@ -101,6 +103,8 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 2. Скачайте `.gadget`-файлы со страницы [Releases](https://github.com/Silverenio/modern-meters/releases/latest) и дважды щёлкните каждый нужный. Ставить все пять не обязательно.
 3. Правый клик по рабочему столу → **Гаджеты**, перетащите гаджет на рабочий стол.
 4. Настройки: наведите мышь на гаджет и нажмите на значок гаечного ключа.
+
+Чтобы обновиться, так же установите новые `.gadget`-файлы поверх старых. При обновлении с 1.1.0 и старше после этого один раз перезапустите боковую панель (правый клик по её значку в трее → Выход, затем запустите снова); новые версии сами перезагружаются, когда вы нажимаете OK в их настройках.
 
 ## Как уместить их на экране
 
@@ -119,12 +123,12 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 ## Обращения в интернет
 
 - Network Meter узнаёт внешний IP у api.ipify.org раз в 30 минут и при смене сети. Это отключается в его настройках.
-- Weather Meter раз в 30 минут берёт прогноз у [Open-Meteo](https://open-meteo.com/). В режиме «Авто» он спрашивает у службы местоположения Windows, где вы (Параметры → Конфиденциальность → Расположение; если она выключена — определяет по IP через get.geojs.io), а название места берёт у OpenStreetMap. Координаты перед отправкой округляются примерно до 1 км. Если выбрать город кликом по названию места, всё это отключается.
-- Раз в сутки один из гаджетов спрашивает у GitHub, не вышла ли новая версия. Если вышла, внизу гаджетов появляется строка «Новая версия ›», которая открывает страницу выпуска. Сами гаджеты ничего не скачивают и не устанавливают. Отключается в настройках: **О гаджете** → **Новые версии** → **Не проверять**.
+- Weather Meter раз в 30 минут берёт прогноз у [Open-Meteo](https://open-meteo.com/). В режиме «Авто» он спрашивает у службы местоположения Windows, где вы (Параметры → Конфиденциальность → Расположение; если она выключена — определяет по IP через get.geojs.io), а название места берёт у OpenStreetMap. Координаты перед отправкой округляются примерно до 1 км. Если выбрать город кликом по названию места, всё это отключается. Радарная карта загружает плитки у Esri (карта) и RainViewer (осадки), только пока открыта её вкладка; вкладку можно выключить в настройках.
+- Раз в сутки один из гаджетов спрашивает у GitHub, не вышла ли новая версия. Если вышла, в правом верхнем углу гаджетов появляется маленький значок «↑ 1.x.x», клик по нему открывает страницу выпуска. Сами гаджеты ничего не скачивают и не устанавливают. Отключается в настройках: **О гаджете** → **Новые версии** → **Не проверять**.
 
 ## Сборка из исходников
 
-Запустите `build.ps1` в PowerShell. Он нарисует картинки, скомпилирует маленькую библиотеку для чтения Core Temp (`tools/coretemp`, компилятором C#, который есть в Windows) и положит пакеты в `dist`. `build.ps1 -Install` заодно установит гаджеты в боковую панель.
+Запустите `build.ps1` в PowerShell. Он нарисует картинки, скомпилирует маленькие .NET-библиотеки (чтение Core Temp в `tools/coretemp`, датчиков видеокарты в `tools/gpu` и рисование фона цветных стилей в `tools/panel`, компилятором C#, который есть в Windows) и положит пакеты в `dist`. `build.ps1 -Install` заодно установит гаджеты в боковую панель.
 
 ## Поддержать
 
