@@ -4,7 +4,7 @@ var DEFAULTS = {
     theme: "classic",
     accent: "orange",
     width: "170",
-    graph: "64",
+    graph: "48",
     unit: "C",
     wind: "ms",
     pressure: "auto",

@@ -715,19 +715,23 @@ function updateAvailable() {
     return s.latest && isNewer(s.latest, VERSION) ? s : null;
 }
 
-// "New version x.y.z ›" under the content while a newer release exists; returns the y below it
-function updateRow(root, y) {
+// "↑ x.y.z" while a newer release exists, in a corner that is free in every gadget, so the
+// gadget keeps its height and doesn't run into its neighbors: the right end of the title bar in
+// glass, the top margin in classic. Call it after the content so it is drawn on top.
+function updateBadge(root) {
     var s = updateAvailable();
     updates.shown = !!s;
-    if (!s) return y;
-    var l = label(root, PAD, y, W - 2 * PAD, 10, ACCENTS[accentName()], "center", true);
-    setText(l, T("update").replace("%s", s.latest.replace(/^v/i, "")));
-    setHint(l, T("updateHint"), s.url || "https://github.com/" + REPO + "/releases/latest");
-    return y + 16;
+    if (!s) return;
+    var ver = s.latest.replace(/^v/i, "");
+    var l = THEME.glass ? label(root, W - PAD - 40, 10, 40, 9, ACCENTS[accentName()], "right", true) :
+        label(root, W - PAD - 40, -1, 40, 8, ACCENTS[accentName()], "right", true);
+    setText(l, "↑ " + ver);
+    setHint(l, T("update").replace("%s", ver).replace(" ›", "") + ". " + T("updateHint"),
+        s.url || "https://github.com/" + REPO + "/releases/latest");
 }
 
 // Checks once a minute whether the daily request is due; onChange (the gadget's rebuild) runs
-// when the update line has to appear or go away
+// when the update badge has to appear or go away
 function watchUpdates(onChange) {
     if (!IS_GADGET || updates.timer) return;
     var poll = function () {

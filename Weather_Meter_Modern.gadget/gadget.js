@@ -13,7 +13,7 @@ addStrings({
         tabTemp: "Temp", tabRain: "Rain", tabWind: "Wind", tabPress: "Pressure",
         today: "Today", isThis: "Is this %s?", yes: "Yes", change: "change", placeHint: "Click to pick another place",
         auto: "auto", gusts: "gusts", mm: "mm", ms: "m/s", kmh: "km/h", mph: "mph", kn: "kn",
-        hpa: "hPa", mmhg: "mmHg", inhg: "inHg", source: "Open-Meteo.com",
+        hpa: "hPa", mmhg: "mmHg", inhg: "inHg", updated: "updated", herePlace: "current location",
         days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         dry: "No rain expected",
         plTitle: "Location", plAuto: "Auto — where I am", plSearch: "Find a city", plFind: "Find",
@@ -28,7 +28,7 @@ addStrings({
         tabTemp: "Темп.", tabRain: "Осадки", tabWind: "Ветер", tabPress: "Давл.",
         today: "Сегодня", isThis: "Это %s?", yes: "Да", change: "сменить", placeHint: "Нажмите, чтобы выбрать другое место",
         auto: "авто", gusts: "порывы", mm: "мм", ms: "м/с", kmh: "км/ч", mph: "миль/ч", kn: "уз",
-        hpa: "гПа", mmhg: "мм рт. ст.", inhg: "дюйм рт. ст.", source: "Open-Meteo.com",
+        hpa: "гПа", mmhg: "мм рт. ст.", inhg: "дюйм рт. ст.", updated: "обновлено", herePlace: "текущее место",
         days: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
         dry: "Без осадков",
         plTitle: "Место", plAuto: "Авто — где я сейчас", plSearch: "Найти город", plFind: "Найти",
@@ -45,6 +45,7 @@ var ui = null, timer = null, shell, fso;
 var instanceId = Math.floor(Math.random() * 1e9);
 
 var FORECAST_EVERY = 30 * 60000, LOCATE_EVERY = 30 * 60000, IP_EVERY = 3 * 3600000;
+var SOURCE_W = 56;   // "Open-Meteo" credit at the end of the place line
 
 // place: { lat, lon, name, src: "win" | "ip" | "pick" }
 var place = null, forecast = null, forecastAt = 0, forecastFor = "";
@@ -214,19 +215,28 @@ function updateLocation() {
 function setPlace(p) {
     var moved = !place || place.lat != p.lat || place.lon != p.lon;
     place = p;
-    // Auto places get their name in the gadget's language from OpenStreetMap
-    if (p.src != "pick") http.name.get("https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=10&lat=" +
-        p.lat + "&lon=" + p.lon + "&accept-language=" + LANG);
+    if (p.src != "pick") requestName();
     if (moved) forecastAt = 0;
     showPlace();
 }
 
+// Auto places get their name in the gadget's language from OpenStreetMap
+var nameRetry = 0;
+
+function requestName() {
+    nameRetry = 0;
+    http.name.get("https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=10&lat=" +
+        place.lat + "&lon=" + place.lon + "&accept-language=" + LANG);
+}
+
 function updateName() {
+    if (nameRetry && now() >= nameRetry && place && !http.name.busy()) requestName();
     var r = http.name.poll();
-    if (!r || !place) return;
-    var a = r.address || {};
-    var n = a.city || a.town || a.village || a.municipality || a.county || r.name;
+    if (r === undefined || !place) return;
+    var a = (r && r.address) || {};
+    var n = a.city || a.town || a.village || a.municipality || a.county || (r && r.name);
     if (n) { place.name = n; showPlace(); }
+    else if (place.src != "pick") nameRetry = now() + 60000;   // busy or offline: ask again later
 }
 
 // Called from the location flyout
@@ -403,9 +413,12 @@ function rebuild() {
     y += narrow ? 50 : 54;
     ui.desc = label(root, PAD, y, IW, 11, THEME.text);
     y += 17;
-    ui.place = label(root, PAD, y, IW - 40, 10, THEME.dim);
+    ui.place = label(root, PAD, y, IW - SOURCE_W, 10, THEME.dim);
     ui.place.style.cursor = "hand";
-    ui.time = label(root, W - PAD - 40, y, 40, 10, THEME.faint, "right");
+    // Credit to the data source (its license asks for it); the update time is in its tooltip
+    ui.time = label(root, W - PAD - SOURCE_W, y + 1, SOURCE_W, 9, THEME.faint, "right");
+    setText(ui.time, "Open-Meteo");
+    setHint(ui.time, "Weather data by Open-Meteo.com (CC BY 4.0)", "https://open-meteo.com/");
     y += 20;
 
     // Tabs
@@ -432,13 +445,10 @@ function rebuild() {
     y += 5;
     var twoLines = IW / days < 44;
     ui.days = box(root, PAD, y, IW, twoLines ? 60 : 50, "");
-    y += twoLines ? 62 : 52;
-    ui.source = label(root, PAD, y, IW, 9, THEME.faint, "right");
-    setText(ui.source, T("source"));
-    setHint(ui.source, "Weather data by Open-Meteo.com (CC BY 4.0)", "https://open-meteo.com/");
-    y += THEME.glass ? 18 : 14;
+    y += twoLines ? 58 : 48;
+    if (THEME.glass) y += 4;
 
-    y = updateRow(root, y);
+    updateBadge(root);
     paintFrame(W, y);
     drawTabs();
     draw();
@@ -473,11 +483,12 @@ function showPlace() {
     ui.place.onclick = openPlaces;
     ui.place.style.cursor = "hand";
     ui.place.title = T("placeHint");
-    ui.place.style.width = (IW - 40) + "px";
+    ui.place.style.width = (IW - SOURCE_W) + "px";
     ui.time.style.display = "";
     setColor(ui.place, THEME.dim);
+    // Without a name yet: no coordinates on screen, they'd show up in every screenshot
     setText(ui.place, place && place.name ? place.name + (auto ? "  ·  " + T("auto") : "") + " ›" :
-        (place ? round2(place.lat) + ", " + round2(place.lon) + " ›" : T("locating")));
+        (place ? T("herePlace") + " ›" : T("locating")));
 }
 
 // Index of the current hour in the hourly arrays
@@ -502,7 +513,8 @@ function draw() {
     setText(ui.feels, T("feels") + " " + temp(c.apparent_temperature));
     setText(ui.desc, wxText(c.weather_code));
     var d = new Date(forecastAt);
-    setText(ui.time, d.getHours() + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes());
+    ui.time.title = "Weather data by Open-Meteo.com (CC BY 4.0)  ·  " + T("updated") + " " +
+        d.getHours() + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
     drawChart();
     drawDays();
 }

@@ -280,7 +280,7 @@ function rebuild() {
         ui.disks.push(b);
     }
 
-    y = updateRow(root, y);
+    updateBadge(root);
     paintFrame(W, y + 6);
     nextHealth = now() + 300000;
     nextVolumes = 0;

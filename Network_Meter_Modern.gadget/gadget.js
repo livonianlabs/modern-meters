@@ -525,7 +525,7 @@ function rebuild() {
         y += 18;
     }
 
-    y = updateRow(root, y);
+    updateBadge(root);
     paintFrame(W, y + 6);
     tick();
     timer = setInterval(tick, interval);

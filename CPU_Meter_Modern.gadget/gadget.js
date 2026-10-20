@@ -254,7 +254,7 @@ function rebuild() {
     }
     y += 8;
 
-    y = updateRow(root, y);
+    updateBadge(root);
     paintFrame(W, y);
     try { tick(); } catch (e) { reportError(ui.sub, "tick", e); }
     timer = setInterval(tick, interval);

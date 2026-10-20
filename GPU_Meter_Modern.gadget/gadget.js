@@ -368,7 +368,7 @@ function rebuild() {
         y += 2;
     }
 
-    y = updateRow(root, y);
+    updateBadge(root);
     paintFrame(W, y);
     if (!provider) return;
     try { provider.start(); } catch (e) { reportError(ui.sub, "start", e); }
