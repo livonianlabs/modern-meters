@@ -1010,10 +1010,25 @@ function watchUpdates(onChange) {
     }, 15000);
 }
 
+var LOADED_AT = new Date().getTime();
+
+// True when a newer version was installed over the running gadget. The settings dialog is read
+// from disk each time and may offer options this page's older code doesn't know.
+function codeChanged() {
+    try {
+        var f = new ActiveXObject("Scripting.FileSystemObject").GetFile(System.Gadget.path + "\\common.js");
+        return new Date(f.DateLastModified).getTime() > LOADED_AT;
+    } catch (e) {
+        return false;
+    }
+}
+
 function hookSettings(onCommit) {
     if (!IS_GADGET) return;
     System.Gadget.settingsUI = "settings.html";
     System.Gadget.onSettingsClosed = function (e) {
-        if (e.closeAction == e.Action.commit) onCommit();
+        if (e.closeAction != e.Action.commit) return;
+        if (codeChanged()) location.reload();
+        else onCommit();
     };
 }
