@@ -1,0 +1,99 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Location</title>
+<style>
+body { margin: 0; padding: 0; width: 260px; font-family: 'Segoe UI'; font-size: 12px; background-color: #15181d; color: #e8eaed; cursor: default; }
+#box { padding: 8px 12px 12px 12px; border: 1px solid #3a3f46; }
+#box.glass { background-color: #0f1a2c; border-color: #3a6fb0; }
+div.t { color: #ff9f43; font-family: 'Segoe UI Semibold', 'Segoe UI'; padding: 8px 0 4px 0; border-bottom: 1px solid #2c3239; margin-bottom: 4px; }
+div.item { padding: 3px 4px; cursor: hand; }
+div.item:hover { background-color: #2c3239; }
+div.on { color: #ff9f43; }
+span.sub { color: #9aa3ad; font-size: 11px; }
+input { width: 168px; font-family: 'Segoe UI'; font-size: 12px; }
+button { font-family: 'Segoe UI'; font-size: 12px; }
+#status { color: #9aa3ad; padding: 3px 4px; }
+</style>
+<script type="text/javascript">
+// Location flyout of Weather Meter Modern: Auto, city search (Open-Meteo geocoding) and the
+// recently picked places. The gadget window owns the state; this page only calls into it.
+var G = System.Gadget.document.parentWindow;
+var req = null, poll = null;
+
+function init() {
+    var s = G.placeState();
+    document.getElementById("box").className = s.glass ? "glass" : "";
+    document.body.style.backgroundColor = s.glass ? "#0f1a2c" : "#15181d";
+    var h = "<div class='t'>" + G.esc(G.T("plTitle")) + "</div>";
+    h += "<div class='item" + (s.mode != "pick" ? " on" : "") + "' onclick='G.useAuto()'>" +
+        (s.mode != "pick" ? "● " : "○ ") + G.esc(G.T("plAuto")) +
+        (s.mode != "pick" && s.name ? " <span class='sub'>— " + G.esc(s.name) + "</span>" : "") + "</div>";
+    h += "<div class='t'>" + G.esc(G.T("plSearch")) + "</div>" +
+        "<input id='q' onkeydown='if (event.keyCode == 13) search()'> <button onclick='search()'>" + G.esc(G.T("plFind")) + "</button>" +
+        "<div id='results'></div>";
+    if (s.recent.length) {
+        h += "<div class='t'>" + G.esc(G.T("plRecent")) + "</div>";
+        for (var i = 0; i < s.recent.length; i++) {
+            var p = s.recent[i], on = s.mode == "pick" && s.name == p.name;
+            h += "<div class='item" + (on ? " on" : "") + "' onclick='G.pickPlace(" + p.lat + "," + p.lon + ",\"" +
+                jsq(p.name) + "\")'>" + (on ? "● " : "○ ") + G.esc(p.name) + "</div>";
+        }
+    }
+    document.getElementById("box").innerHTML = h;
+    fit();
+    try { document.getElementById("q").focus(); } catch (e) { }
+}
+
+// A place name inside a double-quoted JS string inside a single-quoted onclick attribute
+function jsq(s) {
+    return String(s).replace(/\\/g, "\\\\").replace(/"/g, "\\x22").replace(/'/g, "\\x27").replace(/&/g, "&amp;").replace(/</g, "&lt;");
+}
+
+function fit() {
+    document.body.style.height = document.getElementById("box").offsetHeight + "px";
+}
+
+function search() {
+    var q = document.getElementById("q").value.replace(/^\s+|\s+$/g, "");
+    if (!q) return;
+    show("<div id='status'>" + G.esc(G.T("plSearching")) + "</div>");
+    try {
+        req = new ActiveXObject("MSXML2.ServerXMLHTTP.6.0");
+        req.open("GET", "https://geocoding-api.open-meteo.com/v1/search?count=6&format=json&language=" + G.LANG +
+            "&name=" + encodeURIComponent(q), true);
+        req.send();
+    } catch (e) {
+        show("<div id='status'>" + G.esc(G.T("plFailed")) + "</div>");
+        return;
+    }
+    var started = new Date().getTime();
+    if (poll) clearInterval(poll);
+    poll = setInterval(function () {
+        var state = 0;
+        try { state = req.readyState; } catch (e2) { }
+        if (state != 4 && new Date().getTime() - started < 20000) return;
+        clearInterval(poll);
+        var data = null;
+        try { if (state == 4 && req.status == 200) data = G.parseJson(req.responseText); } catch (e3) { }
+        if (!data) { show("<div id='status'>" + G.esc(G.T("plFailed")) + "</div>"); return; }
+        var list = data.results || [], h = "";
+        for (var i = 0; i < list.length; i++) {
+            var r = list[i], sub = [r.admin1, r.country].join(", ").replace(/^, |, $/g, "");
+            h += "<div class='item' onclick='G.pickPlace(" + r.latitude + "," + r.longitude + ",\"" + jsq(r.name) + "\")'>" +
+                G.esc(r.name) + " <span class='sub'>" + G.esc(sub) + "</span></div>";
+        }
+        show(h || "<div id='status'>" + G.esc(G.T("plNothing")) + "</div>");
+    }, 200);
+}
+
+function show(html) {
+    document.getElementById("results").innerHTML = html;
+    fit();
+}
+</script>
+</head>
+<body onload="init()">
+<div id="box"></div>
+</body>
+</html>

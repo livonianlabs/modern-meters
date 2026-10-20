@@ -170,9 +170,126 @@ function Save-Glyphs([string]$dir, [string]$prefix, [string[]]$kinds) {
                 'pulse' {
                     $g.DrawLines($pen, [System.Drawing.PointF[]]@((& $pt 3 17), (& $pt 10 17), (& $pt 13 8), (& $pt 18 26), (& $pt 21 17), (& $pt 29 17)))
                 }
+                'sky' {
+                    # Sun peeking out from behind a cloud
+                    $g.DrawArc($pen, 13, 4, 14, 14, 160, 230)
+                    foreach ($ang in 0, 45, 90, 135) {
+                        $rad = $ang * [Math]::PI / 180
+                        $g.DrawLine($pen, 20 + 10 * [Math]::Cos($rad), 11 - 10 * [Math]::Sin($rad), 20 + 12.5 * [Math]::Cos($rad), 11 - 12.5 * [Math]::Sin($rad))
+                    }
+                    $cloud = New-Object System.Drawing.Drawing2D.GraphicsPath ([System.Drawing.Drawing2D.FillMode]::Winding)
+                    $cloud.AddArc(3, 17, 10, 10, 90, 180)
+                    $cloud.AddArc(8, 11, 12, 12, 180, 180)
+                    $cloud.AddArc(16, 15, 12, 12, 270, 180)
+                    $cloud.CloseFigure()
+                    $g.FillPath((New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 15, 26, 44))), $cloud)
+                    $g.DrawPath($pen, $cloud)
+                }
             }
             $g.Dispose()
             $bmp.Save((Join-Path $dir "${prefix}_${kind}_${name}.png"), [System.Drawing.Imaging.ImageFormat]::Png)
+            $bmp.Dispose()
+        }
+    }
+}
+
+# Weather icons in their own colors (the same in every theme): wx_<kind>.png at 96px for the
+# current conditions (shown at 48) and wxs_<kind>.png at 44px for the day strip (shown at 22).
+# Kinds match wxKind() in Weather Meter's gadget.js.
+function Save-WeatherIcons([string]$dir) {
+    $sunC = [System.Drawing.Color]::FromArgb(255, 255, 201, 60)
+    $moonC = [System.Drawing.Color]::FromArgb(255, 222, 230, 245)
+    $light = [System.Drawing.Color]::FromArgb(255, 234, 240, 247)
+    $mid = [System.Drawing.Color]::FromArgb(255, 176, 188, 204)
+    $dark = [System.Drawing.Color]::FromArgb(255, 112, 126, 146)
+    $rainC = [System.Drawing.Color]::FromArgb(255, 76, 194, 255)
+    $kinds = 'clear_d', 'clear_n', 'partly_d', 'partly_n', 'cloudy', 'fog', 'drizzle', 'rain', 'snow', 'sleet', 'thunder'
+    foreach ($size in 96, 44) {
+        $k = $size / 96   # everything below is laid out on a 96px grid
+        foreach ($kind in $kinds) {
+            $bmp = New-Object System.Drawing.Bitmap $size, $size
+            $g = [System.Drawing.Graphics]::FromImage($bmp)
+            $g.SmoothingMode = 'AntiAlias'
+            $g.Clear([System.Drawing.Color]::Transparent)
+            $g.ScaleTransform($k, $k)
+            $sun = {
+                param($cx, $cy, $r)
+                $b = New-Object System.Drawing.SolidBrush $sunC
+                $p = New-Object System.Drawing.Pen $sunC, ($r * 0.22)
+                $p.StartCap = 'Round'; $p.EndCap = 'Round'
+                for ($a = 0; $a -lt 360; $a += 45) {
+                    $rad = $a * [Math]::PI / 180
+                    $g.DrawLine($p, $cx + $r * 1.35 * [Math]::Cos($rad), $cy + $r * 1.35 * [Math]::Sin($rad), $cx + $r * 1.75 * [Math]::Cos($rad), $cy + $r * 1.75 * [Math]::Sin($rad))
+                }
+                $g.FillEllipse($b, $cx - $r, $cy - $r, 2 * $r, 2 * $r)
+            }
+            $moon = {
+                param($cx, $cy, $r)
+                $p = New-Object System.Drawing.Drawing2D.GraphicsPath
+                $p.AddEllipse($cx - $r, $cy - $r, 2 * $r, 2 * $r)
+                $cut = New-Object System.Drawing.Drawing2D.GraphicsPath
+                $cut.AddEllipse($cx - $r * 0.35, $cy - $r * 1.25, 2 * $r, 2 * $r)
+                $reg = New-Object System.Drawing.Region $p
+                $reg.Exclude($cut)
+                $g.FillRegion((New-Object System.Drawing.SolidBrush $moonC), $reg)
+            }
+            $cloud = {
+                param($x, $y, $w, $color)
+                # A cloud $w wide with its flat bottom at $y
+                $h = $w * 0.62
+                # Winding: the overlapping shapes fill as one instead of cancelling out
+                $p = New-Object System.Drawing.Drawing2D.GraphicsPath ([System.Drawing.Drawing2D.FillMode]::Winding)
+                $p.AddEllipse($x, $y - $h * 0.62, $w * 0.42, $h * 0.62)
+                $p.AddEllipse($x + $w * 0.2, $y - $h, $w * 0.5, $w * 0.5)
+                $p.AddEllipse($x + $w * 0.5, $y - $h * 0.72, $w * 0.5, $h * 0.72)
+                $p.AddRectangle((New-Object System.Drawing.RectangleF ($x + $w * 0.15), ($y - $h * 0.35), ($w * 0.7), ($h * 0.35)))
+                $g.FillRegion((New-Object System.Drawing.SolidBrush $color), (New-Object System.Drawing.Region $p))
+            }
+            $drops = {
+                param($n, $y)
+                $p = New-Object System.Drawing.Pen $rainC, 5
+                $p.StartCap = 'Round'; $p.EndCap = 'Round'
+                for ($i = 0; $i -lt $n; $i++) { $x = 34 + $i * 16 - ($n - 3) * 8; $g.DrawLine($p, $x, $y, $x - 5, $y + 14) }
+            }
+            $flakes = {
+                param($xs, $y)
+                $p = New-Object System.Drawing.Pen $light, 3.5
+                $p.StartCap = 'Round'; $p.EndCap = 'Round'
+                foreach ($x in $xs) {
+                    for ($a = 0; $a -lt 180; $a += 60) {
+                        $rad = $a * [Math]::PI / 180
+                        $g.DrawLine($p, $x - 7 * [Math]::Cos($rad), $y - 7 * [Math]::Sin($rad), $x + 7 * [Math]::Cos($rad), $y + 7 * [Math]::Sin($rad))
+                    }
+                }
+            }
+            switch ($kind) {
+                'clear_d' { & $sun 48 48 20 }
+                'clear_n' { & $moon 48 48 26 }
+                'partly_d' { & $sun 60 34 15; & $cloud 10 78 64 $light }
+                'partly_n' { & $moon 62 32 18; & $cloud 10 78 64 $light }
+                'cloudy' { & $cloud 30 62 56 $mid; & $cloud 8 80 64 $light }
+                'fog' {
+                    & $cloud 16 56 64 $mid
+                    $p = New-Object System.Drawing.Pen $light, 6
+                    $p.StartCap = 'Round'; $p.EndCap = 'Round'
+                    $g.DrawLine($p, 14, 68, 82, 68); $g.DrawLine($p, 22, 82, 74, 82)
+                }
+                'drizzle' { & $cloud 14 60 68 $light; & $drops 2 70 }
+                'rain' { & $cloud 14 60 68 $mid; & $drops 3 70 }
+                'snow' { & $cloud 14 60 68 $light; & $flakes @(30, 50, 70) 78 }
+                'sleet' { & $cloud 14 60 68 $mid; & $drops 1 70; & $flakes @(62) 78 }
+                'thunder' {
+                    & $cloud 14 60 68 $dark
+                    $bolt = [System.Drawing.PointF[]]@(
+                        (New-Object System.Drawing.PointF 52, 52), (New-Object System.Drawing.PointF 38, 74),
+                        (New-Object System.Drawing.PointF 48, 74), (New-Object System.Drawing.PointF 42, 92),
+                        (New-Object System.Drawing.PointF 62, 66), (New-Object System.Drawing.PointF 51, 66),
+                        (New-Object System.Drawing.PointF 58, 52))
+                    $g.FillPolygon((New-Object System.Drawing.SolidBrush $sunC), $bolt)
+                }
+            }
+            $g.Dispose()
+            $bmp.Save((Join-Path $dir "$(if ($size -eq 96) { 'wx' } else { 'wxs' })_$kind.png"), [System.Drawing.Imaging.ImageFormat]::Png)
             $bmp.Dispose()
         }
     }
@@ -214,7 +331,7 @@ $MinH = 150; $MaxH = 1100   # must match BG_MIN_H / BG_MAX_H in common.js
 $cache = Join-Path $env:TEMP 'modern_meters_panels'
 if (Test-Path $cache) { Remove-Item $cache -Recurse -Force }
 Save-Panels $cache
-$gadgets = @{ 'CPU_Meter_Modern.gadget' = 'cpu'; 'GPU_Meter_Modern.gadget' = 'gpu'; 'Network_Meter_Modern.gadget' = 'net'; 'Drives_Meter_Modern.gadget' = 'disk' }
+$gadgets = @{ 'CPU_Meter_Modern.gadget' = 'cpu'; 'GPU_Meter_Modern.gadget' = 'gpu'; 'Network_Meter_Modern.gadget' = 'net'; 'Drives_Meter_Modern.gadget' = 'disk'; 'Weather_Meter_Modern.gadget' = 'sky' }
 foreach ($name in $gadgets.Keys) {
     $dir = Join-Path $Root "$name\img"
     if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
@@ -223,10 +340,12 @@ foreach ($name in $gadgets.Keys) {
     Save-Glyphs $dir 'hdr' @($gadgets[$name])
     Save-Glyphs $dir 'row' @('ram', 'commit', 'bus', 'power', 'fan', 'ip', 'globe', 'shield', 'pulse')
     if ($name -eq 'GPU_Meter_Modern.gadget') { Save-Gauges $dir }
+    if ($name -eq 'Weather_Meter_Modern.gadget') { Save-WeatherIcons $dir }
 }
 Remove-Item $cache -Recurse -Force
 Save-Icon (Join-Path $Root 'CPU_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 76, 194, 255)) 'CPU'
 Save-Icon (Join-Path $Root 'GPU_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 118, 185, 0)) 'GPU'
 Save-Icon (Join-Path $Root 'Network_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 46, 230, 197)) 'NET'
 Save-Icon (Join-Path $Root 'Drives_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 177, 140, 255)) 'DISK'
+Save-Icon (Join-Path $Root 'Weather_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 255, 159, 67)) 'SKY'
 "Images written under $Root"
