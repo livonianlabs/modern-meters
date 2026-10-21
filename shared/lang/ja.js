@@ -22,6 +22,7 @@ addLanguage("ja", "日本語", {
     alarmStop: "過熱しています！クリックすると冷えるまで消音します。",
     update: "新バージョン %s ›",
     updateHint: "クリックでリリースページを開きます。更新が自動でインストールされることはありません。この確認は設定でオフにできます。",
+    procTip: "クリックで負荷の高いプロセスを表示", topCpu: "プロセス · CPU", topRam: "プロセス · メモリ", topVram: "プロセス · ビデオメモリ", topShared: "プロセス · 共有メモリ", topGpu: "プロセス · GPU 負荷", vramStop: "ビデオメモリがほぼいっぱいです！クリックで消音。",
     noNet: "接続なし", ethernet: "イーサネット", intIp: "IP", extIp: "外部 IP",
     firewall: "FW", link: "リンク", on: "オン", off: "オフ", priv: "プライベート", pub: "パブリック", domain: "ドメイン",
     session: "今回", total: "合計", bps: "bit/s", kbps: "kbit/s", Mbps: "Mbit/s", Gbps: "Gbit/s",
@@ -60,6 +61,7 @@ addLanguage("ja", "日本語", {
 }, {
     "Language": "言語", "Auto (as Windows)": "自動（Windows と同じ）", "Display": "表示", "Style": "スタイル",
     "Classic (flat)": "クラシック（フラット）", "Glass": "ガラス", "Colored glass": "カラーガラス", "Light": "ライト", "Retro terminal": "レトロ端末", "Accent color": "アクセントカラー",
+    "For all gadgets": "すべてのガジェットに適用", "Only this one": "このガジェットのみ", "Style and language": "スタイルと言語", "Style, color, language": "スタイル・色・言語", "Alarms": "アラーム", "VRAM above": "VRAM が次を超えたら",
     "Blue": "ブルー", "Teal": "ティール", "Green": "グリーン", "Purple": "パープル", "Orange": "オレンジ", "Pink": "ピンク", "Red": "レッド", "Yellow": "イエロー",
     "Width": "幅", "Classic (%d)": "クラシック (%d)", "Medium (%d)": "中 (%d)", "Wide (%d)": "広い (%d)",
     "Wider (%d)": "より広い (%d)", "Widest (%d)": "最大 (%d)",
@@ -84,10 +86,10 @@ addLanguage("ja", "日本語", {
     "Wind": "風", "m/s": "m/s", "km/h": "km/h", "knots": "ノット", "Pressure": "気圧", "By language": "言語に合わせる",
     "mmHg": "mmHg", "hPa": "hPa", "inHg": "inHg", "Chart": "グラフの範囲", "%d hours": "%d 時間",
     "Days ahead": "予報日数", "Radar map tab": "「地図」タブ",
-    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "ライブゾーン: グラフの右側は直近の数秒を毎秒 5 回の測定で表示します（CPU 使用率が少し上がります）。温度は Core Temp から取得するため、起動しておく必要があります。ガジェットの ♪ をクリックするとアラームのオン/オフや消音ができます。",
-    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "自動: NVIDIA は nvidia-smi（ワット数、エンコーダー、PCIe も表示）、AMD と Intel はタスク マネージャーと同じ Windows のデータを使います。内蔵 GPU は温度を報告しないことがあります。LibreHardwareMonitor が起動していれば補います。ガジェットの ♪ をクリックするとアラームのオン/オフや消音ができます。",
+    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it. Click the processor's name for the busiest processes.":
+        "ライブゾーン: グラフの右側は直近の数秒を毎秒 5 回の測定で表示します（CPU 使用率が少し上がります）。温度は Core Temp から取得するため、起動しておく必要があります。ガジェットの ♪ をクリックするとアラームのオン/オフや消音ができます。プロセッサ名をクリックすると負荷の高いプロセスを表示します。",
+    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it, the blinking VRAM percentage to silence its alarm. Click the card's name for the processes using it.":
+        "自動: NVIDIA は nvidia-smi（ワット数、エンコーダー、PCIe も表示）、AMD と Intel はタスク マネージャーと同じ Windows のデータを使います。内蔵 GPU は温度を報告しないことがあります。LibreHardwareMonitor が起動していれば補います。ガジェットの ♪ をクリックするとアラームのオン/オフや消音ができます。点滅する VRAM の割合をクリックするとアラームを消音、カード名をクリックすると使用中のプロセスを表示します。",
     "Live zone: the right part of the graph shows the last seconds sampled 5 times a second. Click the adapter name for details. The ♪ icon turns the connection-lost alarm on/off. IP addresses are masked; click one to show or hide them (they are masked again after a restart). External IP is looked up at api.ipify.org every 30 minutes and when the network changes; double-click it to look up again. Click \"Session\" to reset it, double-click \"Total\" to reset the total (it is kept in %APPDATA%\\ModernMeters).":
         "ライブゾーン: グラフの右側は直近の数秒を毎秒 5 回の測定で表示します。アダプター名をクリックすると詳細を表示します。♪ アイコンで切断アラームをオン/オフします。IP アドレスは隠されています。クリックすると表示/非表示を切り替えます（再起動後は再び隠れます）。外部 IP は 30 分ごとおよびネットワーク変更時に api.ipify.org から取得します。ダブルクリックで再取得します。「今回」をクリックするとリセット、「合計」をダブルクリックすると合計をリセットします（%APPDATA%\\ModernMeters に保存）。",
     "Health is the drive's own SMART verdict as reported by Windows. SSD life and temperature need administrator rights, so \"Turn on\" adds a small Windows scheduled task that reads them every 5 minutes (hard drives are left alone so they can sleep). Bars show used space; the number next to them is free space.":

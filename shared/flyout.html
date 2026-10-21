@@ -18,10 +18,15 @@ div.light div.t { color: #0a7fd0; border-bottom-color: #e1e6eb; }
 div.light td.k { color: #5d6773; }
 </style>
 <script type="text/javascript">
-// Content comes from the gadget (toggleDetails in common.js)
+// Content comes from the gadget (toggleDetails in common.js), which calls render() again to
+// update an open flyout
 function init() {
     var html = "";
     try { html = System.Gadget.document.parentWindow.flyoutHtml; } catch (e) { }
+    render(html);
+}
+
+function render(html) {
     document.getElementById("content").innerHTML = html;
     var bg = /background-color:(#[0-9a-f]{6})/i.exec(html);
     document.body.style.backgroundColor = bg ? bg[1] : "#15181d";

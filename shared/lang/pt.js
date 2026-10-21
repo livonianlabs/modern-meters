@@ -22,6 +22,7 @@ addLanguage("pt", "Português", {
     alarmStop: "Superaquecimento! Clique para silenciar até esfriar.",
     update: "Nova versão %s ›",
     updateHint: "Clique para abrir a página da versão. Nada é instalado sozinho; esta verificação pode ser desligada nas configurações.",
+    procTip: "Clique para ver os processos mais ativos", topCpu: "Processos · CPU", topRam: "Processos · memória", topVram: "Processos · memória de vídeo", topShared: "Processos · memória compartilhada", topGpu: "Processos · carga da GPU", vramStop: "Memória de vídeo quase cheia! Clique para silenciar.",
     noNet: "sem conexão", ethernet: "Ethernet", intIp: "IP", extIp: "IP externo",
     firewall: "Firewall", link: "Link", on: "Sim", off: "Não", priv: "Privada", pub: "Pública", domain: "Domínio",
     session: "Sessão", total: "Total", bps: "bit/s", kbps: "kbit/s", Mbps: "Mbit/s", Gbps: "Gbit/s",
@@ -60,6 +61,7 @@ addLanguage("pt", "Português", {
 }, {
     "Language": "Idioma", "Auto (as Windows)": "Auto (como o Windows)", "Display": "Aparência", "Style": "Estilo",
     "Classic (flat)": "Clássico (plano)", "Glass": "Vidro", "Colored glass": "Vidro colorido", "Light": "Claro", "Retro terminal": "Terminal retrô", "Accent color": "Cor de destaque",
+    "For all gadgets": "Para todos os gadgets", "Only this one": "Só este", "Style and language": "Estilo e idioma", "Style, color, language": "Estilo, cor, idioma", "Alarms": "Alarmes", "VRAM above": "VRAM acima de",
     "Blue": "Azul", "Teal": "Turquesa", "Green": "Verde", "Purple": "Roxo", "Orange": "Laranja", "Pink": "Rosa", "Red": "Vermelho", "Yellow": "Amarelo",
     "Width": "Largura", "Classic (%d)": "Clássica (%d)", "Medium (%d)": "Média (%d)", "Wide (%d)": "Larga (%d)",
     "Wider (%d)": "Mais larga (%d)", "Widest (%d)": "Muito larga (%d)",
@@ -84,10 +86,10 @@ addLanguage("pt", "Português", {
     "Wind": "Vento", "m/s": "m/s", "km/h": "km/h", "knots": "nós", "Pressure": "Pressão", "By language": "Pelo idioma",
     "mmHg": "mmHg", "hPa": "hPa", "inHg": "inHg", "Chart": "Gráfico de", "%d hours": "%d horas",
     "Days ahead": "Dias de previsão", "Radar map tab": "Aba \"Mapa\"",
-    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "Zona ao vivo: a parte direita do gráfico mostra os últimos segundos medidos 5 vezes por segundo (um pouco mais de uso da CPU). As temperaturas vêm do Core Temp, que precisa estar aberto. Clique em ♪ no gadget para ligar/desligar o alarme ou silenciá-lo.",
-    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "Auto: nvidia-smi para NVIDIA (com watts, codificador e PCIe), Windows para AMD e Intel, os mesmos dados do Gerenciador de Tarefas. Gráficos integrados podem não informar a temperatura; o LibreHardwareMonitor a completa se estiver aberto. Clique em ♪ no gadget para ligar/desligar o alarme ou silenciá-lo.",
+    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it. Click the processor's name for the busiest processes.":
+        "Zona ao vivo: a parte direita do gráfico mostra os últimos segundos medidos 5 vezes por segundo (um pouco mais de uso da CPU). As temperaturas vêm do Core Temp, que precisa estar aberto. Clique em ♪ no gadget para ligar/desligar o alarme ou silenciá-lo. Clique no nome do processador para ver os processos mais ativos.",
+    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it, the blinking VRAM percentage to silence its alarm. Click the card's name for the processes using it.":
+        "Auto: nvidia-smi para NVIDIA (com watts, codificador e PCIe), Windows para AMD e Intel, os mesmos dados do Gerenciador de Tarefas. Gráficos integrados podem não informar a temperatura; o LibreHardwareMonitor a completa se estiver aberto. Clique em ♪ no gadget para ligar/desligar o alarme ou silenciá-lo. Clique na porcentagem de VRAM piscando para silenciar o alarme dela, e no nome da placa para ver os processos que a usam.",
     "Live zone: the right part of the graph shows the last seconds sampled 5 times a second. Click the adapter name for details. The ♪ icon turns the connection-lost alarm on/off. IP addresses are masked; click one to show or hide them (they are masked again after a restart). External IP is looked up at api.ipify.org every 30 minutes and when the network changes; double-click it to look up again. Click \"Session\" to reset it, double-click \"Total\" to reset the total (it is kept in %APPDATA%\\ModernMeters).":
         "Zona ao vivo: a parte direita do gráfico mostra os últimos segundos medidos 5 vezes por segundo. Clique no nome do adaptador para ver detalhes. O ícone ♪ liga/desliga o alarme de perda de conexão. Os endereços IP ficam ocultos; clique em um para mostrá-los ou ocultá-los (voltam a ficar ocultos após reiniciar). O IP externo é consultado em api.ipify.org a cada 30 minutos e quando a rede muda; clique duas vezes para consultar de novo. Clique em \"Sessão\" para zerá-la; clique duas vezes em \"Total\" para zerar o total (guardado em %APPDATA%\\ModernMeters).",
     "Health is the drive's own SMART verdict as reported by Windows. SSD life and temperature need administrator rights, so \"Turn on\" adds a small Windows scheduled task that reads them every 5 minutes (hard drives are left alone so they can sleep). Bars show used space; the number next to them is free space.":

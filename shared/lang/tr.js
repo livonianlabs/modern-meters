@@ -22,6 +22,7 @@ addLanguage("tr", "Türkçe", {
     alarmStop: "Aşırı ısınma! Soğuyana kadar susturmak için tıklayın.",
     update: "Yeni sürüm %s ›",
     updateHint: "Sürüm sayfasını açmak için tıklayın. Güncellemeler asla kendiliğinden yüklenmez; bu denetim ayarlardan kapatılabilir.",
+    procTip: "En etkin işlemler için tıklayın", topCpu: "İşlemler · CPU", topRam: "İşlemler · bellek", topVram: "İşlemler · video belleği", topShared: "İşlemler · paylaşılan bellek", topGpu: "İşlemler · GPU yükü", vramStop: "Video belleği neredeyse dolu! Susturmak için tıklayın.",
     noNet: "bağlantı yok", ethernet: "Ethernet", intIp: "IP", extIp: "Dış IP",
     firewall: "Güvenlik d.", link: "Hız", on: "Açık", off: "Kapalı", priv: "Özel", pub: "Genel", domain: "Etki alanı",
     session: "Oturum", total: "Toplam", bps: "bit/sn", kbps: "kbit/sn", Mbps: "Mbit/sn", Gbps: "Gbit/sn",
@@ -60,6 +61,7 @@ addLanguage("tr", "Türkçe", {
 }, {
     "Language": "Dil", "Auto (as Windows)": "Otomatik (Windows gibi)", "Display": "Görünüm", "Style": "Stil",
     "Classic (flat)": "Klasik (düz)", "Glass": "Cam", "Colored glass": "Renkli cam", "Light": "Açık", "Retro terminal": "Retro terminal", "Accent color": "Vurgu rengi",
+    "For all gadgets": "Tüm gadget'lar için", "Only this one": "Yalnızca bu", "Style and language": "Stil ve dil", "Style, color, language": "Stil, renk, dil", "Alarms": "Alarmlar", "VRAM above": "VRAM üstü",
     "Blue": "Mavi", "Teal": "Turkuaz", "Green": "Yeşil", "Purple": "Mor", "Orange": "Turuncu", "Pink": "Pembe", "Red": "Kırmızı", "Yellow": "Sarı",
     "Width": "Genişlik", "Classic (%d)": "Klasik (%d)", "Medium (%d)": "Orta (%d)", "Wide (%d)": "Geniş (%d)",
     "Wider (%d)": "Daha geniş (%d)", "Widest (%d)": "En geniş (%d)",
@@ -84,10 +86,10 @@ addLanguage("tr", "Türkçe", {
     "Wind": "Rüzgâr", "m/s": "m/sn", "km/h": "km/sa", "knots": "knot", "Pressure": "Basınç", "By language": "Dile göre",
     "mmHg": "mmHg", "hPa": "hPa", "inHg": "inHg", "Chart": "Grafik süresi", "%d hours": "%d saat",
     "Days ahead": "Tahmin günü", "Radar map tab": "\"Harita\" sekmesi",
-    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "Canlı bölge: grafiğin sağ kısmı son saniyeleri saniyede 5 kez ölçerek gösterir (biraz daha fazla CPU kullanımı). Sıcaklıklar Core Temp'ten gelir; çalışıyor olmalıdır. Alarmı açıp kapatmak veya susturmak için gadget'taki ♪ simgesine tıklayın.",
-    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "Otomatik: NVIDIA için nvidia-smi (watt, kodlayıcı ve PCIe ekler), AMD ve Intel için Windows — Görev Yöneticisi'ndeki verilerin aynısı. Tümleşik grafik sıcaklık bildirmeyebilir; LibreHardwareMonitor çalışıyorsa onu tamamlar. Alarmı açıp kapatmak veya susturmak için gadget'taki ♪ simgesine tıklayın.",
+    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it. Click the processor's name for the busiest processes.":
+        "Canlı bölge: grafiğin sağ kısmı son saniyeleri saniyede 5 kez ölçerek gösterir (biraz daha fazla CPU kullanımı). Sıcaklıklar Core Temp'ten gelir; çalışıyor olmalıdır. Alarmı açıp kapatmak veya susturmak için gadget'taki ♪ simgesine tıklayın. En etkin işlemler için işlemci adına tıklayın.",
+    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it, the blinking VRAM percentage to silence its alarm. Click the card's name for the processes using it.":
+        "Otomatik: NVIDIA için nvidia-smi (watt, kodlayıcı ve PCIe ekler), AMD ve Intel için Windows — Görev Yöneticisi'ndeki verilerin aynısı. Tümleşik grafik sıcaklık bildirmeyebilir; LibreHardwareMonitor çalışıyorsa onu tamamlar. Alarmı açıp kapatmak veya susturmak için gadget'taki ♪ simgesine tıklayın. Alarmını susturmak için yanıp sönen VRAM yüzdesine, kartı kullanan işlemler için kart adına tıklayın.",
     "Live zone: the right part of the graph shows the last seconds sampled 5 times a second. Click the adapter name for details. The ♪ icon turns the connection-lost alarm on/off. IP addresses are masked; click one to show or hide them (they are masked again after a restart). External IP is looked up at api.ipify.org every 30 minutes and when the network changes; double-click it to look up again. Click \"Session\" to reset it, double-click \"Total\" to reset the total (it is kept in %APPDATA%\\ModernMeters).":
         "Canlı bölge: grafiğin sağ kısmı son saniyeleri saniyede 5 kez ölçerek gösterir. Ayrıntılar için bağdaştırıcı adına tıklayın. ♪ simgesi bağlantı kopma alarmını açar/kapatır. IP adresleri gizlidir; göstermek veya gizlemek için birine tıklayın (yeniden başlatınca tekrar gizlenir). Dış IP her 30 dakikada bir ve ağ değiştiğinde api.ipify.org'dan sorgulanır; yeniden sorgulamak için çift tıklayın. \"Oturum\"a tıklamak onu sıfırlar, \"Toplam\"a çift tıklamak toplamı sıfırlar (%APPDATA%\\ModernMeters içinde saklanır).",
     "Health is the drive's own SMART verdict as reported by Windows. SSD life and temperature need administrator rights, so \"Turn on\" adds a small Windows scheduled task that reads them every 5 minutes (hard drives are left alone so they can sleep). Bars show used space; the number next to them is free space.":

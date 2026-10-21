@@ -151,7 +151,10 @@ var STRINGS = {
         alarmOff: "Overheat alarm is off. Click to turn on.",
         alarmStop: "Overheating! Click to silence until it cools down.",
         update: "New version %s ›",
-        updateHint: "Click to open the release page. Updates are never installed by themselves; this check can be turned off in the settings."
+        updateHint: "Click to open the release page. Updates are never installed by themselves; this check can be turned off in the settings.",
+        procTip: "Click for the busiest processes", topCpu: "Processes · CPU", topRam: "Processes · memory",
+        topVram: "Processes · video memory", topShared: "Processes · shared memory", topGpu: "Processes · GPU load",
+        vramStop: "Video memory is almost full! Click to silence."
     },
     ru: {
         B: "Б", KB: "КБ", MB: "МБ", TB: "ТБ", Bs: "Б/с", KBs: "КБ/с", MBs: "МБ/с", GBs: "ГБ/с",
@@ -187,7 +190,14 @@ var STRINGS = {
         alarmOff: "Сигнал перегрева выключен. Нажмите, чтобы включить.",
         alarmStop: "Перегрев! Нажмите, чтобы заглушить до остывания.",
         update: "Новая версия %s ›",
-        updateHint: "Нажмите, чтобы открыть страницу выпуска. Сами обновления не устанавливаются; проверку можно выключить в настройках."
+        updateHint: "Нажмите, чтобы открыть страницу выпуска. Сами обновления не устанавливаются; проверку можно выключить в настройках.",
+        procTip: "Нажмите, чтобы увидеть самые активные процессы",
+        topCpu: "Процессы · ЦП",
+        topRam: "Процессы · память",
+        topVram: "Процессы · видеопамять",
+        topShared: "Процессы · общая память",
+        topGpu: "Процессы · нагрузка GPU",
+        vramStop: "Видеопамять почти заполнена! Нажмите, чтобы заглушить."
     }
 };
 
@@ -782,14 +792,17 @@ function soundBusy() {
 // otherwise it turns the alarm on or off.
 // opts (optional): { limit, hyst, tips: {on, off, stop} string keys, onClear: called when an
 // alarm that went off is over }. By default it watches a temperature against "alarmTemp".
+// opts.el instead of the icon: an existing label that only blinks while alarming and silences
+// it on click; the alarm is on when opts.on is.
 function Alarm(parent, x, y, opts) {
     var self = this;
     opts = opts || {};
-    this.icon = label(parent, x, y - 2, 14, 13, THEME.faint, "center");
-    setText(this.icon, "♪");
+    this.el = opts.el;
+    this.icon = this.el || label(parent, x, y - 2, 14, 13, THEME.faint, "center");
+    if (!this.el) setText(this.icon, "♪");
     this.icon.style.cursor = "hand";
     this.icon.onclick = function () { self.click(); };
-    this.on = getSetting("alarm") == "on";
+    this.on = this.el ? !!opts.on : getSetting("alarm") == "on";
     this.limit = opts.limit != null ? opts.limit : parseFloat(getSetting("alarmTemp"));
     this.hyst = opts.hyst != null ? opts.hyst : 3;
     this.tips = opts.tips || { on: "alarmOn", off: "alarmOff", stop: "alarmStop" };
@@ -801,7 +814,7 @@ function Alarm(parent, x, y, opts) {
 }
 
 Alarm.prototype.update = function (value) {
-    this.icon.style.display = value == null ? "none" : "";
+    if (!this.el) this.icon.style.display = value == null ? "none" : "";
     if (this.on && value != null && value >= this.limit) {
         if (!this.firing && !this.snoozed) {
             this.firing = true;
@@ -829,7 +842,7 @@ Alarm.prototype.click = function () {
         stopSound();
         this.firing = false;
         this.snoozed = true;
-    } else {
+    } else if (!this.el) {
         this.on = !this.on;
         setSetting("alarm", this.on ? "on" : "off");
     }
@@ -837,6 +850,16 @@ Alarm.prototype.click = function () {
 };
 
 Alarm.prototype.paint = function () {
+    if (this.el) {
+        // The label keeps its own color and has no tip unless it alarms
+        if (this.firing) {
+            this.el.style.color = this.blink ? THEME.hot : LEVELS[3];
+            this.el._c = null;   // setColor sets it again once it is over
+        }
+        this.el.title = this.firing ? T(this.tips.stop) : "";
+        this.el.style.cursor = this.firing ? "hand" : "default";
+        return;
+    }
     setColor(this.icon, this.firing ? (this.blink ? THEME.hot : LEVELS[3]) : (this.on ? THEME.dim : THEME.faint));
     this.icon.title = T(this.firing ? this.tips.stop : (this.on ? this.tips.on : this.tips.off));
 };
@@ -869,15 +892,46 @@ function detailsHtml(sections) {
     return h;
 }
 
-// Opens the details flyout beside the gadget, or closes it when it is already open
-function toggleDetails(sections) {
+function flyoutPage(sections) {
+    return "<div class='" + (THEME.light ? "light" : (THEME.glass ? "glass" : "classic")) + "' style='background-color:" + THEME.panel +
+        (THEME.edge ? ";border-color:" + THEME.edge : "") + "'>" + detailsHtml(sections) + "</div>";
+}
+
+var flyoutTimer = null;
+
+// [label, value] rows of the TOP_N biggest of [{ name, n (processes), <key> }] by `key`; fmt
+// formats a value and returns "" to leave the item out
+var TOP_N = 6;
+
+function topRows(list, key, fmt) {
+    list.sort(function (a, b) { return b[key] - a[key]; });
+    var rows = [];
+    for (var i = 0; i < list.length && rows.length < TOP_N; i++) {
+        var v = fmt(list[i][key]);
+        if (v) rows.push([list[i].name + (list[i].n > 1 ? "  ×" + list[i].n : ""), v]);
+    }
+    return rows;
+}
+
+// Opens the details flyout beside the gadget, or closes it when it is already open.
+// sections: an array, or a function returning one; with `every` (ms) the function runs again
+// that often while the flyout stays open, and the flyout redraws.
+function toggleDetails(sections, every) {
     if (!IS_GADGET) return;
     var f = System.Gadget.Flyout;
+    if (flyoutTimer) clearInterval(flyoutTimer);
+    flyoutTimer = null;
     if (f.show) { f.show = false; return; }
-    flyoutHtml = "<div class='" + (THEME.light ? "light" : (THEME.glass ? "glass" : "classic")) + "' style='background-color:" + THEME.panel +
-        (THEME.edge ? ";border-color:" + THEME.edge : "") + "'>" + detailsHtml(sections) + "</div>";
+    var build = typeof sections == "function" ? sections : function () { return sections; };
+    flyoutHtml = flyoutPage(build());
     f.file = "flyout.html";
     f.show = true;
+    if (!every) return;
+    flyoutTimer = setInterval(function () {
+        if (!f.show) { clearInterval(flyoutTimer); flyoutTimer = null; return; }
+        flyoutHtml = flyoutPage(build());
+        try { f.document.parentWindow.render(flyoutHtml); } catch (e) { }
+    }, every);
 }
 
 // "20261018054836.000000+180" -> "2026-10-18 05:48"
@@ -897,14 +951,19 @@ var KOFI_URL = "https://ko-fi.com/silverenio";
 var UPDATE_EVERY = 24 * 3600 * 1000;
 var updates = { timer: null, req: null, sent: 0, shown: false };
 
-function updatePath() {
-    return new ActiveXObject("WScript.Shell").ExpandEnvironmentStrings("%APPDATA%") + "\\ModernMeters\\update.txt";
+// %APPDATA%\ModernMeters\<name>: key=value files the gadgets share
+function sharedPath(name) {
+    return new ActiveXObject("WScript.Shell").ExpandEnvironmentStrings("%APPDATA%") + "\\ModernMeters\\" + name;
 }
 
-function readUpdateFile() {
+function readUpdateFile() { return readShared("update.txt"); }
+
+function writeUpdateFile(s) { writeShared("update.txt", s); }
+
+function readShared(name) {
     var s = {};
     try {
-        var f = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(updatePath(), 1), lines = f.ReadAll().split(/\r?\n/);
+        var f = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(sharedPath(name), 1), lines = f.ReadAll().split(/\r?\n/);
         f.Close();
         for (var i = 0; i < lines.length; i++) {
             var at = lines[i].indexOf("=");
@@ -914,11 +973,11 @@ function readUpdateFile() {
     return s;
 }
 
-function writeUpdateFile(s) {
+function writeShared(name, s) {
     try {
-        var fso = new ActiveXObject("Scripting.FileSystemObject"), dir = fso.GetParentFolderName(updatePath());
+        var fso = new ActiveXObject("Scripting.FileSystemObject"), dir = fso.GetParentFolderName(sharedPath(name));
         if (!fso.FolderExists(dir)) fso.CreateFolder(dir);
-        var f = fso.CreateTextFile(updatePath(), true), text = "";
+        var f = fso.CreateTextFile(sharedPath(name), true), text = "";
         for (var k in s) text += k + "=" + s[k] + "\r\n";
         f.Write(text);
         f.Close();
@@ -955,6 +1014,43 @@ function updateBadge(root) {
     setText(l, "↑ " + ver);
     setHint(l, T("update").replace("%s", ver).replace(" ›", "") + ". " + T("updateHint"),
         s.url || "https://github.com/" + REPO + "/releases/latest");
+}
+
+// ---- one style for all gadgets --------------------------------------------
+// With "Apply to all gadgets" on, OK in a gadget's settings writes its style to
+// %APPDATA%\ModernMeters\style.txt, and every gadget (also one added later) takes it over within
+// STYLE_POLL ms. Width, graph and the rest stay per gadget.
+
+var STYLE_POLL = 3000;
+var SYNC_KEYS = { style: ["theme", "lang"], all: ["theme", "lang", "accent"] };
+
+function syncMode(v) {
+    return SYNC_KEYS[v] ? v : "off";
+}
+
+// Called by the settings page once it saved the form. Turning the option off is passed on too,
+// so the gadgets stop following each other.
+function shareStyle(wasMode) {
+    var mode = syncMode(getSetting("sync"));
+    if (mode == "off" && wasMode == "off") return;
+    var s = { stamp: new Date().getTime(), sync: mode }, keys = SYNC_KEYS[mode] || [];
+    for (var i = 0; i < keys.length; i++) s[keys[i]] = getSetting(keys[i]);
+    writeShared("style.txt", s);
+    setSetting("styleStamp", s.stamp);
+}
+
+// Takes over a style shared since this gadget last looked; true when anything changed
+function adoptStyle() {
+    var s = readShared("style.txt");
+    if (!(parseFloat(s.stamp) > (parseFloat(getSetting("styleStamp")) || 0))) return false;
+    setSetting("styleStamp", s.stamp);
+    var changed = false;
+    for (var k in s) {
+        if (k == "stamp" || getSetting(k) == s[k]) continue;
+        setSetting(k, s[k]);
+        changed = true;
+    }
+    return changed;
 }
 
 // Checks once a minute whether the daily request is due; onChange (the gadget's rebuild) runs
@@ -1004,6 +1100,9 @@ function watchUpdates(onChange) {
     };
     updates.timer = setInterval(poll, 60000);
     setTimeout(poll, 10000);
+    // Before the gadget's first build, so it starts in the shared style
+    adoptStyle();
+    setInterval(function () { if (adoptStyle()) onChange(); }, STYLE_POLL);
     // The auto theme follows Windows switching between light and dark mode
     setInterval(function () {
         if (getSetting("theme") == "auto" && themeName("auto") != THEME.name) onChange();

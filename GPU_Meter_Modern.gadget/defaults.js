@@ -12,6 +12,7 @@ var DEFAULTS = {
     details: "on",
     alarm: "off",
     alarmTemp: "85",
+    vramAlarm: "off",
     sound: "Alarm01.wav",
     volume: "100",
     repeat: "loop"
@@ -81,6 +82,10 @@ function settingsSpec() {
     var gpus = listGpus(), cards = [];
     for (var i = 0; i < Math.max(gpus.length, 1); i++)
         cards.push([String(i), gpus[i] ? gpus[i].name.replace(/^(NVIDIA|AMD|Intel\(R\))\s+/i, "") : "GPU " + i]);
+    // Overheat, then nearly full video memory, both with the same sound
+    var alarms = alarmRows({ en: "Alarms", ru: "Сигналы" });
+    alarms.splice(3, 0, { key: "vramAlarm", label: { en: "VRAM above", ru: "VRAM больше" }, options: [
+        ["off", OPT.onOff[1][1]], ["80", "80%"], ["90", "90%"], ["95", "95%"]] });
     return [].concat(generalRows(), [
         { key: "details", label: { en: "Bottom details", ru: "Нижние строки" }, options: OPT.onOff },
         { section: { en: "Data source", ru: "Источник данных" } },
@@ -89,10 +94,10 @@ function settingsSpec() {
             ["smi", "nvidia-smi"],
             ["wmi", { en: "Windows counters", ru: "Счётчики Windows" }]] },
         { key: "gpu", label: { en: "Graphics card", ru: "Видеокарта" }, options: cards }
-    ], alarmRows());
+    ], alarms);
 }
 
 var SETTINGS_NOTE = {
-    en: "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it.",
-    ru: "Авто: для NVIDIA — nvidia-smi (плюс ватты, кодер и PCIe), для AMD и Intel — данные Windows, как в Диспетчере задач. Встроенная графика может не сообщать температуру; её добавит LibreHardwareMonitor, если он запущен. Кнопка ♪ на гаджете включает/выключает сигнал или глушит его."
+    en: "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it, the blinking VRAM percentage to silence its alarm. Click the card's name for the processes using it.",
+    ru: "Авто: для NVIDIA — nvidia-smi (плюс ватты, кодер и PCIe), для AMD и Intel — данные Windows, как в Диспетчере задач. Встроенная графика может не сообщать температуру; её добавит LibreHardwareMonitor, если он запущен. Кнопка ♪ на гаджете включает/выключает сигнал или глушит его, мигающий процент VRAM глушит её сигнал. Клик по названию карты покажет процессы, которые её используют."
 };

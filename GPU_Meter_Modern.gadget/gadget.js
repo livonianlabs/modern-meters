@@ -6,7 +6,7 @@
 //    records from the GPU performance counters and D3DKMT (ModernMetersGpu.dll), the sources
 //    Task Manager uses; LibreHardwareMonitor adds what the driver doesn't report if it runs.
 
-var W, IW, accent, unit, graphH, interval, gpuIndex, source, showDetails, narrow;
+var W, IW, accent, unit, graphH, interval, gpuIndex, source, showDetails, narrow, vramLimit;
 var ui = null, timer = null;
 var shell, fso, wmi, smiPath = null, provider = null, misses = 0;
 var gpus = [], card = null;   // listGpus() (defaults.js), and the one picked in the settings
@@ -19,13 +19,19 @@ function init() {
     gpus = listGpus();
     hookSettings(rebuild);
     watchUpdates(rebuild);
+    if (IS_GADGET) System.Gadget.Flyout.onHide = function () { procs = null; };
     rebuild();
 }
 
 function shutdown() {
     if (timer) clearInterval(timer);
     if (provider) provider.stop();
+    disposeAlarms();
+}
+
+function disposeAlarms() {
     if (ui && ui.alarm) ui.alarm.dispose();
+    if (ui && ui.vramAlarm) ui.vramAlarm.dispose();
 }
 
 function tempPath(name) {
@@ -284,6 +290,70 @@ function pickProvider() {
     return card ? new CounterProvider() : null;
 }
 
+// ---- top processes (flyout) -----------------------------------------------
+
+var procs = null;   // the per-process GPU counters while the flyout is open
+
+// The programs using the most video memory and GPU, from the counters Task Manager shows per
+// process. Integrated graphics count their shared memory. A process's load is its busiest engine.
+function processDetails() {
+    if (!card) return [];
+    if (!procs) {
+        var r = new ActiveXObject("WbemScripting.SWbemRefresher");
+        procs = {
+            refresher: r, first: true, names: {},
+            mem: r.AddEnum(wmi, "Win32_PerfFormattedData_GPUPerformanceCounters_GPUProcessMemory").ObjectSet,
+            eng: r.AddEnum(wmi, "Win32_PerfFormattedData_GPUPerformanceCounters_GPUEngine").ObjectSet
+        };
+    }
+    procs.refresher.Refresh();
+    var tag = ("_luid_" + card.luid + "_").toUpperCase(), pids = {}, e, it, m;
+    var pid = function (name) {
+        var n = String(name).toUpperCase();
+        if (n.indexOf(tag) < 0 || !(m = /^PID_(\d+)_/.exec(n))) return null;
+        return pids[m[1]] || (pids[m[1]] = { mem: 0, eng: {} });
+    };
+    for (e = new Enumerator(procs.mem); !e.atEnd(); e.moveNext()) {
+        it = e.item();
+        var p = pid(it.Name);
+        if (p) p.mem += parseFloat(card.integrated ? it.SharedUsage : it.DedicatedUsage) || 0;
+    }
+    if (!procs.first) {
+        for (e = new Enumerator(procs.eng); !e.atEnd(); e.moveNext()) {
+            it = e.item();
+            var u = parseFloat(it.UtilizationPercentage) || 0, q = u ? pid(it.Name) : null;
+            if (!q) continue;
+            var type = String(it.Name).replace(/^.*engtype_/i, "");
+            q.eng[type] = (q.eng[type] || 0) + u;
+        }
+    }
+    // Program names by process ID, asked again only for processes not seen before
+    var unknown = false;
+    for (var k in pids) if (!procs.names[k]) unknown = true;
+    if (unknown) {
+        try {
+            for (e = new Enumerator(wmi.ExecQuery("SELECT ProcessId,Name FROM Win32_Process")); !e.atEnd(); e.moveNext())
+                procs.names[e.item().ProcessId] = String(e.item().Name).replace(/\.exe$/i, "");
+        } catch (err) { }
+    }
+    var by = {}, list = [];
+    for (k in pids) {
+        var name = procs.names[k] || "PID " + k, g = by[name], load = 0;
+        if (!g) list.push(g = by[name] = { name: name, n: 0, mem: 0, gpu: 0 });
+        for (var t in pids[k].eng) load = Math.max(load, pids[k].eng[t]);
+        g.n++;
+        g.mem += pids[k].mem;
+        g.gpu = Math.min(100, g.gpu + load);
+    }
+    var gpuRows = procs.first ? [] : topRows(list, "gpu", function (v) { return v >= 0.5 ? Math.round(v) + "%" : ""; });
+    procs.first = false;
+    return [
+        { title: T(card.integrated ? "topShared" : "topVram"),
+            rows: topRows(list, "mem", function (v) { return v >= 1048576 ? fmtBytes(v) : ""; }) },
+        { title: T("topGpu"), rows: gpuRows }
+    ];
+}
+
 // ---- layout ---------------------------------------------------------------
 
 function readSettings() {
@@ -300,6 +370,7 @@ function readSettings() {
     card = gpus[gpuIndex] || gpus[0] || null;
     source = getSetting("source");
     showDetails = getSetting("details") != "off";
+    vramLimit = parseFloat(getSetting("vramAlarm")) || 0;
 }
 
 // The label may run under the value: values are right-aligned and short enough to leave room
@@ -322,7 +393,7 @@ function legend(root, x, y, color, text) {
 function rebuild() {
     if (timer) clearInterval(timer);
     if (provider) provider.stop();
-    if (ui && ui.alarm) ui.alarm.dispose();
+    disposeAlarms();
     readSettings();
     provider = pickProvider();
     misses = 0;
@@ -335,6 +406,11 @@ function rebuild() {
 
     ui.name = label(root, PAD, y + 3, IW - 44, narrow ? 12 : 13, THEME.text, "left", true);
     setText(ui.name, provider ? "GPU" : T(card ? "smiMissing" : "noGpu"));
+    if (card) {
+        ui.name.style.cursor = "hand";
+        ui.name.title = T("procTip");
+        ui.name.onclick = function () { toggleDetails(processDetails, 2000); };
+    }
     ui.usage = label(root, W - PAD - 60, y - 3, 60, narrow ? 19 : 22, accent, "right", true);
     y += 22;
     ui.sub = label(root, PAD, y, IW - 50, 11, THEME.dim);
@@ -365,6 +441,9 @@ function rebuild() {
     }
 
     ui.vram = meterRow(root, y, T("vram"), "ram");
+    // Its percentage blinks while video memory is nearly full
+    ui.vramAlarm = new Alarm(root, 0, 0, { el: ui.vram.pct, on: vramLimit > 0, limit: vramLimit, hyst: 3,
+        tips: { stop: "vramStop" } });
     y += 30;
     ui.row2 = meterRow(root, y, "", "bus");
     y += 30;
@@ -423,6 +502,7 @@ function tick() {
             setText(ui.sub, T("nodata"));
             if (ui.graph) ui.graph.push([0, 0]);
             ui.alarm.update(null);
+            ui.vramAlarm.update(null);
         }
         return;
     }
@@ -447,6 +527,7 @@ function tick() {
     setText(ui.vram.name, d.memLabel || T("vram"));
     show(ui.vram, d.vramUsed == null ? "" :
         fmtPair((d.vramUsed / 1024).toFixed(1), (d.vramTotal / 1024).toFixed(1), "GB", narrow), vramPct);
+    ui.vramAlarm.update(vramPct);
     setText(ui.row2.name, d.row2.label);
     show(ui.row2, d.row2.val, d.row2.pct, d.row2.noPct);
     if (d.power == null && d.powerPct != null) {

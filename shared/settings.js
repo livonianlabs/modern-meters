@@ -49,12 +49,16 @@ function generalRows(noTemp, graphOpts) {
             ["terminal", { en: "Retro terminal", ru: "Ретро-терминал" }],
             ["auto", OPT.lang[0][1]]] },
         { key: "accent", label: { en: "Accent color", ru: "Цвет акцента" }, options: OPT.accent },
+        { key: "sync", label: { en: "For all gadgets", ru: "Для всех гаджетов" }, options: [
+            ["off", { en: "Only this one", ru: "Только для этого" }],
+            ["style", { en: "Style and language", ru: "Стиль и язык" }],
+            ["all", { en: "Style, color, language", ru: "Стиль, цвет и язык" }]] },
         { key: "width", label: { en: "Width", ru: "Ширина" }, options: OPT.width },
         { key: "graph", label: { en: "Graph", ru: "График" }, options: graphOpts || OPT.graph },
         { key: "unit", label: { en: "Temperature", ru: "Температура" }, options: OPT.unit },
         { key: "interval", label: { en: "Refresh", ru: "Обновление" }, options: OPT.interval }
     ];
-    if (noTemp) rows.splice(6, 1);
+    if (noTemp) rows.splice(7, 1);
     return rows;
 }
 
@@ -185,7 +189,9 @@ function refreshInfo() {
 function settingsClosing(e) {
     stopSound();
     if (e.closeAction != e.Action.commit) return;
+    var wasSync = syncMode(getSetting("sync"));
     for (var i = 0; i < rows.length; i++)
         if (rows[i].key) setSetting(rows[i].key, selected(rows[i].key));
+    shareStyle(wasSync);
     e.cancel = false;
 }

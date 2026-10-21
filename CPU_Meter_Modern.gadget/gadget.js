@@ -11,6 +11,7 @@ function init() {
     hookSettings(rebuild);
     watchUpdates(rebuild);
     probe();
+    if (IS_GADGET) System.Gadget.Flyout.onHide = function () { procs = null; };
     rebuild();
 }
 
@@ -180,6 +181,9 @@ function rebuild() {
 
     ui.name = label(root, PAD, y + 3, IW - 44, narrow ? 12 : 13, THEME.text, "left", true);
     setText(ui.name, narrow ? cpuName.replace(/^(Intel|AMD)\s+/i, "") : cpuName);
+    ui.name.style.cursor = "hand";
+    ui.name.title = T("procTip");
+    ui.name.onclick = function () { toggleDetails(processDetails, 1500); };
     ui.total = label(root, W - PAD - 60, y - 3, 60, narrow ? 19 : 22, accent, "right", true);
     y += 22;
     ui.sub = label(root, PAD, y, IW - 50, 11, THEME.dim);
@@ -271,6 +275,39 @@ function liveTick() {
         liveItem.refresher.Refresh();
         ui.graph.pushLive([clamp(parseFloat(liveItem.obj.PercentProcessorUtility) || 0, 0, 100)]);
     } catch (e) { }
+}
+
+// ---- top processes (flyout) -----------------------------------------------
+
+var procs = null;   // the per-process counters while the flyout is open
+
+// The busiest programs by CPU and by memory; the processes of one program are added up
+function processDetails() {
+    if (!procs) {
+        var r = new ActiveXObject("WbemScripting.SWbemRefresher");
+        procs = { refresher: r, set: r.AddEnum(wmi, "Win32_PerfFormattedData_PerfProc_Process").ObjectSet, first: true };
+    }
+    procs.refresher.Refresh();
+    var by = {}, list = [];
+    for (var e = new Enumerator(procs.set); !e.atEnd(); e.moveNext()) {
+        var p = e.item(), name = String(p.Name).replace(/#\d+$/, "");
+        if (name == "_Total" || name == "Idle") continue;
+        var r2 = by[name];
+        if (!r2) list.push(r2 = by[name] = { name: name, n: 0, cpu: 0, mem: 0 });
+        r2.n++;
+        r2.cpu += parseFloat(p.PercentProcessorTime) || 0;
+        r2.mem += parseFloat(p.WorkingSetPrivate) || 0;
+    }
+    // Load needs two samples, so it shows from the second one on
+    var cpuRows = procs.first ? [] : topRows(list, "cpu", function (v) {
+        v /= nLogical;
+        return v >= 0.05 ? v.toFixed(1) + "%" : "";
+    });
+    procs.first = false;
+    return [
+        { title: T("topCpu"), rows: cpuRows },
+        { title: T("topRam"), rows: topRows(list, "mem", fmtBytes) }
+    ];
 }
 
 // ---- update ---------------------------------------------------------------

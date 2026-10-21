@@ -22,6 +22,7 @@ addLanguage("uk", "Українська", {
     alarmStop: "Перегрів! Натисніть, щоб приглушити до охолодження.",
     update: "Нова версія %s ›",
     updateHint: "Натисніть, щоб відкрити сторінку випуску. Оновлення ніколи не встановлюються самі; перевірку можна вимкнути в налаштуваннях.",
+    procTip: "Натисніть, щоб побачити найактивніші процеси", topCpu: "Процеси · ЦП", topRam: "Процеси · пам'ять", topVram: "Процеси · відеопам'ять", topShared: "Процеси · спільна пам'ять", topGpu: "Процеси · навантаження GPU", vramStop: "Відеопам'ять майже заповнена! Натисніть, щоб вимкнути звук.",
     noNet: "немає підключення", ethernet: "Ethernet", intIp: "IP", extIp: "Зовнішній IP",
     firewall: "Фаєрвол", link: "Канал", on: "увімк", off: "вимк", priv: "приватна", pub: "загальна", domain: "домен",
     session: "Сеанс", total: "Усього", bps: "біт/с", kbps: "Кбіт/с", Mbps: "Мбіт/с", Gbps: "Гбіт/с",
@@ -60,6 +61,7 @@ addLanguage("uk", "Українська", {
 }, {
     "Language": "Мова", "Auto (as Windows)": "Авто (як у Windows)", "Display": "Вигляд", "Style": "Стиль",
     "Classic (flat)": "Класичний", "Glass": "Скло", "Colored glass": "Кольорове скло", "Light": "Світлий", "Retro terminal": "Ретро-термінал", "Accent color": "Колір акценту",
+    "For all gadgets": "Для всіх гаджетів", "Only this one": "Лише для цього", "Style and language": "Стиль і мова", "Style, color, language": "Стиль, колір і мова", "Alarms": "Сигнали", "VRAM above": "VRAM більше",
     "Blue": "Блакитний", "Teal": "Бірюзовий", "Green": "Зелений", "Purple": "Фіолетовий", "Orange": "Помаранчевий", "Pink": "Рожевий", "Red": "Червоний", "Yellow": "Жовтий",
     "Width": "Ширина", "Classic (%d)": "Як старі (%d)", "Medium (%d)": "Середній (%d)", "Wide (%d)": "Широкий (%d)",
     "Wider (%d)": "Ширший (%d)", "Widest (%d)": "Дуже широкий (%d)",
@@ -84,10 +86,10 @@ addLanguage("uk", "Українська", {
     "Wind": "Вітер", "m/s": "м/с", "km/h": "км/год", "knots": "вузли", "Pressure": "Тиск", "By language": "За мовою",
     "mmHg": "мм рт. ст.", "hPa": "гПа", "inHg": "дюйми рт. ст.", "Chart": "Графік на", "%d hours": "%d годин",
     "Days ahead": "Днів наперед", "Radar map tab": "Вкладка «Мапа»",
-    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "Плавна зона: права частина графіка показує останні секунди з опитуванням 5 разів на секунду (трохи більше навантаження). Температури беруться з Core Temp — він має бути запущений. Кнопка ♪ на гаджеті вмикає/вимикає сигнал або приглушує його.",
-    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "Авто: для NVIDIA — nvidia-smi (плюс вати, кодер і PCIe), для AMD та Intel — дані Windows, як у Диспетчері завдань. Вбудована графіка може не повідомляти температуру; її додасть LibreHardwareMonitor, якщо він запущений. Кнопка ♪ на гаджеті вмикає/вимикає сигнал або приглушує його.",
+    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it. Click the processor's name for the busiest processes.":
+        "Плавна зона: права частина графіка показує останні секунди з опитуванням 5 разів на секунду (трохи більше навантаження). Температури беруться з Core Temp — він має бути запущений. Кнопка ♪ на гаджеті вмикає/вимикає сигнал або приглушує його. Клік по назві процесора покаже найактивніші процеси.",
+    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it, the blinking VRAM percentage to silence its alarm. Click the card's name for the processes using it.":
+        "Авто: для NVIDIA — nvidia-smi (плюс вати, кодер і PCIe), для AMD та Intel — дані Windows, як у Диспетчері завдань. Вбудована графіка може не повідомляти температуру; її додасть LibreHardwareMonitor, якщо він запущений. Кнопка ♪ на гаджеті вмикає/вимикає сигнал або приглушує його. Клік по мигаючому відсотку VRAM вимикає його сигнал, по назві карти — показує процеси, що її використовують.",
     "Live zone: the right part of the graph shows the last seconds sampled 5 times a second. Click the adapter name for details. The ♪ icon turns the connection-lost alarm on/off. IP addresses are masked; click one to show or hide them (they are masked again after a restart). External IP is looked up at api.ipify.org every 30 minutes and when the network changes; double-click it to look up again. Click \"Session\" to reset it, double-click \"Total\" to reset the total (it is kept in %APPDATA%\\ModernMeters).":
         "Плавна зона: права частина графіка показує останні секунди з опитуванням 5 разів на секунду. Клік по імені адаптера — подробиці. Значок ♪ вмикає/вимикає сигнал обриву зв'язку. IP-адреси приховано; клік по адресі показує або ховає їх (після перезапуску знову приховані). Зовнішній IP запитується в api.ipify.org раз на 30 хвилин і при зміні мережі; подвійний клік по ньому — запитати знову. Клік по «Сеанс» обнуляє його, подвійний клік по «Усього» обнуляє загальний лічильник (зберігається в %APPDATA%\\ModernMeters).",
     "Health is the drive's own SMART verdict as reported by Windows. SSD life and temperature need administrator rights, so \"Turn on\" adds a small Windows scheduled task that reads them every 5 minutes (hard drives are left alone so they can sleep). Bars show used space; the number next to them is free space.":

@@ -22,6 +22,7 @@ addLanguage("zh", "中文", {
     alarmStop: "过热！点击静音，直到温度降下来。",
     update: "新版本 %s ›",
     updateHint: "点击打开发布页面。更新从不会自动安装；可在设置中关闭此检查。",
+    procTip: "单击查看最活跃的进程", topCpu: "进程 · CPU", topRam: "进程 · 内存", topVram: "进程 · 显存", topShared: "进程 · 共享内存", topGpu: "进程 · GPU 负载", vramStop: "显存即将用尽！单击静音。",
     noNet: "无连接", ethernet: "以太网", intIp: "IP", extIp: "外部 IP",
     firewall: "防火墙", link: "连接", on: "开", off: "关", priv: "专用", pub: "公用", domain: "域",
     session: "本次", total: "总计", bps: "bit/s", kbps: "kbit/s", Mbps: "Mbit/s", Gbps: "Gbit/s",
@@ -60,6 +61,7 @@ addLanguage("zh", "中文", {
 }, {
     "Language": "语言", "Auto (as Windows)": "自动（同 Windows）", "Display": "外观", "Style": "样式",
     "Classic (flat)": "经典（扁平）", "Glass": "玻璃", "Colored glass": "彩色玻璃", "Light": "浅色", "Retro terminal": "复古终端", "Accent color": "强调色",
+    "For all gadgets": "应用于所有小工具", "Only this one": "仅此小工具", "Style and language": "样式和语言", "Style, color, language": "样式、颜色和语言", "Alarms": "警报", "VRAM above": "显存高于",
     "Blue": "蓝色", "Teal": "青色", "Green": "绿色", "Purple": "紫色", "Orange": "橙色", "Pink": "粉色", "Red": "红色", "Yellow": "黄色",
     "Width": "宽度", "Classic (%d)": "经典 (%d)", "Medium (%d)": "中等 (%d)", "Wide (%d)": "宽 (%d)",
     "Wider (%d)": "更宽 (%d)", "Widest (%d)": "最宽 (%d)",
@@ -84,10 +86,10 @@ addLanguage("zh", "中文", {
     "Wind": "风速", "m/s": "米/秒", "km/h": "公里/时", "knots": "节", "Pressure": "气压", "By language": "按语言",
     "mmHg": "毫米汞柱", "hPa": "百帕", "inHg": "英寸汞柱", "Chart": "图表范围", "%d hours": "%d 小时",
     "Days ahead": "预报天数", "Radar map tab": "“地图”标签",
-    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "实时区域：图表右侧以每秒 5 次的采样显示最近几秒（CPU 占用稍高）。温度来自 Core Temp，需保持其运行。点击小工具上的 ♪ 可开关警报或静音。",
-    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "自动：NVIDIA 使用 nvidia-smi（另有功耗瓦数、编码器和 PCIe），AMD 和 Intel 使用 Windows 数据，与任务管理器相同。集成显卡可能不报告温度；运行 LibreHardwareMonitor 时会补全。点击小工具上的 ♪ 可开关警报或静音。",
+    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it. Click the processor's name for the busiest processes.":
+        "实时区域：图表右侧以每秒 5 次的采样显示最近几秒（CPU 占用稍高）。温度来自 Core Temp，需保持其运行。点击小工具上的 ♪ 可开关警报或静音。单击处理器名称可查看最活跃的进程。",
+    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it, the blinking VRAM percentage to silence its alarm. Click the card's name for the processes using it.":
+        "自动：NVIDIA 使用 nvidia-smi（另有功耗瓦数、编码器和 PCIe），AMD 和 Intel 使用 Windows 数据，与任务管理器相同。集成显卡可能不报告温度；运行 LibreHardwareMonitor 时会补全。点击小工具上的 ♪ 可开关警报或静音。单击闪烁的显存百分比可使其警报静音，单击显卡名称可查看使用它的进程。",
     "Live zone: the right part of the graph shows the last seconds sampled 5 times a second. Click the adapter name for details. The ♪ icon turns the connection-lost alarm on/off. IP addresses are masked; click one to show or hide them (they are masked again after a restart). External IP is looked up at api.ipify.org every 30 minutes and when the network changes; double-click it to look up again. Click \"Session\" to reset it, double-click \"Total\" to reset the total (it is kept in %APPDATA%\\ModernMeters).":
         "实时区域：图表右侧以每秒 5 次的采样显示最近几秒。点击适配器名称查看详情。♪ 图标可开关断网警报。IP 地址默认隐藏；点击任一地址可显示或隐藏（重启后再次隐藏）。外部 IP 每 30 分钟及网络变化时从 api.ipify.org 查询；双击可重新查询。点击“本次”清零本次流量，双击“总计”清零总流量（保存在 %APPDATA%\\ModernMeters）。",
     "Health is the drive's own SMART verdict as reported by Windows. SSD life and temperature need administrator rights, so \"Turn on\" adds a small Windows scheduled task that reads them every 5 minutes (hard drives are left alone so they can sleep). Bars show used space; the number next to them is free space.":

@@ -29,6 +29,6 @@ function settingsSpec() {
 }
 
 var SETTINGS_NOTE = {
-    en: "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it.",
-    ru: "Плавная зона: правая часть графика показывает последние секунды с опросом 5 раз в секунду (чуть больше нагрузки). Температуры берутся из Core Temp — он должен быть запущен. Кнопка ♪ на гаджете включает/выключает сигнал или глушит его."
+    en: "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it. Click the processor's name for the busiest processes.",
+    ru: "Плавная зона: правая часть графика показывает последние секунды с опросом 5 раз в секунду (чуть больше нагрузки). Температуры берутся из Core Temp — он должен быть запущен. Кнопка ♪ на гаджете включает/выключает сигнал или глушит его. Клик по названию процессора покажет самые активные процессы."
 };

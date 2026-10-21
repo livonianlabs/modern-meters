@@ -22,6 +22,7 @@ addLanguage("it", "Italiano", {
     alarmStop: "Surriscaldamento! Fai clic per silenziare finché non si raffredda.",
     update: "Nuova versione %s ›",
     updateHint: "Fai clic per aprire la pagina della versione. Gli aggiornamenti non si installano mai da soli; il controllo si può disattivare nelle impostazioni.",
+    procTip: "Clic per i processi più attivi", topCpu: "Processi · CPU", topRam: "Processi · memoria", topVram: "Processi · memoria video", topShared: "Processi · memoria condivisa", topGpu: "Processi · carico GPU", vramStop: "Memoria video quasi piena! Clic per silenziare.",
     noNet: "nessuna connessione", ethernet: "Ethernet", intIp: "IP", extIp: "IP esterno",
     firewall: "Firewall", link: "Link", on: "Sì", off: "No", priv: "Privata", pub: "Pubblica", domain: "Dominio",
     session: "Sessione", total: "Totale", bps: "bit/s", kbps: "kbit/s", Mbps: "Mbit/s", Gbps: "Gbit/s",
@@ -60,6 +61,7 @@ addLanguage("it", "Italiano", {
 }, {
     "Language": "Lingua", "Auto (as Windows)": "Auto (come Windows)", "Display": "Aspetto", "Style": "Stile",
     "Classic (flat)": "Classico (piatto)", "Glass": "Vetro", "Colored glass": "Vetro colorato", "Light": "Chiaro", "Retro terminal": "Terminale retrò", "Accent color": "Colore d'accento",
+    "For all gadgets": "Per tutti i gadget", "Only this one": "Solo questo", "Style and language": "Stile e lingua", "Style, color, language": "Stile, colore, lingua", "Alarms": "Allarmi", "VRAM above": "VRAM oltre",
     "Blue": "Blu", "Teal": "Turchese", "Green": "Verde", "Purple": "Viola", "Orange": "Arancione", "Pink": "Rosa", "Red": "Rosso", "Yellow": "Giallo",
     "Width": "Larghezza", "Classic (%d)": "Classica (%d)", "Medium (%d)": "Media (%d)", "Wide (%d)": "Larga (%d)",
     "Wider (%d)": "Più larga (%d)", "Widest (%d)": "Larghissima (%d)",
@@ -84,10 +86,10 @@ addLanguage("it", "Italiano", {
     "Wind": "Vento", "m/s": "m/s", "km/h": "km/h", "knots": "nodi", "Pressure": "Pressione", "By language": "In base alla lingua",
     "mmHg": "mmHg", "hPa": "hPa", "inHg": "inHg", "Chart": "Grafico di", "%d hours": "%d ore",
     "Days ahead": "Giorni di previsione", "Radar map tab": "Scheda «Mappa»",
-    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "Zona live: la parte destra del grafico mostra gli ultimi secondi campionati 5 volte al secondo (un po' più di carico sulla CPU). Le temperature arrivano da Core Temp, che deve essere in esecuzione. Fai clic su ♪ nel gadget per attivare/disattivare l'allarme o silenziarlo.",
-    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it.":
-        "Auto: nvidia-smi per NVIDIA (aggiunge watt, encoder e PCIe), Windows per AMD e Intel, gli stessi dati di Gestione attività. La grafica integrata può non riportare la temperatura; LibreHardwareMonitor la aggiunge se è in esecuzione. Fai clic su ♪ nel gadget per attivare/disattivare l'allarme o silenziarlo.",
+    "Live zone: the right part of the graph shows the last seconds sampled 5 times a second (a little more CPU use). Temperatures come from Core Temp, which must be running. Click ♪ on the gadget to turn the alarm on/off or to silence it. Click the processor's name for the busiest processes.":
+        "Zona live: la parte destra del grafico mostra gli ultimi secondi campionati 5 volte al secondo (un po' più di carico sulla CPU). Le temperature arrivano da Core Temp, che deve essere in esecuzione. Fai clic su ♪ nel gadget per attivare/disattivare l'allarme o silenziarlo. Clic sul nome del processore per i processi più attivi.",
+    "Auto: nvidia-smi for NVIDIA (adds watts, encoder and PCIe), Windows for AMD and Intel, the same data Task Manager shows. Integrated graphics may not report temperature; LibreHardwareMonitor fills it in if it runs. Click ♪ on the gadget to turn the alarm on/off or to silence it, the blinking VRAM percentage to silence its alarm. Click the card's name for the processes using it.":
+        "Auto: nvidia-smi per NVIDIA (aggiunge watt, encoder e PCIe), Windows per AMD e Intel, gli stessi dati di Gestione attività. La grafica integrata può non riportare la temperatura; LibreHardwareMonitor la aggiunge se è in esecuzione. Fai clic su ♪ nel gadget per attivare/disattivare l'allarme o silenziarlo. Clic sulla percentuale VRAM lampeggiante per silenziarne l'allarme, sul nome della scheda per i processi che la usano.",
     "Live zone: the right part of the graph shows the last seconds sampled 5 times a second. Click the adapter name for details. The ♪ icon turns the connection-lost alarm on/off. IP addresses are masked; click one to show or hide them (they are masked again after a restart). External IP is looked up at api.ipify.org every 30 minutes and when the network changes; double-click it to look up again. Click \"Session\" to reset it, double-click \"Total\" to reset the total (it is kept in %APPDATA%\\ModernMeters).":
         "Zona live: la parte destra del grafico mostra gli ultimi secondi campionati 5 volte al secondo. Fai clic sul nome della scheda per i dettagli. L'icona ♪ attiva/disattiva l'allarme perdita connessione. Gli indirizzi IP sono nascosti; fai clic su uno per mostrarli o nasconderli (tornano nascosti dopo un riavvio). L'IP esterno viene chiesto ad api.ipify.org ogni 30 minuti e al cambio di rete; doppio clic per richiederlo. Clic su «Sessione» la azzera, doppio clic su «Totale» azzera il totale (salvato in %APPDATA%\\ModernMeters).",
     "Health is the drive's own SMART verdict as reported by Windows. SSD life and temperature need administrator rights, so \"Turn on\" adds a small Windows scheduled task that reads them every 5 minutes (hard drives are left alone so they can sleep). Bars show used space; the number next to them is free space.":
