@@ -21,7 +21,8 @@ addLanguage("tr", "Türkçe", {
     alarmOff: "Aşırı ısınma alarmı kapalı. Açmak için tıklayın.",
     alarmStop: "Aşırı ısınma! Soğuyana kadar susturmak için tıklayın.",
     update: "Yeni sürüm %s ›",
-    updateHint: "Sürüm sayfasını açmak için tıklayın. Güncellemeler asla kendiliğinden yüklenmez; bu denetim ayarlardan kapatılabilir.",
+    updateHint: "Yüklemek için tıklayın: gadget'lar onu GitHub'dan indirir ve kendiliğinden yeniden başlar. Tıklamanız olmadan hiçbir şey yüklenmez; denetim ayarlardan kapatılabilir.",
+    updating: "Yükleniyor…", updateFailed: "Yüklenemedi (%s). Sürüm sayfasını açıp elle yüklemek için tıklayın.",
     procTip: "En etkin işlemler için tıklayın", topCpu: "İşlemler · CPU", topRam: "İşlemler · bellek", topVram: "İşlemler · video belleği", topShared: "İşlemler · paylaşılan bellek", topGpu: "İşlemler · GPU yükü", vramStop: "Video belleği neredeyse dolu! Susturmak için tıklayın.",
     noNet: "bağlantı yok", ethernet: "Ethernet", intIp: "IP", extIp: "Dış IP",
     firewall: "Güvenlik d.", link: "Hız", on: "Açık", off: "Kapalı", priv: "Özel", pub: "Genel", domain: "Etki alanı",
@@ -61,6 +62,7 @@ addLanguage("tr", "Türkçe", {
 }, {
     "Language": "Dil", "Auto (as Windows)": "Otomatik (Windows gibi)", "Display": "Görünüm", "Style": "Stil",
     "Classic (flat)": "Klasik (düz)", "Glass": "Cam", "Colored glass": "Renkli cam", "Light": "Açık", "Retro terminal": "Retro terminal", "Accent color": "Vurgu rengi",
+    "Terminal: black and white": "Terminal: siyah beyaz", "Terminal: Norton Commander": "Terminal: Norton Commander", "Terminal: Ubuntu": "Terminal: Ubuntu", "Windows classic": "Klasik Windows", "Glass frosting": "Cam buzluluğu", "Glass tint": "Cam tonu", "By wallpaper": "Duvar kâğıdına göre", "Dark": "Koyu",
     "For all gadgets": "Tüm gadget'lar için", "Only this one": "Yalnızca bu", "Style and language": "Stil ve dil", "Style, color, language": "Stil, renk, dil", "Alarms": "Alarmlar", "VRAM above": "VRAM üstü",
     "Blue": "Mavi", "Teal": "Turkuaz", "Green": "Yeşil", "Purple": "Mor", "Orange": "Turuncu", "Pink": "Pembe", "Red": "Kırmızı", "Yellow": "Sarı",
     "Width": "Genişlik", "Classic (%d)": "Klasik (%d)", "Medium (%d)": "Orta (%d)", "Wide (%d)": "Geniş (%d)",

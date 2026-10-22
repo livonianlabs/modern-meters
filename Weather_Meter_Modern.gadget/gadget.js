@@ -362,17 +362,23 @@ function pressVal(hpa) {
     return pUnit == "mmhg" ? Math.round(hpa * 0.750062) : pUnit == "inhg" ? (hpa * 0.02953).toFixed(2) : Math.round(hpa);
 }
 
-// Color scales after Windy's
-function scale(stops, v) {
+// Color scales after Windy's; kind: temp, wind or rain. The terminals with their own palette
+// have scales in it, Norton's in steps as its 16 colors had no shades between them.
+function scale(kind, v) {
+    var stops = (THEME_SCALES[THEME.scales || THEME.name] || DEFAULT_SCALES)[kind];
     if (v <= stops[0][0]) return stops[0][1];
-    for (var i = 1; i < stops.length; i++)
-        if (v <= stops[i][0]) return mix(stops[i - 1][1], stops[i][1], (v - stops[i - 1][0]) / (stops[i][0] - stops[i - 1][0]));
+    for (var i = 1; i < stops.length; i++) {
+        if (v > stops[i][0]) continue;
+        var f = (v - stops[i - 1][0]) / (stops[i][0] - stops[i - 1][0]);
+        if (THEME.name == "norton") return stops[f < 0.5 ? i - 1 : i][1];
+        return mix(stops[i - 1][1], stops[i][1], f);
+    }
     return stops[stops.length - 1][1];
 }
 
-// The scales' pastel colors, a little deeper on the light panel
+// The default scales' pastel colors, a little deeper on the light panel
 function tone(c) {
-    return THEME.light ? mix(c, "#000000", 0.18) : c;
+    return THEME.light && !THEME_SCALES[THEME.name] ? mix(c, "#000000", 0.18) : c;
 }
 
 // Weather icon file prefix: wx_/wxs_, or wxl_/wxsl_ with darker clouds for the light theme
@@ -380,9 +386,56 @@ function wxIcon(prefix) {
     return prefix + (THEME.light ? "l_" : "_");
 }
 
-var TEMP_COLORS = [[-25, "#9b5de5"], [-10, "#3a86ff"], [0, "#4cc2ff"], [10, "#7ee787"], [20, "#f5d547"], [28, "#ff9f43"], [35, "#ff5f56"]];
-var WIND_COLORS = [[0, "#3a86ff"], [3, "#4cc2ff"], [6, "#7ee787"], [10, "#f5d547"], [15, "#ff9f43"], [20, "#ff5f56"], [28, "#b18cff"]];
-var RAIN_COLORS = [[0, "#9ad0ff"], [1, "#4cc2ff"], [4, "#3a86ff"], [10, "#9b5de5"]];
+// The icon for prefix (wx, wxs) and kind: in the accent of a terminal with its own palette, a
+// shade darker on the gray of Windows classic and the white of Liquid Glass
+function wxSrc(prefix, kind) {
+    var file = wxIcon(prefix) + kind, out = null;
+    // Read from the gadget folder only when drawn (outside the Sidebar there is none)
+    var src = function () { return System.Gadget.path + "\\img\\" + file + ".png"; };
+    if (THEME.terminal && THEME.accents) out = themeImage(themeKey() + "_tint_" + file + ".png", function (p, path) {
+        return p.Tint(src(), path, ACCENTS[accentName()]);
+    });
+    else if (THEME.bevel || (THEME.art == "liquid" && THEME.light)) out = themeImage(themeKey() + "_shade_" + file + ".png", function (p, path) {
+        return p.Shade(src(), path, THEME.bevel ? 0.72 : 0.8);
+    });
+    return out || "img/" + file + ".png";
+}
+
+var DEFAULT_SCALES = {
+    temp: [[-25, "#9b5de5"], [-10, "#3a86ff"], [0, "#4cc2ff"], [10, "#7ee787"], [20, "#f5d547"], [28, "#ff9f43"], [35, "#ff5f56"]],
+    wind: [[0, "#3a86ff"], [3, "#4cc2ff"], [6, "#7ee787"], [10, "#f5d547"], [15, "#ff9f43"], [20, "#ff5f56"], [28, "#b18cff"]],
+    rain: [[0, "#9ad0ff"], [1, "#4cc2ff"], [4, "#3a86ff"], [10, "#9b5de5"]]
+};
+var THEME_SCALES = {
+    // Brightness for warmth, wind and rain; red only for heat and storms, as a warning
+    mono: {
+        temp: [[-25, "#5c5c5c"], [0, "#999999"], [20, "#dedede"], [28, "#ffffff"], [35, "#ff5f56"]],
+        wind: [[0, "#6c6c6c"], [6, "#b4b4b4"], [15, "#ffffff"], [20, "#ff5f56"]],
+        rain: [[0, "#8c8c8c"], [4, "#c8c8c8"], [10, "#ffffff"]]
+    },
+    // The old 16 colors in their dark half, readable on the gray face
+    win98: {
+        temp: [[-25, "#800080"], [-10, "#000080"], [0, "#0000ff"], [10, "#008000"], [20, "#6e5600"], [28, "#c05800"], [35, "#ff0000"]],
+        wind: [[0, "#000080"], [3, "#0000ff"], [6, "#008000"], [10, "#6e5600"], [15, "#c05800"], [20, "#ff0000"], [28, "#800080"]],
+        rain: [[0, "#008080"], [1, "#0000ff"], [4, "#000080"], [10, "#800080"]]
+    },
+    // Apple's system colors, deep enough for the light glass
+    liquid: {
+        temp: [[-25, "#af52de"], [-10, "#5856d6"], [0, "#007aff"], [10, "#28a745"], [20, "#c79400"], [28, "#ff9500"], [35, "#ff3b30"]],
+        wind: [[0, "#5856d6"], [3, "#007aff"], [6, "#28a745"], [10, "#c79400"], [15, "#ff9500"], [20, "#ff3b30"], [28, "#af52de"]],
+        rain: [[0, "#30a2b8"], [1, "#007aff"], [4, "#5856d6"], [10, "#af52de"]]
+    },
+    norton: {
+        temp: [[-25, "#ff55ff"], [-10, "#5555ff"], [0, "#55ffff"], [10, "#55ff55"], [20, "#ffff55"], [28, "#ffaa55"], [35, "#ff5555"]],
+        wind: [[0, "#5555ff"], [3, "#55ffff"], [6, "#55ff55"], [10, "#ffff55"], [15, "#ffaa55"], [20, "#ff5555"], [28, "#ff55ff"]],
+        rain: [[0, "#00aaaa"], [1, "#55ffff"], [4, "#ffffff"], [10, "#ff55ff"]]
+    },
+    ubuntu: {
+        temp: [[-25, "#ad7fa8"], [-10, "#3465a4"], [0, "#729fcf"], [10, "#8ae234"], [20, "#fce94f"], [28, "#fcaf3e"], [35, "#ef2929"]],
+        wind: [[0, "#3465a4"], [3, "#729fcf"], [6, "#8ae234"], [10, "#fce94f"], [15, "#fcaf3e"], [20, "#ef2929"], [28, "#ad7fa8"]],
+        rain: [[0, "#34e2e2"], [1, "#729fcf"], [4, "#3465a4"], [10, "#ad7fa8"]]
+    }
+};
 
 // Arrow pointing where the wind blows to (direction is where it comes from)
 function windArrow(deg) {
@@ -538,10 +591,10 @@ function draw() {
         return;
     }
     var c = f.current;
-    ui.icon.src = "img/" + wxIcon("wx") + wxKind(c.weather_code, c.is_day) + ".png";
+    ui.icon.src = wxSrc("wx", wxKind(c.weather_code, c.is_day));
     ui.icon.style.display = "";
     setText(ui.temp, temp(c.temperature_2m));
-    setColor(ui.temp, scale(TEMP_COLORS, c.temperature_2m));
+    setColor(ui.temp, scale("temp", c.temperature_2m));
     setText(ui.feels, T("feels") + " " + temp(c.apparent_temperature));
     setText(ui.desc, wxText(c.weather_code));
     var d = new Date(forecastAt);
@@ -577,31 +630,34 @@ function drawChart() {
     else { base = lo - 2; span = Math.max(hi - lo + 3, 6); }
     var yOf = function (val) { return top + gh - Math.round(clamp((val - base) / span, 0, 1) * gh); };
 
-    // Plot background with quarter lines, like the graphs of the other gadgets
-    var plot = rect(box0, 0, top, IW, gh, THEME.plot);
-    for (i = 1; i < 4; i++) rect(plot, 0, Math.round(gh * i / 4), IW, 1, THEME.grid);
+    // Plot background with quarter lines, like the graphs of the other gadgets. Windows classic
+    // has it just as wide as the bars, like a sunken field with nothing left over at the sides.
+    var px = THEME.bevel ? x0 : 0, pw = THEME.bevel ? bw * n - gap : IW;
+    var plot = plotRect(box0, px, top, pw, gh);
+    for (i = 1; i < 4; i++) rect(plot, 0, Math.round(gh * i / 4), pw, 1, THEME.grid);
     for (i = 0; i < n; i++) {
         v = vals[i];
         var x = x0 + i * bw, yy = yOf(v), color;
         if (tab == "rain") {
             // Chance of rain as a faint column behind the amount
             var prob = h.precipitation_probability ? h.precipitation_probability[start + i] || 0 : 0;
-            if (prob > 0) rect(box0, x, top + gh - Math.round(prob / 100 * gh), bw - gap, Math.round(prob / 100 * gh), THEME.track);
+            if (prob > 0) rect(box0, x, top + gh - Math.round(prob / 100 * gh), bw - gap, Math.round(prob / 100 * gh),
+                THEME.track == THEME.plot ? mix(THEME.plot, THEME.faint, 0.25) : THEME.track);
             if (v <= 0) continue;
-            color = (h.snowfall && h.snowfall[start + i] > 0) ? (THEME.light ? "#a9b4c2" : "#eaf0f7") : tone(scale(RAIN_COLORS, v));
+            color = (h.snowfall && h.snowfall[start + i] > 0) ? (THEME.light ? "#a9b4c2" : "#eaf0f7") : tone(scale("rain", v));
             yy = Math.min(yy, top + gh - 2);
         } else if (tab == "wind") {
-            color = tone(scale(WIND_COLORS, v));
+            color = tone(scale("wind", v));
             var gy = yOf(h.wind_gusts_10m[start + i] || v);
             rect(box0, x, gy, bw - gap, 2, THEME.light ? mix(color, "#000000", 0.3) : mix(color, "#ffffff", 0.5));
         } else if (tab == "press") {
             rect(box0, x, yy, bw - gap, 3, accent);
             continue;
         } else {
-            color = tone(scale(TEMP_COLORS, v));
+            color = tone(scale("temp", v));
         }
         var bar = rect(box0, x, yy, bw - gap, top + gh - yy, color);
-        if (THEME.glass) gradient(bar, color, mix(color, THEME.plot, 0.6));
+        if (THEME.glass && !THEME.bevel) gradient(bar, color, mix(color, THEME.plot, 0.6));
     }
 
     // Range or total in the top corner
@@ -752,8 +808,8 @@ function drawDays() {
         var x = i * cw, p = String(dl.time[i]).split("-");
         var wd = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)).getDay();
         setText(label(box0, x, 0, cw, 9, THEME.dim, "center"), i == 0 && n <= 3 ? T("today") : T("days")[wd]);
-        icon(box0, x + Math.floor((cw - 22) / 2), 12, 22, wxIcon("wxs") + wxKind(dl.weather_code[i], true));
-        var hi = label(box0, x, 35, cw, 10, scale(TEMP_COLORS, dl.temperature_2m_max[i]), "center", true);
+        icon(box0, x + Math.floor((cw - 22) / 2), 12, 22, wxIcon("wxs") + "clear_d").src = wxSrc("wxs", wxKind(dl.weather_code[i], true));
+        var hi = label(box0, x, 35, cw, 10, scale("temp", dl.temperature_2m_max[i]), "center", true);
         if (cw < 44) {
             setText(hi, temp(dl.temperature_2m_max[i]));
             setText(label(box0, x, 47, cw, 10, THEME.dim, "center"), temp(dl.temperature_2m_min[i]));

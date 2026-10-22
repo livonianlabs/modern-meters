@@ -2,6 +2,8 @@ var DEFAULTS = {
     lang: "auto",
     updates: "on",
     theme: "classic",
+    frost: "40",
+    glass: "auto",
     accent: "blue",
     width: "170",
     interval: "1000",

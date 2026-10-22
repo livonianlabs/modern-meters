@@ -14,9 +14,13 @@ Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
 
 All of them speak 12 languages (English, Українська, Русский, Deutsch, Español, Français, Italiano, Polski, Português, Türkçe, 中文, 日本語) and pick yours from Windows, and have five widths, accent colors, and a five-step color scale for load and temperature. Translations live in `shared/lang/`, one file per language; corrections are welcome.
 
-Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your accent color: blue, teal, green, purple, orange, pink, red or yellow), **Retro terminal** (a CRT screen with scanlines in your accent color) and **Auto**, which switches between Light and Glass with Windows' light/dark mode. Panels for the colored styles are drawn once on your PC the first time they're needed. Set **For all gadgets** in any gadget's settings to give every gadget the same style and language (and, if you like, accent color) in one go.
+Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your accent color: blue, teal, green, purple, orange, pink, red or yellow), **Retro terminal** (a CRT screen with scanlines in your accent color, whose cursor now and then retypes the title), three more terminals (**black and white**, **Norton Commander** blue and the **Ubuntu** terminal), **Windows classic** (gray 95/98 windows with a navy title bar and block progress bars), **Aero** and **Liquid Glass**, and **Auto**, which switches between Light and Glass with Windows' light/dark mode. Aero and Liquid Glass are frosted glass: the gadget shows your wallpaper under it, blurred, through Windows 7's blue or Apple's light or dark glass (picked by how bright the wallpaper is, or as you set it), with **Glass frosting** setting how much. They redraw themselves when you move a gadget or change the wallpaper. Panels for the colored styles are drawn once on your PC the first time they're needed. Set **For all gadgets** in any gadget's settings to give every gadget the same style and language (and, if you like, accent color) in one go.
 
 <img src="docs/themes.png" width="660" alt="Light, colored glass and retro terminal styles">
+
+<img src="docs/themes-retro.png" width="660" alt="Black and white terminal, Norton Commander, Ubuntu terminal and Windows classic styles">
+
+<img src="docs/themes-glass.png" width="440" alt="Liquid Glass light, Aero and Liquid Glass dark over a wallpaper">
 
 ### Glass style
 
@@ -45,7 +49,7 @@ Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your acce
 3. Right-click the desktop → **Gadgets**, and drag the gadget onto the desktop.
 4. Settings: hover over the gadget and click the wrench icon.
 
-To update, install the new `.gadget` files over the old ones the same way. Coming from 1.1.0 or older, restart the Sidebar once afterwards (right-click its tray icon → Exit, then start it again); newer versions reload by themselves when you press OK in their settings.
+When a new version is out, a blinking **↑ x.y.z** appears in the gadget's corner. Click it, and the gadgets download the release from GitHub, install it over themselves (all Modern Meters gadgets at once) and restart; nothing is installed without that click. You can also install the new `.gadget` files over the old ones by hand. Coming from 1.1.0 or older, restart the Sidebar once afterwards (right-click its tray icon → Exit, then start it again).
 
 ## Fitting them on the screen
 
@@ -95,7 +99,11 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 
 У всех 12 языков (английский, украинский, русский, немецкий, испанский, французский, итальянский, польский, португальский, турецкий, китайский, японский), язык берётся из Windows; пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: светлый, цветное стекло, ретро-терминал, «Стекло» и классический.
 
-Стили: «Стекло», «Классический», «Светлый», «Цветное стекло» (стекло в цвете акцента: голубой, бирюзовый, зелёный, фиолетовый, оранжевый, розовый, красный или жёлтый), «Ретро-терминал» (ЭЛТ-экран со строками развёртки в цвете акцента) и «Авто» — переключается между светлым и стеклом вслед за светлым/тёмным режимом Windows. Фон для цветных стилей рисуется один раз на вашем компьютере, когда впервые понадобится. Настройка **Для всех гаджетов** в любом гаджете сразу даёт всем гаджетам один стиль и язык (а при желании и цвет акцента).
+Стили: «Стекло», «Классический», «Светлый», «Цветное стекло» (стекло в цвете акцента: голубой, бирюзовый, зелёный, фиолетовый, оранжевый, розовый, красный или жёлтый), «Ретро-терминал» (ЭЛТ-экран со строками развёртки в цвете акцента, курсор которого время от времени перепечатывает заголовок), ещё три терминала (**чёрно-белый**, синий **Norton Commander** и терминал **Ubuntu**), «Классический Windows» (серые окна 95/98 с синим заголовком и прогресс-барами из блоков), **Aero** и **Liquid Glass**, а также «Авто» — переключается между светлым и стеклом вслед за светлым/тёмным режимом Windows. Aero и Liquid Glass — матовое стекло: сквозь гаджет видны размытые обои под ним, в синем стекле Windows 7 или в светлом или тёмном стекле Apple (выбирается по яркости обоев или как вы зададите), а настройка «Матовость стекла» задаёт, насколько оно матовое. Когда вы передвигаете гаджет или меняете обои, стекло перерисовывается само. Фон для цветных стилей рисуется один раз на вашем компьютере, когда впервые понадобится. Настройка **Для всех гаджетов** в любом гаджете сразу даёт всем гаджетам один стиль и язык (а при желании и цвет акцента).
+
+<img src="docs/themes-retro.png" width="660" alt="Чёрно-белый терминал, Norton Commander, терминал Ubuntu и классический Windows">
+
+<img src="docs/themes-glass.png" width="440" alt="Светлое Liquid Glass, Aero и тёмное Liquid Glass поверх обоев">
 
 ## Установка
 
@@ -104,7 +112,7 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 3. Правый клик по рабочему столу → **Гаджеты**, перетащите гаджет на рабочий стол.
 4. Настройки: наведите мышь на гаджет и нажмите на значок гаечного ключа.
 
-Чтобы обновиться, так же установите новые `.gadget`-файлы поверх старых. При обновлении с 1.1.0 и старше после этого один раз перезапустите боковую панель (правый клик по её значку в трее → Выход, затем запустите снова); новые версии сами перезагружаются, когда вы нажимаете OK в их настройках.
+Когда выходит новая версия, в углу гаджета мигает **↑ x.y.z**. Нажмите на него, и гаджеты скачают выпуск с GitHub, установят его поверх себя (сразу все гаджеты Modern Meters) и перезапустятся; без этого клика ничего не устанавливается. Можно и вручную установить новые `.gadget`-файлы поверх старых. При обновлении с 1.1.0 и старше после этого один раз перезапустите боковую панель (правый клик по её значку в трее → Выход, затем запустите снова).
 
 ## Как уместить их на экране
 

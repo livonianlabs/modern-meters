@@ -21,7 +21,8 @@ addLanguage("ja", "日本語", {
     alarmOff: "過熱アラームはオフです。クリックでオンにします。",
     alarmStop: "過熱しています！クリックすると冷えるまで消音します。",
     update: "新バージョン %s ›",
-    updateHint: "クリックでリリースページを開きます。更新が自動でインストールされることはありません。この確認は設定でオフにできます。",
+    updateHint: "クリックでインストール：ガジェットが GitHub からダウンロードし、自動で再起動します。クリックしない限り何もインストールされません。この確認は設定でオフにできます。",
+    updating: "インストール中…", updateFailed: "インストールできませんでした（%s）。クリックしてリリースページを開き、手動でインストールしてください。",
     procTip: "クリックで負荷の高いプロセスを表示", topCpu: "プロセス · CPU", topRam: "プロセス · メモリ", topVram: "プロセス · ビデオメモリ", topShared: "プロセス · 共有メモリ", topGpu: "プロセス · GPU 負荷", vramStop: "ビデオメモリがほぼいっぱいです！クリックで消音。",
     noNet: "接続なし", ethernet: "イーサネット", intIp: "IP", extIp: "外部 IP",
     firewall: "FW", link: "リンク", on: "オン", off: "オフ", priv: "プライベート", pub: "パブリック", domain: "ドメイン",
@@ -61,6 +62,7 @@ addLanguage("ja", "日本語", {
 }, {
     "Language": "言語", "Auto (as Windows)": "自動（Windows と同じ）", "Display": "表示", "Style": "スタイル",
     "Classic (flat)": "クラシック（フラット）", "Glass": "ガラス", "Colored glass": "カラーガラス", "Light": "ライト", "Retro terminal": "レトロ端末", "Accent color": "アクセントカラー",
+    "Terminal: black and white": "ターミナル：白黒", "Terminal: Norton Commander": "ターミナル：Norton Commander", "Terminal: Ubuntu": "ターミナル：Ubuntu", "Windows classic": "Windows クラシック", "Glass frosting": "ガラスのすりガラス度", "Glass tint": "ガラスの色合い", "By wallpaper": "壁紙に合わせる", "Dark": "ダーク",
     "For all gadgets": "すべてのガジェットに適用", "Only this one": "このガジェットのみ", "Style and language": "スタイルと言語", "Style, color, language": "スタイル・色・言語", "Alarms": "アラーム", "VRAM above": "VRAM が次を超えたら",
     "Blue": "ブルー", "Teal": "ティール", "Green": "グリーン", "Purple": "パープル", "Orange": "オレンジ", "Pink": "ピンク", "Red": "レッド", "Yellow": "イエロー",
     "Width": "幅", "Classic (%d)": "クラシック (%d)", "Medium (%d)": "中 (%d)", "Wide (%d)": "広い (%d)",

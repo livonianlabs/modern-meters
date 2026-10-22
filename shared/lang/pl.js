@@ -21,7 +21,8 @@ addLanguage("pl", "Polski", {
     alarmOff: "Alarm przegrzania jest wyłączony. Kliknij, aby włączyć.",
     alarmStop: "Przegrzanie! Kliknij, aby wyciszyć do ostygnięcia.",
     update: "Nowa wersja %s ›",
-    updateHint: "Kliknij, aby otworzyć stronę wydania. Aktualizacje nigdy nie instalują się same; sprawdzanie można wyłączyć w ustawieniach.",
+    updateHint: "Kliknij, aby zainstalować: gadżety pobiorą ją z GitHuba i same się uruchomią ponownie. Bez Twojego kliknięcia nic się nie instaluje; sprawdzanie można wyłączyć w ustawieniach.",
+    updating: "Instalowanie…", updateFailed: "Nie udało się zainstalować (%s). Kliknij, aby otworzyć stronę wydania i zainstalować ręcznie.",
     procTip: "Kliknij, aby zobaczyć najbardziej aktywne procesy", topCpu: "Procesy · CPU", topRam: "Procesy · pamięć", topVram: "Procesy · pamięć wideo", topShared: "Procesy · pamięć współdzielona", topGpu: "Procesy · obciążenie GPU", vramStop: "Pamięć wideo prawie pełna! Kliknij, aby wyciszyć.",
     noNet: "brak połączenia", ethernet: "Ethernet", intIp: "IP", extIp: "IP zewn.",
     firewall: "Zapora", link: "Łącze", on: "wł.", off: "wył.", priv: "prywatna", pub: "publiczna", domain: "domena",
@@ -61,6 +62,7 @@ addLanguage("pl", "Polski", {
 }, {
     "Language": "Język", "Auto (as Windows)": "Auto (jak Windows)", "Display": "Wygląd", "Style": "Styl",
     "Classic (flat)": "Klasyczny (płaski)", "Glass": "Szkło", "Colored glass": "Kolorowe szkło", "Light": "Jasny", "Retro terminal": "Retro terminal", "Accent color": "Kolor akcentu",
+    "Terminal: black and white": "Terminal: czarno-biały", "Terminal: Norton Commander": "Terminal: Norton Commander", "Terminal: Ubuntu": "Terminal: Ubuntu", "Windows classic": "Windows klasyczny", "Glass frosting": "Matowość szkła", "Glass tint": "Odcień szkła", "By wallpaper": "Według tapety", "Dark": "Ciemne",
     "For all gadgets": "Dla wszystkich gadżetów", "Only this one": "Tylko ten", "Style and language": "Styl i język", "Style, color, language": "Styl, kolor, język", "Alarms": "Alarmy", "VRAM above": "VRAM powyżej",
     "Blue": "Niebieski", "Teal": "Turkusowy", "Green": "Zielony", "Purple": "Fioletowy", "Orange": "Pomarańczowy", "Pink": "Różowy", "Red": "Czerwony", "Yellow": "Żółty",
     "Width": "Szerokość", "Classic (%d)": "Klasyczna (%d)", "Medium (%d)": "Średnia (%d)", "Wide (%d)": "Szeroka (%d)",

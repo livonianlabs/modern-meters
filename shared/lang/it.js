@@ -21,7 +21,8 @@ addLanguage("it", "Italiano", {
     alarmOff: "L'allarme surriscaldamento è disattivato. Fai clic per attivarlo.",
     alarmStop: "Surriscaldamento! Fai clic per silenziare finché non si raffredda.",
     update: "Nuova versione %s ›",
-    updateHint: "Fai clic per aprire la pagina della versione. Gli aggiornamenti non si installano mai da soli; il controllo si può disattivare nelle impostazioni.",
+    updateHint: "Fai clic per installarla: i gadget la scaricano da GitHub e si riavviano da soli. Nulla viene installato senza il tuo clic; il controllo si può disattivare nelle impostazioni.",
+    updating: "Installazione…", updateFailed: "Installazione non riuscita (%s). Fai clic per aprire la pagina della versione e installarla a mano.",
     procTip: "Clic per i processi più attivi", topCpu: "Processi · CPU", topRam: "Processi · memoria", topVram: "Processi · memoria video", topShared: "Processi · memoria condivisa", topGpu: "Processi · carico GPU", vramStop: "Memoria video quasi piena! Clic per silenziare.",
     noNet: "nessuna connessione", ethernet: "Ethernet", intIp: "IP", extIp: "IP esterno",
     firewall: "Firewall", link: "Link", on: "Sì", off: "No", priv: "Privata", pub: "Pubblica", domain: "Dominio",
@@ -61,6 +62,7 @@ addLanguage("it", "Italiano", {
 }, {
     "Language": "Lingua", "Auto (as Windows)": "Auto (come Windows)", "Display": "Aspetto", "Style": "Stile",
     "Classic (flat)": "Classico (piatto)", "Glass": "Vetro", "Colored glass": "Vetro colorato", "Light": "Chiaro", "Retro terminal": "Terminale retrò", "Accent color": "Colore d'accento",
+    "Terminal: black and white": "Terminale: bianco e nero", "Terminal: Norton Commander": "Terminale: Norton Commander", "Terminal: Ubuntu": "Terminale: Ubuntu", "Windows classic": "Windows classico", "Glass frosting": "Satinatura del vetro", "Glass tint": "Tinta del vetro", "By wallpaper": "In base allo sfondo", "Dark": "Scuro",
     "For all gadgets": "Per tutti i gadget", "Only this one": "Solo questo", "Style and language": "Stile e lingua", "Style, color, language": "Stile, colore, lingua", "Alarms": "Allarmi", "VRAM above": "VRAM oltre",
     "Blue": "Blu", "Teal": "Turchese", "Green": "Verde", "Purple": "Viola", "Orange": "Arancione", "Pink": "Rosa", "Red": "Rosso", "Yellow": "Giallo",
     "Width": "Larghezza", "Classic (%d)": "Classica (%d)", "Medium (%d)": "Media (%d)", "Wide (%d)": "Larga (%d)",

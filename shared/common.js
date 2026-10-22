@@ -9,7 +9,11 @@ var PAD = 12;
 // classic: flat dark panel. glass: navy gradient panel with a glowing border, a title bar with
 // an icon, gradient bars and graphs. Panel images for both come from tools/make-images.ps1.
 // tinted: glass in the hue of the accent color. light: the glass layout on a light panel.
-// terminal: a retro CRT in the accent's hue. Their panels are drawn on first use (themeImage).
+// terminal: a retro CRT in the accent's hue. mono, norton, ubuntu: the same CRT in the colors of
+// a black-and-white monitor, Norton Commander and the Ubuntu terminal, each with its own palette
+// for the accents and levels. win98: the gray beveled windows of Windows 95/98/2000 with a navy
+// title bar. aero, liquid: the glass of Windows 7 and Apple's Liquid Glass, their panels drawn
+// whole by PanelPainter.Art (art); Liquid Glass frosts the wallpaper under it (frostImage). Their panels are drawn on first use (themeImage).
 // auto: light or glass as Windows' app mode.
 // THEME.glass means the glass layout (title bar, icons, axes), whatever the colors.
 var THEMES = {
@@ -36,6 +40,78 @@ var THEMES = {
         plot: "#040d08", panel: "#06120b", panelTop: "#0a1a10", panelBottom: "#040b07",
         sep: "#123d26", hot: "#ff4d4d", live: "#b8ffd0", edge: "#33ff88", glow: "210,80,35,14", gloss: 10,
         font: "Consolas,'Lucida Console',monospace", glass: true, terminal: true
+    },
+    // Windows 7 Aero: blue glass with a gloss and light streaks, in the accents of the dark themes
+    aero: {
+        text: "#ffffff", dim: "#d2e3f5", faint: "#94b4d6", track: "#1b3c62", grid: "#2b5784",
+        plot: "#163556", panel: "#2b5a8c", panelTop: "#5d93cc", panelBottom: "#1e436f",
+        sep: "#4f7aa8", hot: "#ff5f56", live: "#ffffff", glass: true, art: "aero", rev: 2,
+        // Frosted: the wallpaper through Aero's blue, at least this much of it (percent), and
+        // see-through graphs and tracks
+        tint: "#1c4a80", tintMin: 45, plotAlpha: 40, trackAlpha: 45
+    },
+    // Apple's Liquid Glass: frosted light glass, a large radius, Apple's system colors
+    liquid: {
+        text: "#1c1c1e", dim: "#40454d", faint: "#666c75", track: "#dde2ea", grid: "#e4e8ef",
+        plot: "#ffffff", plotAlpha: 45, trackAlpha: 70, panel: "#eef1f6", panelTop: "#fafbfd", panelBottom: "#e8ecf2",
+        sep: "#d7dce4", hot: "#ff3b30", live: "#6e7480", glass: true, light: true, art: "liquid", rev: 2,
+        accents: { blue: "#007aff", teal: "#30a2b8", green: "#28a745", purple: "#af52de", orange: "#ff9500",
+            pink: "#ff2d55", red: "#ff3b30", yellow: "#d4a000" },
+        levels: ["#007aff", "#28a745", "#d4a000", "#ff9500", "#ff3b30"],
+        // Over a dark wallpaper (or as set): dark glass with light text and Apple's dark-mode
+        // colors (glassDark)
+        dark: {
+            text: "#ffffff", dim: "#dfe3ea", faint: "#aab1bc", track: "#4a5059", grid: "#5a6069",
+            plot: "#000000", plotAlpha: 25, track: "#ffffff", trackAlpha: 22, panel: "#2c3036", panelTop: "#3a3f46", panelBottom: "#24282d",
+            sep: "#7d848e", hot: "#ff453a", live: "#ffffff", light: false, scales: "dark",
+            accents: { blue: "#0a84ff", teal: "#40c8e0", green: "#30d158", purple: "#bf5af2", orange: "#ff9f0a",
+                pink: "#ff375f", red: "#ff453a", yellow: "#ffd60a" },
+            // The first a lighter blue than Apple's: small text in it has to read on dark glass
+            levels: ["#5eb0ff", "#30d158", "#ffd60a", "#ff9f0a", "#ff453a"]
+        }
+    },
+    // Windows 95/98/2000: gray face, raised bevel (bevel: true), navy title bar, Tahoma, the old
+    // 16-color palette in its darker half
+    win98: {
+        text: "#000000", dim: "#303030", faint: "#585858", track: "#ffffff", grid: "#e4e4e4",
+        plot: "#ffffff", panel: "#c0c0c0", panelTop: "#c0c0c0", panelBottom: "#c0c0c0",
+        sep: "#808080", hot: "#ff0000", live: "#000000", gloss: 0,
+        font: "Tahoma,'MS Sans Serif',Arial", fontScale: 0.92, glass: true, light: true, bevel: true,
+        segments: [6, 2],
+        titleBar: ["#000080", "#1084d0"],
+        accents: { blue: "#000080", teal: "#008080", green: "#008000", purple: "#800080", orange: "#c05800",
+            pink: "#b0306c", red: "#a00000", yellow: "#6e5600" },
+        levels: ["#000080", "#008000", "#6e5600", "#c05800", "#ff0000"]
+    },
+    // White phosphor; only an overload stays red
+    mono: {
+        text: "#ececec", dim: "#a2a2a2", faint: "#6a6a6a", track: "#262626", grid: "#1b1b1b",
+        plot: "#070707", panel: "#0b0b0b", panelTop: "#151515", panelBottom: "#080808",
+        sep: "#353535", hot: "#ff4d4d", live: "#ffffff", edge: "#d8d8d8", glow: "190,70,30,12", gloss: 10,
+        font: "Consolas,'Lucida Console',monospace", glass: true, terminal: true,
+        accents: { blue: "#f2f2f2", teal: "#f2f2f2", green: "#f2f2f2", purple: "#f2f2f2", orange: "#f2f2f2",
+            pink: "#f2f2f2", red: "#f2f2f2", yellow: "#f2f2f2" },
+        levels: ["#8e8e8e", "#c4c4c4", "#e6e6e6", "#ffffff", "#ff5f56"]
+    },
+    // Norton Commander: the 16 CGA colors on its blue panels, framed by a double cyan line
+    norton: {
+        text: "#55ffff", dim: "#00aaaa", faint: "#4f4fd0", track: "#000080", grid: "#0a0a9e",
+        plot: "#00008a", panel: "#0000aa", panelTop: "#0000b0", panelBottom: "#0000a4",
+        sep: "#00aaaa", hot: "#ff5555", live: "#ffffff", edge: "#55ffff", glow: "230,0,0,200", gloss: 0,
+        font: "Consolas,'Lucida Console',monospace", glass: true, terminal: true,
+        accents: { blue: "#ffffff", teal: "#55ffff", green: "#55ff55", purple: "#ff55ff", orange: "#ffaa55",
+            pink: "#ff55ff", red: "#ff5555", yellow: "#ffff55" },
+        levels: ["#55ffff", "#55ff55", "#ffff55", "#ffaa55", "#ff5555"]
+    },
+    // Ubuntu's aubergine terminal with the Tango palette and an Ubuntu orange rim
+    ubuntu: {
+        text: "#ffffff", dim: "#c3a6ba", faint: "#8a6380", track: "#4a1a3c", grid: "#3d1232",
+        plot: "#24071b", panel: "#300a24", panelTop: "#3b0d2d", panelBottom: "#2b0920",
+        sep: "#55234a", hot: "#ef2929", live: "#ffffff", edge: "#e95420", glow: "180,60,25,10", gloss: 8,
+        font: "Consolas,'Lucida Console',monospace", glass: true, terminal: true,
+        accents: { blue: "#729fcf", teal: "#34e2e2", green: "#8ae234", purple: "#ad7fa8", orange: "#fcaf3e",
+            pink: "#f080d0", red: "#ef2929", yellow: "#fce94f" },
+        levels: ["#729fcf", "#8ae234", "#fce94f", "#fcaf3e", "#ef2929"]
     }
 };
 
@@ -75,11 +151,12 @@ function applyTheme(name) {
     for (k in THEME) delete THEME[k];
     var t = THEMES[name == "tinted" ? "glass" : name];
     for (k in t) THEME[k] = t[k];
+    if (t.dark && glassDark()) for (k in t.dark) THEME[k] = t.dark[k];
     THEME.name = name;
-    var set = THEME.light ? "light" : "dark";
-    for (k in ACCENT_SETS[set]) ACCENTS[k] = ACCENT_SETS[set][k];
+    var set = THEME.light ? "light" : "dark", accents = THEME.accents || ACCENT_SETS[set];
+    for (k in accents) ACCENTS[k] = accents[k];
     LEVELS.length = 0;
-    for (k = 0; k < 5; k++) LEVELS.push(LEVEL_SETS[set][k]);
+    for (k = 0; k < 5; k++) LEVELS.push((THEME.levels || LEVEL_SETS[set])[k]);
     if (name == "tinted" || name == "terminal") {
         // Every glass color keeps its saturation and lightness and takes the accent's hue
         var hue = hsl(ACCENTS[accentName()])[0];
@@ -151,7 +228,9 @@ var STRINGS = {
         alarmOff: "Overheat alarm is off. Click to turn on.",
         alarmStop: "Overheating! Click to silence until it cools down.",
         update: "New version %s ›",
-        updateHint: "Click to open the release page. Updates are never installed by themselves; this check can be turned off in the settings.",
+        updateHint: "Click to install it: the gadgets download it from GitHub and restart by themselves. Nothing is installed without your click; this check can be turned off in the settings.",
+        updating: "Installing…",
+        updateFailed: "Couldn't install it (%s). Click to open the release page and install it by hand.",
         procTip: "Click for the busiest processes", topCpu: "Processes · CPU", topRam: "Processes · memory",
         topVram: "Processes · video memory", topShared: "Processes · shared memory", topGpu: "Processes · GPU load",
         vramStop: "Video memory is almost full! Click to silence."
@@ -190,7 +269,9 @@ var STRINGS = {
         alarmOff: "Сигнал перегрева выключен. Нажмите, чтобы включить.",
         alarmStop: "Перегрев! Нажмите, чтобы заглушить до остывания.",
         update: "Новая версия %s ›",
-        updateHint: "Нажмите, чтобы открыть страницу выпуска. Сами обновления не устанавливаются; проверку можно выключить в настройках.",
+        updateHint: "Нажмите, чтобы установить: гаджеты скачают её с GitHub и сами перезапустятся. Без вашего клика ничего не устанавливается; проверку можно выключить в настройках.",
+        updating: "Устанавливается…",
+        updateFailed: "Не удалось установить (%s). Нажмите, чтобы открыть страницу выпуска и установить вручную.",
         procTip: "Нажмите, чтобы увидеть самые активные процессы",
         topCpu: "Процессы · ЦП",
         topRam: "Процессы · память",
@@ -347,7 +428,7 @@ function label(parent, x, y, w, size, color, align, bold) {
 // The terminal's monospace runs wider than Segoe UI, so its text is set a little smaller in the
 // same boxes
 function fontSize(size) {
-    return THEME.font ? Math.round(size * 0.88) : size;
+    return THEME.font ? Math.round(size * (THEME.fontScale || 0.88)) : size;
 }
 
 // The theme's font (the terminal's monospace) or Segoe UI
@@ -371,27 +452,70 @@ function setText(el, s) {
     if (el._t !== s) { el.innerText = s; el._t = s; }
 }
 
+// setText for a label that opens something on click: a faint " ›" after the text shows it can
+// be clicked, as on "cores ›". A text too long for the label is set a little smaller, then
+// replaced by short (when given), so the mark stays in sight.
+function setLinkText(el, s, short) {
+    if (el._t === s) return;
+    el._t = s;
+    if (el._fs == null) el._fs = parseFloat(el.style.fontSize);
+    var texts = short && short != s ? [s, short] : [s];
+    for (var i = 0; i < texts.length; i++) {
+        el.innerHTML = esc(texts[i]) + "<span style='color:" + THEME.faint + "'> ›</span>";
+        for (var fs = el._fs; fs >= el._fs * 0.85; fs -= 0.5) {
+            el.style.fontSize = fs + "px";
+            if (el.scrollWidth <= el.clientWidth) return;
+        }
+    }
+}
+
 function setColor(el, c) {
     if (el._c !== c) { el.style.color = c; el._c = c; }
 }
 
 // ---- horizontal bar -------------------------------------------------------
 
+// THEME.segments [block, gap]: filled in whole blocks with gaps, like the progress bars of
+// Windows 95/98. Every block and gap is the same size, so they stay even when the Sidebar scales
+// the page; the bar is cut to a whole number of blocks.
 function Bar(parent, x, y, w, h) {
     this.w = w;
-    this.track = rect(parent, x, y, w, h, THEME.track);
+    // THEME.trackAlpha: a see-through track under an empty box, as plotRect
+    if (THEME.trackAlpha) {
+        rect(parent, x, y, w, h, THEME.track).style.filter = "alpha(opacity=" + THEME.trackAlpha + ")";
+        this.track = box(parent, x, y, w, h);
+    } else this.track = rect(parent, x, y, w, h, THEME.track);
     this.fill = rect(this.track, 0, 0, 0, h, THEME.track);
     this.px = 0;
     this.color = null;
+    var seg = THEME.segments;
+    if (!seg) return;
+    // ends[i]: where block i ends
+    var step = seg[0] + seg[1], n = Math.max(1, Math.floor((w + seg[1]) / step));
+    this.w = n * step - seg[1];
+    this.track.style.width = this.w + "px";
+    this.ends = [];
+    for (var i = 0; i < n; i++) {
+        this.ends.push(i * step + seg[0]);
+        if (i < n - 1) rect(this.track, i * step + seg[0], 0, seg[1], h, THEME.track);
+    }
+}
+
+// Bar room for a whole number of THEME.segments blocks: w as it is, or with min blocks the
+// width they take
+function segmentWidth(w, min) {
+    var seg = THEME.segments;
+    return seg ? Math.max(w, min * (seg[0] + seg[1]) - seg[1]) : w;
 }
 
 Bar.prototype.set = function (pct, color) {
-    var px = pct == null ? 0 : Math.round(this.w * clamp(pct, 0, 100) / 100);
+    var px = pct == null ? 0 : Math.round(this.w * clamp(pct, 0, 100) / 100), seg = THEME.segments;
     if (pct > 0 && px < 1) px = 1;
+    if (seg && px > 0) px = this.ends[Math.min(Math.ceil(clamp(pct, 0, 100) / 100 * this.ends.length), this.ends.length) - 1];
     if (px != this.px) { this.fill.style.width = px + "px"; this.px = px; }
     if (color != this.color) {
         this.fill.style.backgroundColor = color;
-        if (THEME.glass) gradient(this.fill, mix(THEME.track, color, 0.45), color, true);
+        if (THEME.glass && !seg) gradient(this.fill, mix(THEME.track, color, 0.45), color, true);
         this.color = color;
     }
 };
@@ -427,7 +551,7 @@ function Graph(parent, x, y, w, h, series, noGrid) {
     this.data = [];
     this.cols = [];
 
-    var frame = rect(parent, x, y, w, h, THEME.plot);
+    var frame = plotRect(parent, x, y, w, h);
     if (!noGrid) for (var i = 1; i < 4; i++) rect(frame, 0, Math.round(h * i / 4), w, 1, THEME.grid);
 
     var x0 = w - this.n * 2;
@@ -520,7 +644,26 @@ function paintFrame(w, h) {
     // Glass leaves a wider rim of the image uncovered for its glowing border
     var panel = $("panel"), r = THEME.glass ? 12 : 10, inset = THEME.glass ? 4 : 1;
     panel.innerHTML = "";
-    if (!THEME.glass) {
+    frost.frame = [w, h];
+    var src = IS_GADGET ? (THEME.art && frostImage(w, h)) || panelImage(w, h) : null;
+    if (THEME.art && src) {
+        // A panel drawn whole (gloss, streaks): the same picture inside, in strips that follow
+        // the rounded corners down to a pixel or two, so text and icons lie on the picture
+        // itself and only the outermost edge is left to g:background
+        var R = THEME.art == "liquid" ? 20 : 8, e = 2;
+        var piece = function (x, y, wd, ht) {
+            var d = box(panel, x, y, wd, ht), im = document.createElement("img");
+            im.src = src;
+            im.style.cssText = "position:absolute;left:" + (-x) + "px;top:" + (-y) + "px;width:" + w + "px;height:" + h + "px;";
+            d.appendChild(im);
+        };
+        for (var by = e; by < R; by += 2) {
+            var dy = R - by - 1, dx = Math.ceil(R - Math.sqrt(Math.max(R * R - dy * dy, 0))) + 1;
+            piece(dx, by, w - 2 * dx, 2);
+            piece(dx, h - by - 2, w - 2 * dx, 2);
+        }
+        piece(e, R, w - 2 * e, h - 2 * R);
+    } else if (!THEME.glass) {
         rect(panel, inset, r, w - 2 * inset, h - 2 * r, THEME.panel);
         rect(panel, r, inset, w - 2 * r, h - 2 * inset, THEME.panel);
     } else {
@@ -537,7 +680,7 @@ function paintFrame(w, h) {
         shade(r, inset, w - 2 * r, h - inset);
         // Gloss over the top, kept on the opaque pieces (over the bare corners it would blend
         // with the Sidebar's transparency color)
-        var gloss = function (y) { return Math.round(clamp(1 - (y - inset) / 70, 0, 1) * 22); };
+        var gloss = function (y) { return Math.round(clamp(1 - (y - inset) / 70, 0, 1) * (THEME.bevel ? 0 : 22)); };
         var alpha = function (y) { var v = gloss(y); return "#" + (v < 16 ? "0" : "") + v.toString(16) + "FFFFFF"; };
         gradient(box(panel, r, inset, w - 2 * r, r - inset), alpha(inset), alpha(r));
         gradient(box(panel, inset, r, w - 2 * inset, 70 + inset - r), alpha(r), alpha(70 + inset));
@@ -565,17 +708,120 @@ function paintFrame(w, h) {
         } catch (e) { }
         return;
     }
-    var bg = $("bg"), file = w + "_" + h + ".png";
-    // Panels in the theme's own colors are drawn on first use; the bundled navy glass stands in
-    // if that fails
-    var src = null;
-    if (THEME.name == "classic") src = "img/bg_" + file;
-    else if (THEME.name != "glass") src = themeImage(themeKey() + "_" + file, function (p, path) {
-        return p.Glass(path, w, h, THEME.panelTop, THEME.panelBottom, GLASS_GRADIENT_H, THEME.edge, THEME.glow, THEME.gloss);
-    });
-    bg.src = src || "img/glass_" + file;
+    var bg = $("bg");
+    bg.src = src || "img/glass_" + w + "_" + h + ".png";
     bg.style.width = w + "px";
     bg.style.height = h + "px";
+}
+
+// A graph's background: the plot color, or with THEME.plotAlpha a see-through pane of it under
+// an empty box (an alpha filter on the box itself would fade what is drawn in it too)
+function plotRect(parent, x, y, w, h) {
+    if (!THEME.plotAlpha) return rect(parent, x, y, w, h, THEME.plot);
+    rect(parent, x, y, w, h, THEME.plot).style.filter = "alpha(opacity=" + THEME.plotAlpha + ")";
+    return box(parent, x, y, w, h);
+}
+
+// ---- frosted glass -------------------------------------------------------
+// Liquid Glass shows the wallpaper under the gadget, blurred and washed with white ("frost"
+// setting: how much white, in percent), drawn by PanelPainter.Frost. Redrawn when the gadget
+// has been moved or the wallpaper changed, once things hold still for a moment.
+
+var frost = { key: null, seen: null, file: null, frame: null, timer: null, lumaKey: null, dark: false };
+
+function wallpaper() {
+    var shell = new ActiveXObject("WScript.Shell"), fso = new ActiveXObject("Scripting.FileSystemObject");
+    var file = shell.ExpandEnvironmentStrings("%APPDATA%") + "\\Microsoft\\Windows\\Themes\\TranscodedWallpaper";
+    if (!fso.FileExists(file)) file = shell.RegRead("HKCU\\Control Panel\\Desktop\\WallPaper");
+    var style = parseInt(shell.RegRead("HKCU\\Control Panel\\Desktop\\WallpaperStyle"), 10) || 0;
+    try { if (shell.RegRead("HKCU\\Control Panel\\Desktop\\TileWallpaper") == "1") style = 1; } catch (e) { }
+    return { file: file, style: style, stamp: new Date(fso.GetFile(file).DateLastModified).getTime() };
+}
+
+// Where the frosted picture for w x h stands now: position, size, wallpaper, frosting and tint
+function frostKey(w, h) {
+    var wp = wallpaper();
+    return [THEME.name, window.screenLeft, window.screenTop, w, h, wp.stamp, getSetting("frost") || 40, THEME.light ? "l" : "d"].join("_");
+}
+
+// Dark glass: as set, or with "auto" when the wallpaper under the gadget is dark
+function glassDark() {
+    var mode = getSetting("glass") || "auto";
+    if (mode != "auto") return mode == "dark";
+    if (!IS_GADGET) return false;
+    try {
+        var w = frost.frame ? frost.frame[0] : parseInt(getSetting("width"), 10) || 170;
+        var h = frost.frame ? frost.frame[1] : 300, wp = wallpaper();
+        var key = [window.screenLeft, window.screenTop, w, h, wp.stamp].join("_");
+        if (key != frost.lumaKey) {
+            var p = getPainter(), k = (screen.deviceXDPI || 96) / 96;
+            var luma = p ? p.Luma(wp.file, wp.style, Math.round(screen.width * k), Math.round(screen.height * k),
+                window.screenLeft, window.screenTop, w, h, k) : -1;
+            frost.lumaKey = key;
+            frost.dark = luma >= 0 && luma < 128;
+        }
+        return frost.dark;
+    } catch (e) {
+        return false;
+    }
+}
+
+// img/gen/ picture of the frosted wallpaper for w x h, or null (no wallpaper picture, gadget off
+// the main screen, no painter): then the plain Liquid Glass panel stands in
+function frostImage(w, h) {
+    if (!frost.timer) frost.timer = setInterval(watchFrost, 1500);
+    try {
+        var x = window.screenLeft, y = window.screenTop;
+        if (x < 0 || y < 0 || x + w > screen.width || y + h > screen.height) return null;
+        var wp = wallpaper(), k = (screen.deviceXDPI || 96) / 96, key = frostKey(w, h);
+        var pct = parseFloat(getSetting("frost")) || 40;
+        // Aero keeps enough blue for its white text: from tintMin at the least frosting up
+        if (THEME.tintMin) pct = THEME.tintMin + pct * (100 - THEME.tintMin) / 100;
+        var alpha = Math.round(pct * 2.55);
+        var file = "frost2_" + key + ".png";
+        var src = themeImage(file, function (p, path) {
+            return p.Frost(path, w, h, wp.file, wp.style, Math.round(screen.width * k), Math.round(screen.height * k),
+                x, y, k, THEME.tint || (THEME.light ? "#ffffff" : "#000000"), alpha, THEME.art);
+        });
+        if (!src) return null;
+        // The previous picture of this gadget isn't needed any more
+        if (frost.file && frost.file != file) {
+            try { new ActiveXObject("Scripting.FileSystemObject").DeleteFile(System.Gadget.path + "\\img\\gen\\" + frost.file); } catch (e2) { }
+            delete themeImages[frost.file];
+        }
+        frost.file = file;
+        frost.key = key;
+        return src;
+    } catch (e) {
+        return null;
+    }
+}
+
+// Redraws the panel once the gadget has stopped moving somewhere new (or the wallpaper changed)
+function watchFrost() {
+    if (!THEME.art || !frost.frame) return;
+    var key;
+    try { key = frostKey(frost.frame[0], frost.frame[1]); } catch (e) { return; }
+    if (key != frost.key && key == frost.seen) {
+        frost.key = key;   // also when drawing fails, so it isn't tried again every round
+        // Moved from light to dark wallpaper (or back): the whole gadget changes colors
+        if (THEMES[THEME.name].dark && glassDark() == !!THEME.light && updates.onChange) updates.onChange();
+        else paintFrame(frost.frame[0], frost.frame[1]);
+    }
+    frost.seen = key;
+}
+
+// The panel picture for w x h: bundled for classic and the navy glass, drawn on first use in the
+// theme's own colors for the others; null if that fails (the bundled navy glass stands in)
+function panelImage(w, h) {
+    var file = w + "_" + h + ".png";
+    if (THEME.name == "classic") return "img/bg_" + file;
+    if (THEME.name == "glass") return "img/glass_" + file;
+    return themeImage(themeKey() + "_" + file, function (p, path) {
+        if (THEME.bevel) return p.Bevel(path, w, h, THEME.panel);
+        if (THEME.art) return p.Art(path, w, h, THEME.art, THEME.panelTop, THEME.panelBottom);
+        return p.Glass(path, w, h, THEME.panelTop, THEME.panelBottom, GLASS_GRADIENT_H, THEME.edge, THEME.glow, THEME.gloss);
+    });
 }
 
 // Turns a label into a clickable hint, or back into plain text (action null). action is a web
@@ -612,10 +858,24 @@ function registerDotNet(clsid, cls, assembly) {
 var painter;   // ModernMetersPanel.dll (tools/panel), created on first use; false if it can't be
 var themeImages = {};   // files known to exist
 
-// Names the cached images of the current theme: the tinted ones have a set per accent. The "1"
-// changes whenever the colors or the drawing change, so old files are never reused.
+// Names the cached images of the current theme: the tinted ones and those with their own accents
+// (tinted icons) have a set per accent. The number (a theme's rev, else 1) changes whenever the
+// colors or the drawing change, so old files are never reused.
 function themeKey() {
-    return THEME.name + (THEME.name == "tinted" || THEME.name == "terminal" ? "-" + accentName() : "") + "1";
+    return THEME.name + (THEME.name == "tinted" || THEME.name == "terminal" || THEME.accents ? "-" + accentName() : "") + (THEME.rev || 1);
+}
+
+// The painter, created on first use; null when it can't be
+function getPainter() {
+    if (painter == null) {
+        try {
+            registerDotNet("{8e3c2a71-5d4b-4f19-b6a0-2c7e9f41d385}", "ModernMeters.PanelPainter", "ModernMetersPanel");
+            painter = new ActiveXObject("ModernMeters.PanelPainter");
+        } catch (e) {
+            painter = false;
+        }
+    }
+    return painter || null;
 }
 
 // "img/gen/<file>" once it exists, drawing it with draw(painter, fullPath) the first time; null
@@ -626,15 +886,8 @@ function themeImage(file, draw) {
     try {
         var path = System.Gadget.path + "\\img\\gen\\" + file;
         if (!new ActiveXObject("Scripting.FileSystemObject").FileExists(path)) {
-            if (painter == null) {
-                try {
-                    registerDotNet("{8e3c2a71-5d4b-4f19-b6a0-2c7e9f41d385}", "ModernMeters.PanelPainter", "ModernMetersPanel");
-                    painter = new ActiveXObject("ModernMeters.PanelPainter");
-                } catch (e) {
-                    painter = false;
-                }
-            }
-            if (!painter || !draw(painter, path)) return null;
+            var p = getPainter();
+            if (!p || !draw(p, path)) return null;
         }
         themeImages[file] = true;
         return "img/gen/" + file;
@@ -657,9 +910,13 @@ function accentName() {
     return ACCENTS[getSetting("accent")] ? getSetting("accent") : "blue";
 }
 
-function icon(root, x, y, size, file) {
-    var img = document.createElement("img");
-    img.src = "img/" + file + ".png";
+// A theme with its own accents gets the glyph drawn in its accent color, or in color
+function icon(root, x, y, size, file, color) {
+    var img = document.createElement("img"), src = null;
+    if (THEME.accents && /^(hdr|row)/.test(file)) src = themeImage(themeKey() + "_" + file + (color ? "_" + color.substr(1) : "") + ".png", function (p, path) {
+        return p.Tint(System.Gadget.path + "\\img\\" + file + ".png", path, color || ACCENTS[accentName()]);
+    });
+    img.src = src || "img/" + file + ".png";
     img.style.cssText = "position:absolute;left:" + x + "px;top:" + y + "px;width:" + size + "px;height:" + size + "px;";
     root.appendChild(img);
     return img;
@@ -675,26 +932,62 @@ function glyph(prefix) {
 // kind: cpu, gpu, net or disk (img/hdr_<kind>_<accent>.png). Returns the y below it.
 function header(root, y, kind, title) {
     if (cursor.timer) clearInterval(cursor.timer);
-    cursor.timer = null;
+    if (cursor.retype) clearTimeout(cursor.retype);
+    cursor.timer = cursor.retype = null;
     if (!THEME.glass) return y;
-    icon(root, PAD, y + 1, 14, glyph("hdr") + kind + "_" + accentName());
-    var t = label(root, PAD + 21, y - 1, W - 2 * PAD - 21, 11, THEME.text, "left", true);
+    // Windows classic: the title on a window's title bar instead of over an accent line
+    var bar = THEME.titleBar;
+    if (bar) gradient(rect(root, 5, 5, W - 10, 24, bar[0]), bar[0], bar[1], true);
+    icon(root, PAD, y + 1, 14, glyph("hdr") + kind + "_" + accentName(), bar ? "#ffffff" : null);
+    var t = label(root, PAD + 21, y - 1, W - 2 * PAD - 21, 11, bar ? "#ffffff" : THEME.text, "left", true);
     t.style.letterSpacing = "1px";
     setText(t, title);
     var c = ACCENTS[accentName()];
-    gradient(rect(root, PAD, y + 20, W - 2 * PAD, 1, c), c, THEME.panel, true);
-    // Terminal: a block cursor blinking after the title
+    if (!bar) gradient(rect(root, PAD, y + 20, W - 2 * PAD, 1, c), c, THEME.panel, true);
+    // Terminal: a block cursor blinking after the title, which now and then erases the title
+    // and types it again
     if (THEME.terminal) {
-        var cur = rect(root, PAD + 21 + textWidth(title, 11, true) + title.length + 3, y + 3, 7, 11, c);
+        var cur = rect(root, 0, y + 3, 7, 11, c), shown = title.length, typing = false;
+        var place = function (n) {
+            var part = title.substring(0, n);
+            setText(t, part);
+            cur.style.left = (PAD + 21 + (n ? textWidth(part, 11, true) + n : 0) + 3) + "px";
+        };
+        place(shown);
         cursor.timer = setInterval(function () {
-            cursor.on = !cursor.on;
+            cursor.on = typing ? true : !cursor.on;
             cur.style.visibility = cursor.on ? "visible" : "hidden";
         }, 530);
+        // Backspaces, a pause, then keystrokes at an uneven pace
+        var step = function () {
+            if (shown > 0 && typing == "erase") {
+                place(--shown);
+                cursor.retype = setTimeout(step, 70);
+            } else if (typing == "erase") {
+                typing = "type";
+                cursor.retype = setTimeout(step, 700);
+            } else if (shown < title.length) {
+                place(++shown);
+                cursor.retype = setTimeout(step, 90 + Math.random() * 160);
+            } else {
+                typing = false;
+                schedule();
+            }
+        };
+        var schedule = function () {
+            cursor.retype = setTimeout(function () {
+                typing = "erase";
+                cur.style.visibility = "visible";
+                step();
+            }, RETYPE_MIN + Math.random() * (RETYPE_MAX - RETYPE_MIN));
+        };
+        schedule();
     }
     return y + 26;
 }
 
-var cursor = { timer: null, on: true };
+var cursor = { timer: null, retype: null, on: true };
+var RETYPE_MIN = 60 * 1000, RETYPE_MAX = 180 * 1000;
 
 // A 13px icon at the start of a row (img/row_<kind>_<accent>.png); returns how far the row's
 // label has to move right
@@ -808,10 +1101,14 @@ function Alarm(parent, x, y, opts) {
     this.tips = opts.tips || { on: "alarmOn", off: "alarmOff", stop: "alarmStop" };
     this.onClear = opts.onClear;
     this.firing = false;
-    this.snoozed = false;
+    // Silenced stays silenced when the gadget redraws and makes a new Alarm
+    this.key = this.tips.stop + ":" + this.limit;
+    this.snoozed = !!snoozedAlarms[this.key];
     this.blink = false;
     this.paint();
 }
+
+var snoozedAlarms = {};
 
 Alarm.prototype.update = function (value) {
     if (!this.el) this.icon.style.display = value == null ? "none" : "";
@@ -827,6 +1124,7 @@ Alarm.prototype.update = function (value) {
         if (this.firing) stopSound();
         this.firing = false;
         this.snoozed = false;
+        delete snoozedAlarms[this.key];
         if (wentOff && this.onClear && value != null) this.onClear();
     }
     this.blink = !this.blink;
@@ -841,7 +1139,7 @@ Alarm.prototype.click = function () {
     if (this.firing) {
         stopSound();
         this.firing = false;
-        this.snoozed = true;
+        this.snoozed = snoozedAlarms[this.key] = true;
     } else if (!this.el) {
         this.on = !this.on;
         setSetting("alarm", this.on ? "on" : "off");
@@ -945,14 +1243,15 @@ function cimDate(s) {
 
 // ---- update check ---------------------------------------------------------
 // Once a day one of the gadgets asks GitHub for the latest release and writes the answer to
-// %APPDATA%\ModernMeters\update.txt, where the others pick it up. A newer version only shows a
-// line linking to its release page; nothing is downloaded.
+// %APPDATA%\ModernMeters\update.txt, where the others pick it up. A newer version shows a badge;
+// only a click on it downloads the release and installs it (update.ps1).
 
-var VERSION = "1.3.0";   // set by build.ps1
+var VERSION = "1.4.0";   // set by build.ps1
 var REPO = "Silverenio/modern-meters";
 var KOFI_URL = "https://ko-fi.com/silverenio";
 var UPDATE_EVERY = 24 * 3600 * 1000;
-var updates = { timer: null, req: null, sent: 0, shown: false };
+var updates = { timer: null, req: null, sent: 0, shown: false, state: "", onChange: null, blink: null, root: null, badge: null };
+var INSTALL_TIMEOUT = 5 * 60 * 1000;
 
 // %APPDATA%\ModernMeters\<name>: key=value files the gadgets share
 function sharedPath(name) {
@@ -976,14 +1275,18 @@ function readShared(name) {
     return s;
 }
 
+// Written to a temporary file that then takes the name's place, so another gadget reading at the
+// same moment never gets half a file
 function writeShared(name, s) {
     try {
-        var fso = new ActiveXObject("Scripting.FileSystemObject"), dir = fso.GetParentFolderName(sharedPath(name));
+        var fso = new ActiveXObject("Scripting.FileSystemObject"), path = sharedPath(name), dir = fso.GetParentFolderName(path);
         if (!fso.FolderExists(dir)) fso.CreateFolder(dir);
-        var f = fso.CreateTextFile(sharedPath(name), true), text = "";
+        var tmp = path + "." + Math.floor(Math.random() * 1e9) + ".tmp", f = fso.CreateTextFile(tmp, true), text = "";
         for (var k in s) text += k + "=" + s[k] + "\r\n";
         f.Write(text);
         f.Close();
+        if (fso.FileExists(path)) fso.DeleteFile(path, true);
+        fso.MoveFile(tmp, path);
     } catch (e) { }
 }
 
@@ -1007,16 +1310,74 @@ function updateAvailable() {
 // "↑ x.y.z" while a newer release exists, in a corner that is free in every gadget, so the
 // gadget keeps its height and doesn't run into its neighbors: the right end of the title bar in
 // glass, the top margin in classic. Call it after the content so it is drawn on top.
+// A click installs it; until then it blinks in step with the terminal cursor. "↻ x.y.z" while
+// that runs. After a failed install the click opens the release page instead.
 function updateBadge(root) {
+    if (updates.blink) clearInterval(updates.blink);
+    updates.blink = null;
+    updates.root = root;
+    updates.badge = null;
     var s = updateAvailable();
     updates.shown = !!s;
+    updates.state = s ? installState(s.latest).state : "";
     if (!s) return;
-    var ver = s.latest.replace(/^v/i, "");
-    var l = THEME.glass ? label(root, W - PAD - 40, 10, 40, 9, ACCENTS[accentName()], "right", true) :
-        label(root, W - PAD - 40, -1, 40, 8, ACCENTS[accentName()], "right", true);
-    setText(l, "↑ " + ver);
-    setHint(l, T("update").replace("%s", ver).replace(" ›", "") + ". " + T("updateHint"),
-        s.url || "https://github.com/" + REPO + "/releases/latest");
+    var ver = s.latest.replace(/^v/i, ""), page = s.url || "https://github.com/" + REPO + "/releases/latest";
+    var c = THEME.titleBar ? "#ffffff" : ACCENTS[accentName()];
+    var l = THEME.glass ? label(root, W - PAD - 40, 10, 40, 9, c, "right", true) :
+        label(root, W - PAD - 40, -1, 40, 8, c, "right", true);
+    // Done counts as running until the gadget reloads into the new version
+    var st = installState(s.latest), busy = st.state == "running" || st.state == "done";
+    var head = T("update").replace("%s", ver).replace(" ›", "") + ". ";
+    setText(l, (busy ? "↻ " : "↑ ") + ver);
+    if (busy) setHint(l, head + T("updating"), function () { });
+    else if (st.state == "failed") setHint(l, head + T("updateFailed").replace("%s", st.error || "?"), page);
+    else setHint(l, head + T("updateHint"), function () { installUpdate(s.latest); });
+    updates.badge = l;
+    if (busy) return;
+    // Not under the mouse: restyling it would take its tip away
+    var on = true, hover = false, dim = THEME.titleBar ? THEME.titleBar[1] : THEME.faint;
+    l.onmouseenter = function () { hover = true; setColor(l, c); };
+    l.onmouseleave = function () { hover = false; };
+    updates.blink = setInterval(function () {
+        on = !on;
+        if (!hover) setColor(l, on ? c : dim);
+    }, 530);
+}
+
+// Redraws just the badge, for a change of the install state
+function redrawBadge() {
+    if (!updates.badge || !updates.root) return false;
+    updates.badge.parentNode.removeChild(updates.badge);
+    updateBadge(updates.root);
+    return true;
+}
+
+// The install of release `tag` as { state: ""|running|failed|done, error }
+function installState(tag) {
+    var s = readShared("updating.txt");
+    if (s.tag != tag) return { state: "" };
+    if (!(new Date().getTime() - parseFloat(s.at) < INSTALL_TIMEOUT)) {
+        // A run that went quiet failed; a done one that didn't bring this gadget the new version
+        // (it lives in another folder) may be tried again
+        if (s.state == "running") return { state: "failed", error: "timeout" };
+        if (s.state == "done") return { state: "" };
+    }
+    return s;
+}
+
+// Runs update.ps1 hidden for every Modern Meters gadget next to this one. It writes its
+// progress to updating.txt; the gadgets reload once it replaced their common.js.
+function installUpdate(tag) {
+    if (installState(tag).state == "running") return;
+    writeShared("updating.txt", { state: "running", tag: tag, at: new Date().getTime() });
+    try {
+        var folder = new ActiveXObject("Scripting.FileSystemObject").GetParentFolderName(System.Gadget.path);
+        new ActiveXObject("WScript.Shell").Run("powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"" +
+            System.Gadget.path + "\\update.ps1\" -Tag \"" + tag + "\" -Folder \"" + folder + "\"", 0, false);
+    } catch (e) {
+        writeShared("updating.txt", { state: "failed", tag: tag, at: new Date().getTime(), error: e.message || "powershell" });
+    }
+    redrawBadge();
 }
 
 // ---- one style for all gadgets --------------------------------------------
@@ -1025,7 +1386,7 @@ function updateBadge(root) {
 // STYLE_POLL ms. Width, graph and the rest stay per gadget.
 
 var STYLE_POLL = 3000;
-var SYNC_KEYS = { style: ["theme", "lang"], all: ["theme", "lang", "accent"] };
+var SYNC_KEYS = { style: ["theme", "lang", "frost", "glass"], all: ["theme", "lang", "accent", "frost", "glass"] };
 
 function syncMode(v) {
     return SYNC_KEYS[v] ? v : "off";
@@ -1044,15 +1405,20 @@ function shareStyle(wasMode) {
 
 // Takes over a style shared since this gadget last looked; true when anything changed
 function adoptStyle() {
-    var s = readShared("style.txt");
-    if (!(parseFloat(s.stamp) > (parseFloat(getSetting("styleStamp")) || 0))) return false;
-    setSetting("styleStamp", s.stamp);
+    var s = readShared("style.txt"), mine = parseFloat(getSetting("styleStamp")) || 0, stamp = parseFloat(s.stamp);
+    // A newer style, or the current one not (fully) taken over yet
+    if (!(stamp >= mine) || (stamp == mine && s.sync == "off")) return false;
+    // Only a whole file (older versions wrote theme and lang too, not the newer keys): read again
+    // next round otherwise
+    if (s.sync != "off" && (s.theme == null || s.lang == null)) return false;
     var changed = false;
     for (var k in s) {
         if (k == "stamp" || getSetting(k) == s[k]) continue;
         setSetting(k, s[k]);
         changed = true;
     }
+    // Marked as taken over only once every value is in
+    if (stamp > mine) setSetting("styleStamp", s.stamp);
     return changed;
 }
 
@@ -1060,6 +1426,7 @@ function adoptStyle() {
 // when the update badge has to appear or go away, or the auto theme has to switch
 function watchUpdates(onChange) {
     if (!IS_GADGET || updates.timer) return;
+    updates.onChange = onChange;
     var poll = function () {
         var t = new Date().getTime(), s;
         if (updates.req) {
@@ -1105,7 +1472,13 @@ function watchUpdates(onChange) {
     setTimeout(poll, 10000);
     // Before the gadget's first build, so it starts in the shared style
     adoptStyle();
-    setInterval(function () { if (adoptStyle()) onChange(); }, STYLE_POLL);
+    setInterval(function () {
+        // A new version was installed over this one (by a badge click or by hand)
+        if (codeSettled()) { location.reload(); return; }
+        var s = updateAvailable(), st = s ? installState(s.latest).state : "";
+        if (adoptStyle()) onChange();
+        else if (st != updates.state && !redrawBadge()) onChange();
+    }, STYLE_POLL);
     // The auto theme follows Windows switching between light and dark mode
     setInterval(function () {
         if (getSetting("theme") == "auto" && themeName("auto") != THEME.name) onChange();
@@ -1117,11 +1490,22 @@ var LOADED_AT = new Date().getTime();
 // True when a newer version was installed over the running gadget. The settings dialog is read
 // from disk each time and may offer options this page's older code doesn't know.
 function codeChanged() {
+    return codeAge() >= 0;
+}
+
+// codeChanged, and nothing written for a few seconds, so a copy in progress is over
+function codeSettled() {
+    return codeAge() > 5000;
+}
+
+// How long ago common.js was replaced, or -1 when it is the one this page loaded
+function codeAge() {
     try {
         var f = new ActiveXObject("Scripting.FileSystemObject").GetFile(System.Gadget.path + "\\common.js");
-        return new Date(f.DateLastModified).getTime() > LOADED_AT;
+        var t = new Date(f.DateLastModified).getTime();
+        return t > LOADED_AT ? new Date().getTime() - t : -1;
     } catch (e) {
-        return false;
+        return -1;
     }
 }
 

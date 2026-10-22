@@ -21,7 +21,8 @@ addLanguage("de", "Deutsch", {
     alarmOff: "Überhitzungsalarm ist aus. Klicken zum Einschalten.",
     alarmStop: "Überhitzung! Klicken, um bis zum Abkühlen stumm zu schalten.",
     update: "Neue Version %s ›",
-    updateHint: "Klicken, um die Release-Seite zu öffnen. Updates werden nie von selbst installiert; die Prüfung lässt sich in den Einstellungen abschalten.",
+    updateHint: "Klicken zum Installieren: Die Gadgets laden sie von GitHub und starten sich selbst neu. Ohne Ihren Klick wird nichts installiert; die Prüfung lässt sich in den Einstellungen abschalten.",
+    updating: "Wird installiert…", updateFailed: "Installation fehlgeschlagen (%s). Klicken, um die Release-Seite zu öffnen und von Hand zu installieren.",
     procTip: "Klicken für die aktivsten Prozesse", topCpu: "Prozesse · CPU", topRam: "Prozesse · Speicher", topVram: "Prozesse · Grafikspeicher", topShared: "Prozesse · gemeinsamer Speicher", topGpu: "Prozesse · GPU-Last", vramStop: "Grafikspeicher fast voll! Klicken zum Stummschalten.",
     noNet: "keine Verbindung", ethernet: "Ethernet", intIp: "IP", extIp: "Externe IP",
     firewall: "Firewall", link: "Link", on: "An", off: "Aus", priv: "Privat", pub: "Öffentlich", domain: "Domäne",
@@ -61,6 +62,7 @@ addLanguage("de", "Deutsch", {
 }, {
     "Language": "Sprache", "Auto (as Windows)": "Auto (wie Windows)", "Display": "Anzeige", "Style": "Stil",
     "Classic (flat)": "Klassisch (flach)", "Glass": "Glas", "Colored glass": "Farbiges Glas", "Light": "Hell", "Retro terminal": "Retro-Terminal", "Accent color": "Akzentfarbe",
+    "Terminal: black and white": "Terminal: Schwarzweiß", "Terminal: Norton Commander": "Terminal: Norton Commander", "Terminal: Ubuntu": "Terminal: Ubuntu", "Windows classic": "Windows klassisch", "Glass frosting": "Mattierung des Glases", "Glass tint": "Glastönung", "By wallpaper": "Nach Hintergrund", "Dark": "Dunkel",
     "For all gadgets": "Für alle Gadgets", "Only this one": "Nur dieses", "Style and language": "Stil und Sprache", "Style, color, language": "Stil, Farbe, Sprache", "Alarms": "Alarme", "VRAM above": "VRAM über",
     "Blue": "Blau", "Teal": "Türkis", "Green": "Grün", "Purple": "Lila", "Orange": "Orange", "Pink": "Pink", "Red": "Rot", "Yellow": "Gelb",
     "Width": "Breite", "Classic (%d)": "Klassisch (%d)", "Medium (%d)": "Mittel (%d)", "Wide (%d)": "Breit (%d)",

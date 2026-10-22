@@ -404,7 +404,8 @@ function rebuild() {
     ui = {};
     var y = header(root, 10, "gpu", "GPU");
 
-    ui.name = label(root, PAD, y + 3, IW - 44, narrow ? 12 : 13, THEME.text, "left", true);
+    // Clear of the load percentage on the right, up to "100%"
+    ui.name = label(root, PAD, y + 3, IW - 58, narrow ? 12 : 13, THEME.text, "left", true);
     setText(ui.name, provider ? "GPU" : T(card ? "smiMissing" : "noGpu"));
     if (card) {
         ui.name.style.cursor = "hand";
@@ -509,7 +510,10 @@ function tick() {
     misses = 0;
 
     var vramPct = pctOf(d.vramUsed, d.vramTotal);
-    setText(ui.name, String(d.name).replace(/^(NVIDIA|AMD|Intel\(R\))\s+/i, ""));
+    var gpuName = String(d.name).replace(/^(NVIDIA|AMD|Intel\(R\))\s+/i, "");
+    // "RTX 3090" when "GeForce RTX 3090" doesn't fit
+    if (card) setLinkText(ui.name, gpuName, gpuName.replace(/^(GeForce|Radeon|Arc)\s+/i, ""));
+    else setText(ui.name, gpuName);
     setText(ui.usage, pctText(d.usage));
     setColor(ui.usage, pctColor(d.usage));
     setColor(ui.sub, THEME.dim);

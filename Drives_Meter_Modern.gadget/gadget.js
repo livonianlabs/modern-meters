@@ -230,7 +230,7 @@ function rebuild() {
             y += 9;
         }
         b.name = label(root, PAD, y + 2, IW, narrow ? 12 : 13, THEME.text, "left", true);
-        setText(b.name, d.name);
+        setLinkText(b.name, d.name);
         b.name.title = d.model + "\n" + T("detailsTip");
         b.name.style.cursor = "hand";
         b.name.onclick = (function (disk) { return function () { toggleDetails(diskDetails(disk)); }; })(d);
@@ -348,9 +348,15 @@ function showHealth(d, b) {
     if (life != null) tip += "\n" + T("lifeTip").replace("{l}", life).replace("{w}", s.wear);
     if (s && s.hours) tip += "\n" + T("hoursTip").replace("{h}", s.hours);
     if (!s && d.media == 4) tip += "\n" + T("ssdHint");
-    setText(b.health, T(h == 0 ? "healthy" : (h == 1 ? "warning" : (h == 2 ? "unhealthy" : "unknown"))) +
-        (life != null ? " " + life + "%" : ""));
+    var text = T(h == 0 ? "healthy" : (h == 1 ? "warning" : (h == 2 ? "unhealthy" : "unknown"))) +
+        (life != null ? " " + life + "%" : "");
+    setText(b.health, text);
     setColor(b.health, color);
+    // The verdict takes the room it needs and the line left of it the rest, whatever the font
+    var hw = Math.min(textWidth(text, narrow ? 10 : 11) + 2, IW - 60);
+    b.health.style.left = (W - PAD - hw) + "px";
+    b.health.style.width = hw + "px";
+    b.sub.style.width = (IW - hw - 6) + "px";
     b.health.title = tip;
 }
 

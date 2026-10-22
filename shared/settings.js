@@ -47,8 +47,20 @@ function generalRows(noTemp, graphOpts) {
             ["classic", { en: "Classic (flat)", ru: "Классический" }], ["glass", { en: "Glass", ru: "Стекло" }],
             ["tinted", { en: "Colored glass", ru: "Цветное стекло" }], ["light", { en: "Light", ru: "Светлый" }],
             ["terminal", { en: "Retro terminal", ru: "Ретро-терминал" }],
+            ["mono", { en: "Terminal: black and white", ru: "Терминал: чёрно-белый" }],
+            ["norton", { en: "Terminal: Norton Commander", ru: "Терминал: Norton Commander" }],
+            ["ubuntu", { en: "Terminal: Ubuntu", ru: "Терминал: Ubuntu" }],
+            ["win98", { en: "Windows classic", ru: "Классический Windows" }],
+            ["aero", { en: "Aero (Windows 7)", ru: "Aero (Windows 7)" }],
+            ["liquid", { en: "Liquid Glass (Apple)", ru: "Liquid Glass (Apple)" }],
             ["auto", OPT.lang[0][1]]] },
         { key: "accent", label: { en: "Accent color", ru: "Цвет акцента" }, options: OPT.accent },
+        // Liquid Glass and Aero: how much tint over the blurred wallpaper
+        { key: "frost", label: { en: "Glass frosting", ru: "Матовость стекла" }, options: [
+            ["15", "15%"], ["25", "25%"], ["40", "40%"], ["55", "55%"], ["70", "70%"]] },
+        { key: "glass", label: { en: "Glass tint", ru: "Оттенок стекла" }, options: [
+            ["auto", { en: "By wallpaper", ru: "По обоям" }], ["light", { en: "Light", ru: "Светлое" }],
+            ["dark", { en: "Dark", ru: "Тёмное" }]] },
         { key: "sync", label: { en: "For all gadgets", ru: "Для всех гаджетов" }, options: [
             ["off", { en: "Only this one", ru: "Только для этого" }],
             ["style", { en: "Style and language", ru: "Стиль и язык" }],
@@ -58,7 +70,7 @@ function generalRows(noTemp, graphOpts) {
         { key: "unit", label: { en: "Temperature", ru: "Температура" }, options: OPT.unit },
         { key: "interval", label: { en: "Refresh", ru: "Обновление" }, options: OPT.interval }
     ];
-    if (noTemp) rows.splice(7, 1);
+    if (noTemp) rows.splice(9, 1);
     return rows;
 }
 
@@ -84,7 +96,7 @@ function aboutRows() {
             var s = updateAvailable();
             return VERSION + (s ? "  →  " + s.latest.replace(/^v/i, "") : "");
         } },
-        // Only shows a link on the gadget; nothing is downloaded
+        // A badge on the gadget; the release is installed only when it is clicked
         { key: "updates", label: { en: "New versions", ru: "Новые версии" }, options: [
             ["on", { en: "Let me know", ru: "Сообщать" }],
             ["off", { en: "Don't check", ru: "Не проверять" }]] },

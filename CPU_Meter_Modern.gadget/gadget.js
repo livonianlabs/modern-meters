@@ -179,8 +179,11 @@ function rebuild() {
     ui = {};
     var y = header(root, 10, "cpu", "CPU");
 
-    ui.name = label(root, PAD, y + 3, IW - 44, narrow ? 12 : 13, THEME.text, "left", true);
-    setText(ui.name, narrow ? cpuName.replace(/^(Intel|AMD)\s+/i, "") : cpuName);
+    // Clear of the load percentage on the right, up to "100%"
+    ui.name = label(root, PAD, y + 3, IW - 58, narrow ? 12 : 13, THEME.text, "left", true);
+    // "i7-14700KF" when "Core i7-14700KF" doesn't fit
+    var shortName = cpuName.replace(/^(Intel|AMD)\s+/i, "");
+    setLinkText(ui.name, narrow ? shortName : cpuName, shortName.replace(/^(Core|Ryzen)\s+/i, ""));
     ui.name.style.cursor = "hand";
     ui.name.title = T("procTip");
     ui.name.onclick = function () { toggleDetails(processDetails, 1500); };
@@ -232,6 +235,11 @@ function rebuild() {
     // Glass: half of the bar's room goes to a sparkline of that core after the percentage
     var sw = THEME.glass ? Math.round(bw / 2) : 0;
     if (sw) bw -= sw + 4;
+    // Room for four whole blocks in Windows classic, taken from the sparkline
+    if (sw && segmentWidth(bw, 4) > bw && sw - (segmentWidth(bw, 4) - bw) >= 16) {
+        sw -= segmentWidth(bw, 4) - bw;
+        bw = segmentWidth(bw, 4);
+    }
     var groups = cellGroups(cols == 1);
     ui.cells = [];
     for (var g = 0; g < groups.length; g++) {

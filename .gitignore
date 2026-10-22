@@ -11,3 +11,4 @@ shared/*.dll
 *_Modern.gadget/settings.html
 *_Modern.gadget/flyout.html
 *_Modern.gadget/lang/
+*_Modern.gadget/update.ps1

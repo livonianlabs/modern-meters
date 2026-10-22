@@ -21,7 +21,8 @@ addLanguage("zh", "中文", {
     alarmOff: "过热警报已关闭。点击开启。",
     alarmStop: "过热！点击静音，直到温度降下来。",
     update: "新版本 %s ›",
-    updateHint: "点击打开发布页面。更新从不会自动安装；可在设置中关闭此检查。",
+    updateHint: "点击即可安装：小工具会从 GitHub 下载并自动重新启动。未经您点击不会安装任何内容；可在设置中关闭此检查。",
+    updating: "正在安装…", updateFailed: "安装失败（%s）。点击打开发布页面并手动安装。",
     procTip: "单击查看最活跃的进程", topCpu: "进程 · CPU", topRam: "进程 · 内存", topVram: "进程 · 显存", topShared: "进程 · 共享内存", topGpu: "进程 · GPU 负载", vramStop: "显存即将用尽！单击静音。",
     noNet: "无连接", ethernet: "以太网", intIp: "IP", extIp: "外部 IP",
     firewall: "防火墙", link: "连接", on: "开", off: "关", priv: "专用", pub: "公用", domain: "域",
@@ -61,6 +62,7 @@ addLanguage("zh", "中文", {
 }, {
     "Language": "语言", "Auto (as Windows)": "自动（同 Windows）", "Display": "外观", "Style": "样式",
     "Classic (flat)": "经典（扁平）", "Glass": "玻璃", "Colored glass": "彩色玻璃", "Light": "浅色", "Retro terminal": "复古终端", "Accent color": "强调色",
+    "Terminal: black and white": "终端：黑白", "Terminal: Norton Commander": "终端：Norton Commander", "Terminal: Ubuntu": "终端：Ubuntu", "Windows classic": "Windows 经典", "Glass frosting": "玻璃磨砂度", "Glass tint": "玻璃色调", "By wallpaper": "根据壁纸", "Dark": "深色",
     "For all gadgets": "应用于所有小工具", "Only this one": "仅此小工具", "Style and language": "样式和语言", "Style, color, language": "样式、颜色和语言", "Alarms": "警报", "VRAM above": "显存高于",
     "Blue": "蓝色", "Teal": "青色", "Green": "绿色", "Purple": "紫色", "Orange": "橙色", "Pink": "粉色", "Red": "红色", "Yellow": "黄色",
     "Width": "宽度", "Classic (%d)": "经典 (%d)", "Medium (%d)": "中等 (%d)", "Wide (%d)": "宽 (%d)",

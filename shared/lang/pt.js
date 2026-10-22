@@ -21,7 +21,8 @@ addLanguage("pt", "Português", {
     alarmOff: "O alarme de superaquecimento está desligado. Clique para ligar.",
     alarmStop: "Superaquecimento! Clique para silenciar até esfriar.",
     update: "Nova versão %s ›",
-    updateHint: "Clique para abrir a página da versão. Nada é instalado sozinho; esta verificação pode ser desligada nas configurações.",
+    updateHint: "Clique para instalar: os gadgets a baixam do GitHub e reiniciam sozinhos. Nada é instalado sem o seu clique; a verificação pode ser desativada nas configurações.",
+    updating: "Instalando…", updateFailed: "Não foi possível instalar (%s). Clique para abrir a página da versão e instalar manualmente.",
     procTip: "Clique para ver os processos mais ativos", topCpu: "Processos · CPU", topRam: "Processos · memória", topVram: "Processos · memória de vídeo", topShared: "Processos · memória compartilhada", topGpu: "Processos · carga da GPU", vramStop: "Memória de vídeo quase cheia! Clique para silenciar.",
     noNet: "sem conexão", ethernet: "Ethernet", intIp: "IP", extIp: "IP externo",
     firewall: "Firewall", link: "Link", on: "Sim", off: "Não", priv: "Privada", pub: "Pública", domain: "Domínio",
@@ -61,6 +62,7 @@ addLanguage("pt", "Português", {
 }, {
     "Language": "Idioma", "Auto (as Windows)": "Auto (como o Windows)", "Display": "Aparência", "Style": "Estilo",
     "Classic (flat)": "Clássico (plano)", "Glass": "Vidro", "Colored glass": "Vidro colorido", "Light": "Claro", "Retro terminal": "Terminal retrô", "Accent color": "Cor de destaque",
+    "Terminal: black and white": "Terminal: preto e branco", "Terminal: Norton Commander": "Terminal: Norton Commander", "Terminal: Ubuntu": "Terminal: Ubuntu", "Windows classic": "Windows clássico", "Glass frosting": "Fosco do vidro", "Glass tint": "Tom do vidro", "By wallpaper": "Pelo papel de parede", "Dark": "Escuro",
     "For all gadgets": "Para todos os gadgets", "Only this one": "Só este", "Style and language": "Estilo e idioma", "Style, color, language": "Estilo, cor, idioma", "Alarms": "Alarmes", "VRAM above": "VRAM acima de",
     "Blue": "Azul", "Teal": "Turquesa", "Green": "Verde", "Purple": "Roxo", "Orange": "Laranja", "Pink": "Rosa", "Red": "Vermelho", "Yellow": "Amarelo",
     "Width": "Largura", "Classic (%d)": "Clássica (%d)", "Medium (%d)": "Média (%d)", "Wide (%d)": "Larga (%d)",
