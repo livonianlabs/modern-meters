@@ -877,17 +877,20 @@ function esc(s) {
     return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// sections: [{ title, rows: [[label, value], ...] }]; rows with an empty value are left out
+// sections: [{ title, rows: [[label, value], ...] }]; rows with an empty value are left out.
+// In the gadget's colors and font: titles in its accent, the terminal's monospace.
 function detailsHtml(sections) {
-    var h = "";
+    var h = "", font = "font-family:" + (THEME.font || "'Segoe UI'") + ";font-size:" + fontSize(12) + "px;";
+    var title = "style=\"color:" + ACCENTS[accentName()] + ";border-bottom-color:" + THEME.sep + ";" + font +
+        (THEME.font ? "font-weight:bold;" : "font-family:'Segoe UI Semibold','Segoe UI';") + "\"";
     for (var i = 0; i < sections.length; i++) {
         var s = sections[i], body = "";
         for (var j = 0; j < s.rows.length; j++) {
             var v = s.rows[j][1];
             if (v == null || v === "") continue;
-            body += "<tr><td class='k'>" + esc(s.rows[j][0]) + "</td><td class='v'>" + esc(v) + "</td></tr>";
+            body += "<tr><td class='k' style='color:" + THEME.dim + "'>" + esc(s.rows[j][0]) + "</td><td class='v'>" + esc(v) + "</td></tr>";
         }
-        if (body) h += "<div class='t'>" + esc(s.title) + "</div><table>" + body + "</table>";
+        if (body) h += "<div class='t' " + title + ">" + esc(s.title) + "</div><table style=\"" + font + "color:" + THEME.text + "\">" + body + "</table>";
     }
     return h;
 }
