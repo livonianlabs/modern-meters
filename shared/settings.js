@@ -43,17 +43,18 @@ function generalRows(noTemp, graphOpts) {
     var rows = [
         { key: "lang", label: { en: "Language", ru: "Язык" }, options: OPT.lang },
         { section: { en: "Display", ru: "Вид" } },
+        // Auto, then the modern styles, the frosted glass and the retro ones, each group A to Z
         { key: "theme", label: { en: "Style", ru: "Стиль" }, options: [
-            ["classic", { en: "Classic (flat)", ru: "Классический" }], ["glass", { en: "Glass", ru: "Стекло" }],
-            ["tinted", { en: "Colored glass", ru: "Цветное стекло" }], ["light", { en: "Light", ru: "Светлый" }],
+            ["auto", OPT.lang[0][1]],
+            ["classic", { en: "Classic (flat)", ru: "Классический" }], ["tinted", { en: "Colored glass", ru: "Цветное стекло" }],
+            ["glass", { en: "Glass", ru: "Стекло" }], ["light", { en: "Light", ru: "Светлый" }],
+            ["aero", { en: "Aero (Windows 7)", ru: "Aero (Windows 7)" }],
+            ["liquid", { en: "Liquid Glass (Apple)", ru: "Liquid Glass (Apple)" }],
             ["terminal", { en: "Retro terminal", ru: "Ретро-терминал" }],
             ["mono", { en: "Terminal: black and white", ru: "Терминал: чёрно-белый" }],
             ["norton", { en: "Terminal: Norton Commander", ru: "Терминал: Norton Commander" }],
             ["ubuntu", { en: "Terminal: Ubuntu", ru: "Терминал: Ubuntu" }],
-            ["win98", { en: "Windows classic", ru: "Классический Windows" }],
-            ["aero", { en: "Aero (Windows 7)", ru: "Aero (Windows 7)" }],
-            ["liquid", { en: "Liquid Glass (Apple)", ru: "Liquid Glass (Apple)" }],
-            ["auto", OPT.lang[0][1]]] },
+            ["win98", { en: "Windows classic", ru: "Классический Windows" }]] },
         { key: "accent", label: { en: "Accent color", ru: "Цвет акцента" }, options: OPT.accent },
         // Liquid Glass and Aero: how much tint over the blurred wallpaper
         { key: "frost", label: { en: "Glass frosting", ru: "Матовость стекла" }, options: [
