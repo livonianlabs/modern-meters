@@ -6,15 +6,15 @@ Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
 
 | Gadget | Shows |
 |---|---|
-| **CPU Meter Modern** | Load of every thread or core (P-cores and E-cores grouped), clock speed, temperature, RAM and commit, history graph |
-| **GPU Meter Modern** | GPU load, VRAM, memory controller or shared memory, power, fan (RPM and %), clocks, encoder/decoder, temperature, history graph. NVIDIA, AMD and Intel, discrete and integrated, with the same sensors Task Manager uses |
+| **CPU Meter Modern** | Load of every thread or core (P-cores and E-cores grouped), clock speed, temperature, RAM and commit, history graph. Click the processor's name for the busiest programs by CPU and memory |
+| **GPU Meter Modern** | GPU load, VRAM, memory controller or shared memory, power, fan (RPM and %), clocks, encoder/decoder, temperature, history graph, an alarm when video memory is nearly full. Click the card's name for the programs using its memory and GPU. NVIDIA, AMD and Intel, discrete and integrated, with the same sensors Task Manager uses |
 | **Network Meter Modern** | Download and upload speed with an auto-scaled graph, Wi-Fi network and signal, IP addresses (hidden until clicked), firewall, traffic totals |
 | **Drives Meter Modern** | Physical disks with their partitions, SMART health, SSD life left, temperature, read/write speed, activity graph |
 | **Weather Meter Modern** | Current weather and a colored hourly chart of temperature, precipitation, wind or pressure (switched by tabs), a rain radar map of the last 80 minutes, 3 or 5 days ahead. Follows you from town to town through Windows location |
 
 All of them speak 12 languages (English, Українська, Русский, Deutsch, Español, Français, Italiano, Polski, Português, Türkçe, 中文, 日本語) and pick yours from Windows, and have five widths, accent colors, and a five-step color scale for load and temperature. Translations live in `shared/lang/`, one file per language; corrections are welcome.
 
-Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your accent color: blue, teal, green, purple, orange, pink, red or yellow), **Retro terminal** (a CRT screen with scanlines in your accent color) and **Auto**, which switches between Light and Glass with Windows' light/dark mode. Panels for the colored styles are drawn once on your PC the first time they're needed.
+Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your accent color: blue, teal, green, purple, orange, pink, red or yellow), **Retro terminal** (a CRT screen with scanlines in your accent color) and **Auto**, which switches between Light and Glass with Windows' light/dark mode. Panels for the colored styles are drawn once on your PC the first time they're needed. Set **For all gadgets** in any gadget's settings to give every gadget the same style and language (and, if you like, accent color) in one go.
 
 <img src="docs/themes.png" width="660" alt="Light, colored glass and retro terminal styles">
 
@@ -87,15 +87,15 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 
 | Гаджет | Что показывает |
 |---|---|
-| **CPU Meter Modern** | Загрузку каждого потока или ядра (P- и E-ядра сгруппированы), частоту, температуру, ОЗУ и выделенную память, график |
-| **GPU Meter Modern** | Загрузку GPU, видеопамять, контроллер памяти или общую память, мощность, вентилятор (обороты и %), частоты, кодер/декодер, температуру, график. NVIDIA, AMD и Intel, дискретные и встроенные, по тем же датчикам, что и Диспетчер задач |
+| **CPU Meter Modern** | Загрузку каждого потока или ядра (P- и E-ядра сгруппированы), частоту, температуру, ОЗУ и выделенную память, график. Клик по названию процессора покажет самые активные программы по нагрузке и памяти |
+| **GPU Meter Modern** | Загрузку GPU, видеопамять, контроллер памяти или общую память, мощность, вентилятор (обороты и %), частоты, кодер/декодер, температуру, график, сигнал при почти заполненной видеопамяти. Клик по названию карты покажет, какие программы занимают её память и нагружают GPU. NVIDIA, AMD и Intel, дискретные и встроенные, по тем же датчикам, что и Диспетчер задач |
 | **Network Meter Modern** | Скорость загрузки и отдачи с автомасштабом графика, Wi-Fi сеть и сигнал, IP-адреса (скрыты, пока не кликнуть), брандмауэр, счётчики трафика |
 | **Drives Meter Modern** | Физические диски с разделами, состояние SMART, остаток ресурса SSD, температуру, скорость чтения/записи, график активности |
 | **Weather Meter Modern** | Погоду сейчас и цветной почасовой график температуры, осадков, ветра или давления (вкладки), радарную карту осадков за последние 80 минут, прогноз на 3 или 5 дней. Следует за вами из города в город через определение местоположения Windows |
 
 У всех 12 языков (английский, украинский, русский, немецкий, испанский, французский, итальянский, польский, португальский, турецкий, китайский, японский), язык берётся из Windows; пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: светлый, цветное стекло, ретро-терминал, «Стекло» и классический.
 
-Стили: «Стекло», «Классический», «Светлый», «Цветное стекло» (стекло в цвете акцента: голубой, бирюзовый, зелёный, фиолетовый, оранжевый, розовый, красный или жёлтый), «Ретро-терминал» (ЭЛТ-экран со строками развёртки в цвете акцента) и «Авто» — переключается между светлым и стеклом вслед за светлым/тёмным режимом Windows. Фон для цветных стилей рисуется один раз на вашем компьютере, когда впервые понадобится.
+Стили: «Стекло», «Классический», «Светлый», «Цветное стекло» (стекло в цвете акцента: голубой, бирюзовый, зелёный, фиолетовый, оранжевый, розовый, красный или жёлтый), «Ретро-терминал» (ЭЛТ-экран со строками развёртки в цвете акцента) и «Авто» — переключается между светлым и стеклом вслед за светлым/тёмным режимом Windows. Фон для цветных стилей рисуется один раз на вашем компьютере, когда впервые понадобится. Настройка **Для всех гаджетов** в любом гаджете сразу даёт всем гаджетам один стиль и язык (а при желании и цвет акцента).
 
 ## Установка
 
