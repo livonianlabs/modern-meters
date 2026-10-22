@@ -211,7 +211,7 @@ var STRINGS = {
     en: {
         B: "B", KB: "KB", MB: "MB", TB: "TB", Bs: "B/s", KBs: "KB/s", MBs: "MB/s", GBs: "GB/s",
         GB: "GB", MHz: "MHz", GHz: "GHz", W: "W", RPM: "RPM",
-        ram: "RAM", commit: "Commit", base: "base", ctOff: "Core Temp off",
+        ram: "RAM", commit: "Commit", base: "base", ctOff: "Core Temp off", up: "up", upTip: "Windows running since %s", upUnits: ["d", "h", "m"],
         threads: "THREADS", cores: "CORES", toCores: "cores ›", toThreads: "threads ›", show: "show ",
         pcores: "P-CORES", ecores: "E-CORES", hdrNet: "NETWORK", hdrDrives: "STORAGE", sec: "s",
         gpuLoad: "GPU load", temperature: "Temperature",
@@ -239,7 +239,7 @@ var STRINGS = {
         B: "Б", KB: "КБ", MB: "МБ", TB: "ТБ", Bs: "Б/с", KBs: "КБ/с", MBs: "МБ/с", GBs: "ГБ/с",
         GB: "ГБ", MHz: "МГц", GHz: "ГГц", W: "Вт", RPM: "об/мин",
         ram: "ОЗУ", commit: "Выделено", base: "база",
-        ctOff: "нет Core Temp",
+        ctOff: "нет Core Temp", up: "вкл.", upTip: "Windows работает с %s", upUnits: ["д", "ч", "м"],
         threads: "ПОТОКИ", cores: "ЯДРА",
         toCores: "ядра ›", toThreads: "потоки ›",
         show: "",
@@ -778,7 +778,7 @@ function frostImage(w, h) {
         // Aero keeps enough blue for its white text: from tintMin at the least frosting up
         if (THEME.tintMin) pct = THEME.tintMin + pct * (100 - THEME.tintMin) / 100;
         var alpha = Math.round(pct * 2.55);
-        var file = "frost2_" + key + ".png";
+        var file = "frost3_" + key + ".png";
         var src = themeImage(file, function (p, path) {
             return p.Frost(path, w, h, wp.file, wp.style, Math.round(screen.width * k), Math.round(screen.height * k),
                 x, y, k, THEME.tint || (THEME.light ? "#ffffff" : "#000000"), alpha, THEME.art);
@@ -930,11 +930,17 @@ function glyph(prefix) {
 
 // Icon and title above the content, with an accent line fading out.
 // kind: cpu, gpu, net or disk (img/hdr_<kind>_<accent>.png). Returns the y below it.
-function header(root, y, kind, title) {
+// vendor (optional): { key, name } from vendorOf, shown after the title in the maker's color
+// (vendorColor): typed along with it in the terminals, white on Windows classic's title bar,
+// and in the top margin in the flat classic style, which has no title
+function header(root, y, kind, title, vendor) {
     if (cursor.timer) clearInterval(cursor.timer);
     if (cursor.retype) clearTimeout(cursor.retype);
     cursor.timer = cursor.retype = null;
-    if (!THEME.glass) return y;
+    if (!THEME.glass) {
+        if (vendor) setText(label(root, PAD, -1, 100, 8, vendorColor(vendor.key), "left", true), vendor.name);
+        return y;
+    }
     // Windows classic: the title on a window's title bar instead of over an accent line
     var bar = THEME.titleBar;
     if (bar) gradient(rect(root, 5, 5, W - 10, 24, bar[0]), bar[0], bar[1], true);
@@ -944,13 +950,27 @@ function header(root, y, kind, title) {
     setText(t, title);
     var c = ACCENTS[accentName()];
     if (!bar) gradient(rect(root, PAD, y + 20, W - 2 * PAD, 1, c), c, THEME.panel, true);
-    // Terminal: a block cursor blinking after the title, which now and then erases the title
-    // and types it again
+    var sep = " · ", vc = vendor && (bar ? "#ffffff" : vendorColor(vendor.key)), dot = bar ? "#ffffff" : THEME.faint;
+    var full = vendor ? title + sep + vendor.name : title;
+    // The vendor beside the title, a little smaller
+    if (vendor && !THEME.terminal) {
+        var v = label(root, PAD + 21 + textWidth(title, 11, true) + title.length + 2, y, 100, 10, vc, "left", true);
+        v.style.letterSpacing = "1px";
+        v.innerHTML = "<span style='color:" + dot + "'>·</span> " + esc(vendor.name);
+    }
+    // Terminal: a block cursor blinking after the title (and vendor), which now and then erases
+    // them and types them again
     if (THEME.terminal) {
-        var cur = rect(root, 0, y + 3, 7, 11, c), shown = title.length, typing = false;
+        var cur = rect(root, 0, y + 3, 7, 11, c), shown = full.length, typing = false;
         var place = function (n) {
-            var part = title.substring(0, n);
-            setText(t, part);
+            var part = full.substring(0, n);
+            if (n <= title.length) setText(t, part);
+            else {
+                var rest = part.substring(title.length);
+                t.innerHTML = esc(title) + "<span style='color:" + dot + "'>" + esc(rest.substring(0, sep.length)) + "</span>" +
+                    "<span style='color:" + vc + "'>" + esc(rest.substring(sep.length)) + "</span>";
+                t._t = null;
+            }
             cur.style.left = (PAD + 21 + (n ? textWidth(part, 11, true) + n : 0) + 3) + "px";
         };
         place(shown);
@@ -966,7 +986,7 @@ function header(root, y, kind, title) {
             } else if (typing == "erase") {
                 typing = "type";
                 cursor.retype = setTimeout(step, 700);
-            } else if (shown < title.length) {
+            } else if (shown < full.length) {
                 place(++shown);
                 cursor.retype = setTimeout(step, 90 + Math.random() * 160);
             } else {
@@ -987,6 +1007,37 @@ function header(root, y, kind, title) {
 }
 
 var cursor = { timer: null, retype: null, on: true };
+
+// Makers of CPUs and GPUs that run Windows, with their colors on dark and light panels, in the
+// CGA palette (Norton) and the Tango one (Ubuntu)
+var VENDORS = {
+    nvidia: { name: "NVIDIA", dark: "#76b900", light: "#4b8500", cga: "#55ff55", tango: "#8ae234" },
+    amd: { name: "AMD", dark: "#ff4b55", light: "#d0111b", cga: "#ff5555", tango: "#ef2929" },
+    intel: { name: "Intel", dark: "#3fa9ff", light: "#0068b5", cga: "#ffffff", tango: "#729fcf" },
+    qualcomm: { name: "Qualcomm", dark: "#7f97ff", light: "#3253dc", cga: "#ffffff", tango: "#729fcf" }
+};
+
+// { key, name } for a processor or graphics card name (and PCI vendor id), or null for unknown
+// and virtual ones. name: the maker, "Snapdragon" for Qualcomm processors.
+function vendorOf(s, pci, cpu) {
+    s = String(s || ""); pci = String(pci || "").toUpperCase();
+    var key = pci == "10DE" || /nvidia|geforce|quadro/i.test(s) ? "nvidia" :
+        pci == "1002" || pci == "1022" || /\bamd\b|radeon|ryzen|athlon|epyc|threadripper/i.test(s) ? "amd" :
+        pci == "8086" || /intel|\barc\b|iris|xeon|pentium|celeron|core\s*(ultra|i\d)/i.test(s) ? "intel" :
+        pci == "5143" || pci == "4D4F4351" || /qualcomm|adreno|snapdragon|microsoft sq/i.test(s) ? "qualcomm" : null;
+    if (!key) return null;
+    return { key: key, name: cpu && key == "qualcomm" ? "Snapdragon" : VENDORS[key].name };
+}
+
+// The maker's color in the current style: its brand color (deeper on light panels), the nearest
+// of the palette in Norton and Ubuntu, the phosphor's own in the one-color terminals
+function vendorColor(key) {
+    var v = VENDORS[key];
+    if (THEME.name == "norton") return v.cga;
+    if (THEME.name == "ubuntu") return v.tango;
+    if (THEME.name == "terminal" || THEME.name == "mono") return THEME.dim;
+    return THEME.light ? v.light : v.dark;
+}
 var RETYPE_MIN = 60 * 1000, RETYPE_MAX = 180 * 1000;
 
 // A 13px icon at the start of a row (img/row_<kind>_<accent>.png); returns how far the row's
@@ -1246,7 +1297,7 @@ function cimDate(s) {
 // %APPDATA%\ModernMeters\update.txt, where the others pick it up. A newer version shows a badge;
 // only a click on it downloads the release and installs it (update.ps1).
 
-var VERSION = "1.4.0";   // set by build.ps1
+var VERSION = "1.5.0";   // set by build.ps1
 var REPO = "Silverenio/modern-meters";
 var KOFI_URL = "https://ko-fi.com/silverenio";
 var UPDATE_EVERY = 24 * 3600 * 1000;

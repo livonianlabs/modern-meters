@@ -56,10 +56,11 @@ function generalRows(noTemp, graphOpts) {
             ["ubuntu", { en: "Terminal: Ubuntu", ru: "Терминал: Ubuntu" }],
             ["win98", { en: "Windows classic", ru: "Классический Windows" }]] },
         { key: "accent", label: { en: "Accent color", ru: "Цвет акцента" }, options: OPT.accent },
-        // Liquid Glass and Aero: how much tint over the blurred wallpaper
-        { key: "frost", label: { en: "Glass frosting", ru: "Матовость стекла" }, options: [
+        // Liquid Glass and Aero: how much tint over the blurred wallpaper; light or dark only in
+        // Liquid Glass. Shown only with those styles picked.
+        { key: "frost", label: { en: "Glass frosting", ru: "Матовость стекла" }, showWith: ["theme", ["aero", "liquid"]], options: [
             ["15", "15%"], ["25", "25%"], ["40", "40%"], ["55", "55%"], ["70", "70%"]] },
-        { key: "glass", label: { en: "Glass tint", ru: "Оттенок стекла" }, options: [
+        { key: "glass", label: { en: "Glass tint", ru: "Оттенок стекла" }, showWith: ["theme", ["liquid"]], options: [
             ["auto", { en: "By wallpaper", ru: "По обоям" }], ["light", { en: "Light", ru: "Светлое" }],
             ["dark", { en: "Dark", ru: "Тёмное" }]] },
         { key: "sync", label: { en: "For all gadgets", ru: "Для всех гаджетов" }, options: [
@@ -124,6 +125,7 @@ function settingsInit() {
     var table = $("form");
     for (var i = 0; i < rows.length; i++) {
         var row = rows[i], line = table.insertRow(-1);
+        row.line = line;
         if (row.section) {
             row.el = line.insertCell(-1);
             row.el.colSpan = 2;
@@ -169,13 +171,26 @@ function settingsInit() {
         LANG = langCode(selected("lang"));
         relabel();
     };
+    $("theme").onchange = showRows;
     relabel();
+    showRows();
     setInterval(refreshInfo, 2000);
-    // Up to SETTINGS_MAX_H the dialog grows with the content, beyond it the page scrolls
+    if (IS_GADGET) System.Gadget.onSettingsClosing = settingsClosing;
+}
+
+// Rows with showWith: [key, values] appear only while that select is set to one of the values.
+// Up to SETTINGS_MAX_H the dialog grows with the content, beyond it the page scrolls.
+function showRows() {
+    for (var i = 0; i < rows.length; i++) {
+        var w = rows[i].showWith;
+        if (!w) continue;
+        var v = selected(w[0]), on = false;
+        for (var j = 0; j < w[1].length; j++) if (w[1][j] == v) on = true;
+        rows[i].line.style.display = on ? "" : "none";
+    }
     var h = Math.min($("inner").offsetHeight, SETTINGS_MAX_H);
     $("scroll").style.height = h + "px";
     document.body.style.height = h + "px";
-    if (IS_GADGET) System.Gadget.onSettingsClosing = settingsClosing;
 }
 
 function relabel() {

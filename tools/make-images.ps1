@@ -96,7 +96,7 @@ function Save-Panels([string]$dir) {
 # Glass layout glyphs, drawn at 2x (32px) once per accent color: <prefix>_<kind>_<accent>.png, and with
 # -Light in the light theme's accents as <prefix>l_<kind>_<accent>.png (ACCENT_SETS in common.js).
 # Only strokes and fills in the accent, so they sit on any panel color.
-# Title icons: cpu, gpu, net, disk, sky. Row icons: ram, commit, bus, power, fan, ip, globe, shield, pulse.
+# Title icons: cpu, gpu, net, disk, sky. Row icons: ram, commit, bus, power, fan, ip, globe, shield, pulse, ping.
 function Save-Glyphs([string]$dir, [string]$prefix, [string[]]$kinds, [switch]$Light) {
     $accents = if ($Light) {
         @{ blue = '0a7fd0'; teal = '0b9c86'; green = '3f9a1e'; purple = '7f56e0'; orange = 'e06c00'; pink = 'd63384'; red = 'd63a3a'; yellow = 'b58900' }
@@ -178,6 +178,12 @@ function Save-Glyphs([string]$dir, [string]$prefix, [string[]]$kinds, [switch]$L
                 }
                 'shield' {
                     $g.DrawPolygon($pen, [System.Drawing.PointF[]]@((& $pt 16 3), (& $pt 27 7), (& $pt 26 17), (& $pt 16 29), (& $pt 6 17), (& $pt 5 7)))
+                }
+                'ping' {
+                    # A stopwatch
+                    $g.DrawEllipse($pen, 5, 8, 22, 22)
+                    $g.DrawLine($pen, 16, 19, 16, 13); $g.DrawLine($pen, 16, 19, 20, 22)
+                    $g.DrawLine($pen, 13, 3, 19, 3); $g.DrawLine($pen, 16, 3, 16, 8)
                 }
                 'pulse' {
                     $g.DrawLines($pen, [System.Drawing.PointF[]]@((& $pt 3 17), (& $pt 10 17), (& $pt 13 8), (& $pt 18 26), (& $pt 21 17), (& $pt 29 17)))
@@ -380,7 +386,7 @@ foreach ($name in $gadgets.Keys) {
     Save-Scanlines $dir
     foreach ($light in $false, $true) {
         Save-Glyphs $dir 'hdr' @($gadgets[$name]) -Light:$light
-        Save-Glyphs $dir 'row' @('ram', 'commit', 'bus', 'power', 'fan', 'ip', 'globe', 'shield', 'pulse') -Light:$light
+        Save-Glyphs $dir 'row' @('ram', 'commit', 'bus', 'power', 'fan', 'ip', 'globe', 'shield', 'pulse', 'ping') -Light:$light
     }
     if ($name -eq 'GPU_Meter_Modern.gadget') { Save-Gauges $dir }
     if ($name -eq 'Weather_Meter_Modern.gadget') { Save-WeatherIcons $dir; Save-WeatherIcons $dir -Light }

@@ -5,6 +5,9 @@
 //    town to town), else the IP address (get.geojs.io); named via OpenStreetMap Nominatim.
 //    Coordinates are rounded to ~1 km before they leave the PC.
 //  - Or a place picked in the location flyout (place.html), with a short list of recent ones.
+//  - Bottom line (can be turned off): sunrise and sunset, today's highest UV index, and the
+//    air quality from Open-Meteo's air quality API (European index, the US one in the Americas)
+//    every hour.
 //  - Map tab (can be turned off): RainViewer rain radar of the last 80 minutes, looped over a
 //    dark Esri map; downloaded only while the tab is open.
 // All requests are asynchronous and polled by a 1 s timer, so the Sidebar never blocks.
@@ -19,6 +22,11 @@ addStrings({
         hpa: "hPa", mmhg: "mmHg", inhg: "inHg", updated: "updated", herePlace: "current location",
         days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         dry: "No rain expected",
+        sunTip: "Sunrise and sunset today",
+        uvTip: "UV index, today's highest: %s", aqTip: "Air quality index (%s): %s",
+        uvLevels: ["low", "moderate", "high", "very high", "extreme"],
+        aqLevels: ["good", "fair", "moderate", "poor", "very poor", "extremely poor"],
+        aqLevelsUs: ["good", "moderate", "unhealthy for sensitive groups", "unhealthy", "very unhealthy", "hazardous"],
         plTitle: "Location", plAuto: "Auto — where I am", plSearch: "Find a city", plFind: "Find",
         plRecent: "Recent", plSearching: "searching…", plFailed: "no connection", plNothing: "nothing found",
         wx0: "Clear", wx1: "Mostly clear", wx2: "Partly cloudy", wx3: "Overcast", wx45: "Fog",
@@ -35,6 +43,11 @@ addStrings({
         hpa: "гПа", mmhg: "мм рт. ст.", inhg: "дюйм рт. ст.", updated: "обновлено", herePlace: "текущее место",
         days: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
         dry: "Без осадков",
+        sunTip: "Восход и закат сегодня",
+        uvTip: "УФ-индекс, сегодня до: %s", aqTip: "Индекс качества воздуха (%s): %s",
+        uvLevels: ["низкий", "умеренный", "высокий", "очень высокий", "экстремальный"],
+        aqLevels: ["хорошее", "приемлемое", "умеренное", "плохое", "очень плохое", "крайне плохое"],
+        aqLevelsUs: ["хорошее", "умеренное", "вредно для чувствительных групп", "вредное", "очень вредное", "опасное"],
         plTitle: "Место", plAuto: "Авто — где я сейчас", plSearch: "Найти город", plFind: "Найти",
         plRecent: "Недавние", plSearching: "ищу…", plFailed: "нет связи", plNothing: "ничего не найдено",
         wx0: "Ясно", wx1: "Малооблачно", wx2: "Переменная облачность", wx3: "Пасмурно", wx45: "Туман",
@@ -44,7 +57,7 @@ addStrings({
     }
 });
 
-var W, IW, accent, graphH, narrow, hours, days, tUnit, wUnit, pUnit, tab, showMap;
+var W, IW, accent, graphH, narrow, hours, days, tUnit, wUnit, pUnit, tab, showMap, showExtra;
 var ui = null, timer = null, shell, fso;
 var instanceId = Math.floor(Math.random() * 1e9);
 
@@ -54,7 +67,9 @@ var SOURCE_W = 56;   // "Open-Meteo" credit at the end of the place line
 // place: { lat, lon, name, src: "win" | "ip" | "pick" }
 var place = null, forecast = null, forecastAt = 0, forecastFor = "";
 var loc = { running: 0, next: 0, ipNext: 0, ip: null };
-var http = { fc: new Http(), ip: new Http(), name: new Http(), radar: new Http() };
+var http = { fc: new Http(), ip: new Http(), name: new Http(), radar: new Http(), air: new Http() };
+var AIR_EVERY = 60 * 60000;
+var air = { data: null, at: 0, forPlace: "" };
 
 // Radar frames from RainViewer: [{ time, path }], refreshed every 10 minutes while the map shows
 var RADAR_EVERY = 10 * 60000, RADAR_FRAMES = 9, MAP_ZOOM = 7;
@@ -141,6 +156,7 @@ function readSettings() {
     pUnit = getSetting("pressure");
     if (pUnit == "auto") pUnit = LANG == "ru" || LANG == "uk" ? "mmhg" : "hpa";
     showMap = getSetting("map") != "off";
+    showExtra = getSetting("extra") != "off";
     tab = getSetting("tab");
     if (tab == "map" && !showMap) tab = "temp";
 }
@@ -334,8 +350,27 @@ function updateForecast() {
     http.fc.get("https://api.open-meteo.com/v1/forecast?latitude=" + place.lat + "&longitude=" + place.lon +
         "&current=temperature_2m,apparent_temperature,weather_code,is_day,wind_speed_10m,wind_direction_10m,pressure_msl" +
         "&hourly=temperature_2m,precipitation,precipitation_probability,snowfall,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl" +
-        "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum" +
+        "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset,uv_index_max" +
         "&timezone=auto&forecast_days=7&wind_speed_unit=ms");
+}
+
+// The air quality now, hourly; only while the bottom line is shown
+function updateAir() {
+    if (http.air.busy()) {
+        var data = http.air.poll();
+        if (data && data.current) {
+            air.data = data.current;
+            drawExtra();
+        }
+        return;
+    }
+    if (!showExtra || !place || place.src == "cache") return;
+    var key = place.lat + ";" + place.lon;
+    if (key == air.forPlace && now() - air.at < AIR_EVERY) return;
+    air.forPlace = key;
+    air.at = now();
+    http.air.get("https://air-quality-api.open-meteo.com/v1/air-quality?latitude=" + place.lat + "&longitude=" + place.lon +
+        "&current=european_aqi,us_aqi&timezone=auto");
 }
 
 function tick() {
@@ -343,6 +378,7 @@ function tick() {
         updateLocation();
         updateName();
         updateForecast();
+        updateAir();
         updateRadar();
     } catch (e) {
         reportError(ui.desc, "tick", e);
@@ -531,6 +567,16 @@ function rebuild() {
     var twoLines = IW / days < 44;
     ui.days = box(root, PAD, y, IW, twoLines ? 60 : 50, "");
     y += twoLines ? 58 : 48;
+
+    // Sunrise and sunset; UV and air quality
+    if (showExtra) {
+        rect(root, PAD, y, IW, 1, THEME.sep);
+        y += 5;
+        ui.sun = label(root, PAD, y, Math.round(IW * 0.5), narrow ? 9 : 10, THEME.dim);
+        ui.sun.title = T("sunTip");
+        ui.air = label(root, PAD + Math.round(IW * 0.4), y, IW - Math.round(IW * 0.4), narrow ? 9 : 10, THEME.dim, "right");
+        y += 17;
+    }
     if (THEME.glass) y += 4;
 
     updateBadge(root);
@@ -602,6 +648,38 @@ function draw() {
         d.getHours() + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
     drawChart();
     drawDays();
+    drawExtra();
+}
+
+// Levels for the colors: UV after the WHO bands, air quality after the European (0..100+, steps
+// of 20) or the US index (50, 100, 150, 200, 300)
+var UV_STEPS = [3, 6, 8, 11], AQ_STEPS = [20, 40, 60, 80, 100], AQ_STEPS_US = [51, 101, 151, 201, 301];
+
+function stepOf(v, steps) {
+    for (var i = 0; i < steps.length; i++) if (v < steps[i]) return i;
+    return steps.length;
+}
+
+function drawExtra() {
+    if (!ui || !ui.sun) return;
+    var dl = forecast && forecast.daily, parts = [];
+    var hm = function (s) { return String(s || "").substring(11, 16); };
+    setText(ui.sun, dl && dl.sunrise ? "↑ " + hm(dl.sunrise[0]) + "  ↓ " + hm(dl.sunset[0]) : "");
+    var colors = [LEVELS[1], LEVELS[2], LEVELS[3], LEVELS[4], THEME.hot], tips = [];
+    if (dl && dl.uv_index_max && dl.uv_index_max[0] != null) {
+        var uv = Math.round(dl.uv_index_max[0]), u = stepOf(uv, UV_STEPS);
+        parts.push("UV <span style='color:" + colors[u] + "'>" + uv + "</span>");
+        tips.push(T("uvTip").replace("%s", uv + " — " + T("uvLevels")[u]));
+    }
+    // The Americas know the US index; the rest of the world gets the European one
+    var us = place && place.lon < -30, aq = air.data && (us ? air.data.us_aqi : air.data.european_aqi);
+    if (aq != null) {
+        var a = stepOf(aq, us ? AQ_STEPS_US : AQ_STEPS);
+        parts.push("AQI <span style='color:" + colors[Math.min(a, 4)] + "'>" + Math.round(aq) + "</span>");
+        tips.push(T("aqTip").replace("%s", us ? "US" : "EU").replace("%s", Math.round(aq) + " — " + T(us ? "aqLevelsUs" : "aqLevels")[a]));
+    }
+    ui.air.innerHTML = parts.join(" · ");
+    ui.air.title = tips.join("\n");
 }
 
 function drawChart() {
@@ -756,6 +834,11 @@ function drawMap(box0) {
             "/MapServer/tile/" + z + "/" + t.y + "/" + t.x;
     };
     for (i = 0; i < tiles.length; i++) tileImg(view, tiles[i], esri("Base", tiles[i]));
+    // The gray map in the style's colors: a veil of the panel's color in the colored styles
+    // (Aero's blue, Norton's, Ubuntu's aubergine), the phosphor's in the retro terminal
+    var veil = THEME.name == "terminal" ? THEME.dim : THEME.panel;
+    if (!THEME.light && hsl(veil)[1] > 0.2)
+        rect(view, 0, 0, IW, mh, veil).style.filter = "alpha(opacity=" + (THEME.name == "terminal" ? 40 : 50) + ")";
 
     // One layer of radar tiles per frame; the animation shows them in turn
     radar.layers = [];

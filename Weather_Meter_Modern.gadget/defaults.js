@@ -13,6 +13,7 @@ var DEFAULTS = {
     hours: "24",
     days: "3",
     map: "on",
+    extra: "on",
     tab: "temp",
     // Location: "auto" (Windows location, else IP) or "pick" (a place chosen in the flyout,
     // stored as "lat;lon;name"); recent: up to 5 "name;lat;lon" joined by "|"
@@ -39,7 +40,8 @@ function settingsSpec() {
             ["24", { en: "24 hours", ru: "24 часа" }], ["48", { en: "48 hours", ru: "48 часов" }]] },
         { key: "days", label: { en: "Days ahead", ru: "Дней вперёд" }, options: [
             ["3", "3"], ["5", "5"]] },
-        { key: "map", label: { en: "Radar map tab", ru: "Вкладка «Карта»" }, options: OPT.onOff }
+        { key: "map", label: { en: "Radar map tab", ru: "Вкладка «Карта»" }, options: OPT.onOff },
+        { key: "extra", label: { en: "Sun, UV and air", ru: "Солнце, UV и воздух" }, options: OPT.onOff }
     ]);
 }
 

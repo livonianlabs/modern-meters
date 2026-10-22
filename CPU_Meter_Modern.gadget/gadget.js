@@ -4,8 +4,19 @@ var W, IW, accent, unit, view, graphH, interval, showMem, live, narrow;
 var ui = null, timer = null, liveTimer = null, liveItem = null;
 
 var wmi, refresher, cpuSet, memObj;
-var cpuName = "CPU", nCores = 0, nLogical = 0, nHT = 0, baseMHz = 0, totalRam = 0;
+var cpuName = "CPU", nCores = 0, nLogical = 0, nHT = 0, baseMHz = 0, totalRam = 0, bootTime = null;
 var coreTemp = null;
+
+function pad2(n) { return (n < 10 ? "0" : "") + n; }
+
+// Time since Windows started: "3d 4h", "4h 12m", "12m"; short: the largest unit only
+function uptime(short) {
+    var m = Math.max(0, Math.floor((new Date().getTime() - bootTime.getTime()) / 60000));
+    var d = Math.floor(m / 1440), h = Math.floor(m / 60) % 24, u = T("upUnits");
+    if (d) return d + u[0] + (short ? "" : " " + h + u[1]);
+    if (h) return h + u[1] + (short ? "" : " " + (m % 60) + u[2]);
+    return m + u[2];
+}
 
 function init() {
     hookSettings(rebuild);
@@ -45,8 +56,11 @@ function probe() {
     }
     nHT = clamp(nLogical - nCores, 0, nCores);
 
-    e = new Enumerator(wmi.ExecQuery("SELECT TotalVisibleMemorySize FROM Win32_OperatingSystem"));
+    e = new Enumerator(wmi.ExecQuery("SELECT TotalVisibleMemorySize, LastBootUpTime FROM Win32_OperatingSystem"));
     totalRam = parseFloat(e.item().TotalVisibleMemorySize) * 1024;
+    // "20261021081530.500000+180", in local time
+    var b = /^(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/.exec(String(e.item().LastBootUpTime || ""));
+    if (b) bootTime = new Date(+b[1], b[2] - 1, +b[3], +b[4], +b[5], +b[6]);
 
     refresher = new ActiveXObject("WbemScripting.SWbemRefresher");
     cpuSet = refresher.AddEnum(wmi, "Win32_PerfFormattedData_Counters_ProcessorInformation").ObjectSet;
@@ -177,7 +191,7 @@ function rebuild() {
     var root = $("root");
     root.innerHTML = "";
     ui = {};
-    var y = header(root, 10, "cpu", "CPU");
+    var y = header(root, 10, "cpu", "CPU", vendorOf(cpuName, null, true));
 
     // Clear of the load percentage on the right, up to "100%"
     ui.name = label(root, PAD, y + 3, IW - 58, narrow ? 12 : 13, THEME.text, "left", true);
@@ -336,8 +350,17 @@ function tick() {
     setText(ui.total, Math.round(d.total) + "%");
     setColor(ui.total, pctColor(d.total));
     setColor(ui.sub, THEME.dim);
-    setText(ui.sub, (d.clock / 1000).toFixed(2) + " " + T("GHz") +
-        (narrow ? "" : "  ·  " + T("base") + " " + (baseMHz / 1000).toFixed(1)));
+    var ghz = (d.clock / 1000).toFixed(2) + " " + T("GHz");
+    if (narrow) {
+        // Days and hours up, or just days when that doesn't fit
+        setText(ui.sub, ghz + (bootTime ? "  ·  " + uptime(false) : ""));
+        if (bootTime && ui.sub.scrollWidth > ui.sub.clientWidth) setText(ui.sub, ghz + "  ·  " + uptime(true));
+    } else {
+        setText(ui.sub, ghz + "  ·  " + T("base") + " " + (baseMHz / 1000).toFixed(1) +
+            (bootTime ? "  ·  " + T("up") + " " + uptime(false) : ""));
+    }
+    if (bootTime) ui.sub.title = T("upTip").replace("%s", bootTime.getDate() + "." + pad2(bootTime.getMonth() + 1) + " " +
+        bootTime.getHours() + ":" + pad2(bootTime.getMinutes()));
     var maxT = null;
     if (d.temps) for (var i = 0; i < d.temps.length; i++) if (d.temps[i] != null && (maxT == null || d.temps[i] > maxT)) maxT = d.temps[i];
     setText(ui.temp, maxT == null ? T("ctOff") : fmtTemp(maxT, unit) + unit);

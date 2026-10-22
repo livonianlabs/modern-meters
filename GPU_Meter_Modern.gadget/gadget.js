@@ -402,7 +402,7 @@ function rebuild() {
     var root = $("root");
     root.innerHTML = "";
     ui = {};
-    var y = header(root, 10, "gpu", "GPU");
+    var y = header(root, 10, "gpu", "GPU", card ? vendorOf(card.name, card.vendor) : null);
 
     // Clear of the load percentage on the right, up to "100%"
     ui.name = label(root, PAD, y + 3, IW - 58, narrow ? 12 : 13, THEME.text, "left", true);

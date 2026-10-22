@@ -287,21 +287,25 @@ namespace ModernMeters
                 // Blur: down to a sixth and back up, smoothly
                 int bw = Math.Max(4, w / 6), bh = Math.Max(4, h / 6);
                 using (var small = Under(wallpaper, wallStyle, sw, sh, x, y, w, h, scale, bw, bh))
+                using (var blur = new Bitmap(W2, H2, PixelFormat.Format32bppArgb))
                 using (var bmp = new Bitmap(W2, H2))
                 using (var g = Graphics.FromImage(bmp))
                 {
+                    using (var gb = Graphics.FromImage(blur))
+                    using (var ia = new ImageAttributes())
+                    {
+                        gb.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        gb.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                        ia.SetWrapMode(WrapMode.TileFlipXY);
+                        gb.DrawImage(small, new Rectangle(0, 0, W2, H2), 0, 0, bw, bh, GraphicsUnit.Pixel, ia);
+                    }
+                    if (!aero) Refract(blur, r, 22 * K, 16 * K);
                     g.SmoothingMode = SmoothingMode.AntiAlias;
                     g.Clear(Color.Transparent);
                     using (var shape = Round(0, 0, W2, H2, r))
                     {
                         g.SetClip(shape);
-                        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                        using (var ia = new ImageAttributes())
-                        {
-                            ia.SetWrapMode(WrapMode.TileFlipXY);
-                            g.DrawImage(small, new Rectangle(0, 0, W2, H2), 0, 0, bw, bh, GraphicsUnit.Pixel, ia);
-                        }
+                        g.DrawImageUnscaled(blur, 0, 0);
                         using (var wash = new SolidBrush(Color.FromArgb(alpha, Parse(tint))))
                             g.FillRectangle(wash, 0, 0, W2, H2);
                         g.ResetClip();
@@ -316,6 +320,53 @@ namespace ModernMeters
             {
                 return false;
             }
+        }
+
+        // Liquid Glass's lens: within band px of the rounded edge (radius r) the picture is pulled in
+        // from further in (toward the middle), up to strength px at the very edge, as a thick rim of glass bends
+        // what is behind it; red a little more than blue, for the faint rainbow along the edge
+        static void Refract(Bitmap bmp, float r, float band, float strength)
+        {
+            int w = bmp.Width, h = bmp.Height;
+            var rect = new Rectangle(0, 0, w, h);
+            var data = bmp.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            int[] src = new int[w * h], dst = new int[w * h];
+            Marshal.Copy(data.Scan0, src, 0, src.Length);
+            Array.Copy(src, dst, src.Length);
+            for (int y = 0; y < h; y++)
+                for (int x = 0; x < w; x++)
+                {
+                    // Distance to the edge and the way in
+                    float d, nx, ny;
+                    float cx = x < r ? r : (x > w - 1 - r ? w - 1 - r : x), cy = y < r ? r : (y > h - 1 - r ? h - 1 - r : y);
+                    if (cx != x && cy != y)
+                    {
+                        float ex = cx - x, ey = cy - y, len = (float)Math.Sqrt(ex * ex + ey * ey);
+                        d = r - len; nx = ex / len; ny = ey / len;
+                    }
+                    else
+                    {
+                        float dl = x, dr = w - 1 - x, dt = y, db = h - 1 - y;
+                        d = Math.Min(Math.Min(dl, dr), Math.Min(dt, db));
+                        nx = d == dl ? 1 : (d == dr ? -1 : 0); ny = nx != 0 ? 0 : (d == dt ? 1 : -1);
+                    }
+                    if (d < 0 || d >= band) continue;
+                    // Pulled toward the middle of the glass, as a lens does, rather than straight in
+                    float mx = w / 2f - x, my = h / 2f - y, ml = (float)Math.Sqrt(mx * mx + my * my);
+                    if (ml > 0) { nx = (nx + 2 * mx / ml) / 3; ny = (ny + 2 * my / ml) / 3; }
+                    float k = 1 - d / band, off = strength * k * k;
+                    int c = 0;
+                    for (int ch = 0; ch < 3; ch++)
+                    {
+                        float o = off * (ch == 0 ? 0.85f : (ch == 2 ? 1.15f : 1f));   // blue, green, red
+                        int sx = Math.Max(0, Math.Min(w - 1, (int)(x + nx * o + 0.5f)));
+                        int sy = Math.Max(0, Math.Min(h - 1, (int)(y + ny * o + 0.5f)));
+                        c |= src[sy * w + sx] & (0xFF << (8 * ch));
+                    }
+                    dst[y * w + x] = c | unchecked((int)0xFF000000);
+                }
+            Marshal.Copy(dst, 0, data.Scan0, dst.Length);
+            bmp.UnlockBits(data);
         }
 
         // A band of white (alpha a) from x at the top to x + lean at the bottom, w wide

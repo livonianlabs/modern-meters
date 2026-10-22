@@ -13,6 +13,7 @@ var DEFAULTS = {
     ip: "on",
     extIp: "on",
     totals: "on",
+    ping: "on",
     live: "off",
     alarm: "off",
     sound: "Alarm02.wav",
@@ -44,6 +45,7 @@ function settingsSpec() {
         { key: "ip", label: { en: "IP addresses", ru: "IP-адреса" }, options: OPT.onOff },
         { key: "extIp", label: { en: "External IP", ru: "Внешний IP" }, options: OPT.onOff },
         { key: "totals", label: { en: "Traffic totals", ru: "Счётчики трафика" }, options: OPT.onOff },
+        { key: "ping", label: { en: "Ping", ru: "Пинг" }, options: OPT.onOff },
         { section: { en: "Network", ru: "Сеть" } },
         { key: "adapter", label: { en: "Adapter", ru: "Адаптер" }, options: adapterOptions() }
     ], alarmRows({ en: "Connection alarm", ru: "Сигнал обрыва связи" }, true));

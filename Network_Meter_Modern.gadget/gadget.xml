@@ -2,7 +2,7 @@
 <gadget>
   <name>Network Meter Modern</name>
   <namespace>ModernMeters</namespace>
-  <version>1.4.0</version>
+  <version>1.5.0</version>
   <author name="Silverenio">
     <info url="https://github.com/Silverenio/modern-meters" text="github.com/Silverenio/modern-meters" />
     <logo src="icon.png" />

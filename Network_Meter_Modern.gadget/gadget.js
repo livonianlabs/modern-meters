@@ -14,6 +14,8 @@ addStrings({
         bps: "bit/s", kbps: "kbit/s", Mbps: "Mbit/s", Gbps: "Gbit/s",
         lookup: "Double-click to look up again.", showTip: "Click to show.", hideTip: "Click to hide.", sessionTip: "Since the gadget started. Click to reset.",
         totalTip: "Since {d}. Double-click to reset.",
+        ping: "Ping", pingLost: "no reply",
+        pingTip: "Ping to 1.1.1.1 (Cloudflare) every 5 s. Now %1, average %2, highest %3 over the last %4 min.",
         connOn: "Connection-lost alarm is on. Click to turn off.",
         connOff: "Connection-lost alarm is off. Click to turn on.",
         connStop: "Connection lost! Click to silence until it is back.",
@@ -33,6 +35,8 @@ addStrings({
         bps: "бит/с", kbps: "Кбит/с", Mbps: "Мбит/с", Gbps: "Гбит/с",
         lookup: "Двойной клик — запросить заново.", showTip: "Нажмите, чтобы показать.", hideTip: "Нажмите, чтобы скрыть.", sessionTip: "С запуска гаджета. Нажмите, чтобы обнулить.",
         totalTip: "С {d}. Двойной клик — обнулить.",
+        ping: "Пинг", pingLost: "нет ответа",
+        pingTip: "Пинг до 1.1.1.1 (Cloudflare) каждые 5 с. Сейчас %1, в среднем %2, максимум %3 за последние %4 мин.",
         connOn: "Сигнал обрыва связи включён. Нажмите, чтобы выключить.",
         connOff: "Сигнал обрыва связи выключен. Нажмите, чтобы включить.",
         connStop: "Связь пропала! Нажмите, чтобы заглушить до её возвращения.",
@@ -46,7 +50,7 @@ addStrings({
     }
 });
 
-var W, IW, accent, upColor, graphH, interval, bytesMode, wanted, showIp, showExt, showTotals, live, narrow;
+var W, IW, accent, upColor, graphH, interval, bytesMode, wanted, showIp, showExt, showTotals, showPing, live, narrow;
 var ui = null, timer = null, liveTimer = null, liveRef = null, liveSet = null, liveLast = null;
 var shell, fso, wmi, refresher, netSet;
 var adapter = null, lastAdapter = null, nextScan = 0, last = null, reveal = false, misses = 0;
@@ -56,6 +60,9 @@ var wlan = { info: null, done: false, launched: 0, next: 0 };
 // Keeps the temp files of several gadget instances apart
 var instanceId = Math.floor(Math.random() * 1e9);
 var ext = { ip: null, req: null, sent: 0, next: 0, forIp: null };
+// Latency to PING_HOST: ms of the recent pings (null: no reply), newest last
+var PING_HOST = "1.1.1.1", PING_EVERY = 5000, PING_SLOW = 15000, PING_KEEP = 36;
+var ping = { hist: [], next: 0 };
 
 function init() {
     shell = new ActiveXObject("WScript.Shell");
@@ -400,6 +407,7 @@ function readSettings() {
     showIp = getSetting("ip") != "off";
     showExt = getSetting("extIp") != "off";
     showTotals = getSetting("totals") != "off";
+    showPing = getSetting("ping") != "off";
     live = getSetting("live") == "on";
 }
 
@@ -509,6 +517,16 @@ function rebuild() {
     y += 18;
     ui.link = infoRow(root, y, T("link"), "pulse");
     y += 18;
+    if (showPing) {
+        // Name, a sparkline of the recent pings, the latest on the right
+        ui.ping = infoRow(root, y, T("ping"), "ping");
+        var sx = PAD + (THEME.glass ? 18 : 0) + textWidth(T("ping"), 11) + 8, sw = W - PAD - 48 - sx;
+        if (sw >= 20) {
+            ui.pingGraph = new Graph(root, sx, y + 3, sw, 11, [{ color: accent, area: true }], true);
+            for (var p = Math.max(0, ping.hist.length - ui.pingGraph.n); p < ping.hist.length; p++) ui.pingGraph.push([pingPct(ping.hist[p])]);
+        }
+        y += 18;
+    }
 
     if (showTotals) {
         rect(root, PAD, y + 2, IW, 1, THEME.sep);
@@ -544,6 +562,7 @@ function tick() {
         speed = sampleSpeed();
         pollWlan();
         pollExt();
+        pollPing();
         if (now() >= nextSave) {
             if (nextSave) saveTotals();
             nextSave = now() + 60000;
@@ -555,6 +574,45 @@ function tick() {
     ui.alarm.update(misses >= 2 ? 1 : 0);
     if (ui.graph) pushGraph(speed);
     update(speed);
+}
+
+// One ping now and then, through WMI. It waits for the reply (up to a second, only when there
+// is none), so after a lost one the next comes later.
+function pollPing() {
+    if (!showPing || now() < ping.next) return;
+    var ms = null;
+    if (adapter) {
+        try {
+            var e = new Enumerator(wmi.ExecQuery("SELECT StatusCode, ResponseTime FROM Win32_PingStatus WHERE Address='" +
+                PING_HOST + "' AND Timeout=1000"));
+            if (!e.atEnd() && e.item().StatusCode === 0) ms = e.item().ResponseTime;
+        } catch (err) { }
+        ping.hist.push(ms);
+        if (ping.hist.length > PING_KEEP) ping.hist.shift();
+        if (ui.pingGraph) ui.pingGraph.push([pingPct(ms)]);
+    }
+    ping.next = now() + (ms == null ? PING_SLOW : PING_EVERY);
+    showPingValue();
+}
+
+// Height in the sparkline: 150 ms and more fill it; a lost ping shows as full
+function pingPct(ms) {
+    return ms == null ? 100 : Math.min(100, Math.max(4, ms / 1.5));
+}
+
+var PING_STEPS = [40, 100, 200];
+
+function showPingValue() {
+    if (!ui || !ui.ping) return;
+    var h = ping.hist, last = h.length ? h[h.length - 1] : undefined, sum = 0, n = 0, max = 0;
+    for (var i = 0; i < h.length; i++) if (h[i] != null) { sum += h[i]; n++; max = Math.max(max, h[i]); }
+    var fmt = function (v) { return v == null ? T("pingLost") : Math.round(v) + " ms"; };
+    setText(ui.ping.val, last === undefined ? "–" : fmt(last));
+    var level = 1;
+    while (last != null && level <= PING_STEPS.length && last >= PING_STEPS[level - 1]) level++;
+    setColor(ui.ping.val, last === null ? THEME.hot : (last === undefined ? THEME.text : LEVELS[level]));
+    ui.ping.val.title = h.length ? T("pingTip").replace("%1", fmt(last)).replace("%2", n ? fmt(sum / n) : "–")
+        .replace("%3", n ? fmt(max) : "–").replace("%4", Math.max(1, Math.round(h.length * PING_EVERY / 60000))) : "";
 }
 
 // Keeps the newest n values, padding with zeros on the left
