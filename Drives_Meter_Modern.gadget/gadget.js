@@ -57,7 +57,6 @@ function shutdown() {
     if (timer) clearInterval(timer);
 }
 
-function now() { return new Date().getTime(); }
 
 // ---- data -----------------------------------------------------------------
 
@@ -200,6 +199,7 @@ function volumeRow(root, y) {
 
 function rebuild() {
     if (timer) clearInterval(timer);
+    if (ui) for (var j = 0; j < ui.disks.length; j++) keepGraph("disk" + disks[j].num, ui.disks[j].graph);
     readSettings();
 
     var perf = readPerf();
@@ -271,9 +271,10 @@ function rebuild() {
         if (graphH > 0) {
             // Read as an area, write as a line, scaled to the busiest moment on screen
             b.graph = new Graph(root, PAD, y, IW, graphH, [{ color: accent, area: true }, { color: writeColor, area: false }]);
-            b.scaleLabel = label(root, PAD + 3, y + 1, IW - 6, 8, THEME.faint, "right");
-            b.hist = [[], []];
-            for (var n = 0; n < b.graph.n; n++) { b.hist[0].push(0); b.hist[1].push(0); }
+            b.scaleLabel = cornerLabel(root, PAD + IW - 1, y + 1, 8);
+            b.graph.span = historySpan(IW, interval);
+            restoreGraph("disk" + d.num, b.graph);
+            b.graph.tip(interval, [T("read"), T("write")], function (s, v) { return fmtByteRate(v); });
             b.scale = 0;
             y += graphH + 6;
         }
@@ -370,21 +371,14 @@ function niceScale(v) {
     return 10 * p * mult;
 }
 
+// Read and write on one scale, the busiest moment on screen rounded up
 function pushRW(b, rd, wr) {
-    b.hist[0].shift(); b.hist[0].push(rd);
-    b.hist[1].shift(); b.hist[1].push(wr);
-    var peak = 0;
-    for (var s = 0; s < 2; s++)
-        for (var i = 0; i < b.hist[s].length; i++) if (b.hist[s][i] > peak) peak = b.hist[s][i];
-    var sc = niceScale(peak);
+    b.graph.push([rd, wr]);
+    var sc = niceScale(b.graph.peak());
     if (sc != b.scale) {
         b.scale = sc;
-        var all = [[], []];
-        for (s = 0; s < 2; s++) for (i = 0; i < b.hist[s].length; i++) all[s].push(b.hist[s][i] / sc * 100);
-        b.graph.load(all);
-        setText(b.scaleLabel, scaled(sc, ["Bs", "KBs", "MBs", "GBs"], 1024, true));
-    } else {
-        b.graph.push([rd / sc * 100, wr / sc * 100]);
+        b.graph.setMax(sc);
+        setCorner(b.scaleLabel, scaled(sc, ["Bs", "KBs", "MBs", "GBs"], 1024, true));
     }
 }
 

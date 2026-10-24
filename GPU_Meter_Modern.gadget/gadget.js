@@ -6,7 +6,7 @@
 //    records from the GPU performance counters and D3DKMT (ModernMetersGpu.dll), the sources
 //    Task Manager uses; LibreHardwareMonitor adds what the driver doesn't report if it runs.
 
-var W, IW, accent, unit, graphH, interval, gpuIndex, source, showDetails, narrow, vramLimit;
+var W, IW, accent, unit, graphH, interval, gpuIndex, source, showDetails, showTop, narrow, vramLimit;
 var ui = null, timer = null;
 var shell, fso, wmi, smiPath = null, provider = null, misses = 0;
 var gpus = [], card = null;   // listGpus() (defaults.js), and the one picked in the settings
@@ -296,8 +296,8 @@ var procs = null;   // the per-process GPU counters while the flyout is open
 
 // The programs using the most video memory and GPU, from the counters Task Manager shows per
 // process. Integrated graphics count their shared memory. A process's load is its busiest engine.
-function processDetails() {
-    if (!card) return [];
+// Load needs two samples, so on the first call it is left out ("first").
+function readProcs() {
     if (!procs) {
         var r = new ActiveXObject("WbemScripting.SWbemRefresher");
         procs = {
@@ -345,13 +345,33 @@ function processDetails() {
         g.mem += pids[k].mem;
         g.gpu = Math.min(100, g.gpu + load);
     }
-    var gpuRows = procs.first ? [] : topRows(list, "gpu", function (v) { return v >= 0.5 ? Math.round(v) + "%" : ""; });
+    var first = procs.first;
     procs.first = false;
+    return first ? { list: list, first: true } : { list: list };
+}
+
+function processDetails() {
+    if (!card) return [];
+    var r = readProcs(), list = r.list;
+    var gpuRows = r.first ? [] : topRows(list, "gpu", function (v) { return v >= 0.5 ? Math.round(v) + "%" : ""; });
     return [
         { title: T(card.integrated ? "topShared" : "topVram"),
             rows: topRows(list, "mem", function (v) { return v >= 1048576 ? fmtBytes(v) : ""; }) },
         { title: T("topGpu"), rows: gpuRows }
     ];
+}
+
+// The busiest program on this card, now and then: reading every process's counters takes a
+// moment
+var topNext = 0;
+
+function updateTop() {
+    if (!ui.top || now() < topNext) return;
+    topNext = now() + TOP_EVERY;
+    var r = readProcs(), best = null;
+    if (r.first) { topNext = now() + 1000; return; }
+    for (var i = 0; i < r.list.length; i++) if (!best || r.list[i].gpu > best.gpu) best = r.list[i];
+    ui.top.set(best && best.gpu >= 1 ? best.name : null, best ? best.gpu : 0);
 }
 
 // ---- layout ---------------------------------------------------------------
@@ -370,6 +390,7 @@ function readSettings() {
     card = gpus[gpuIndex] || gpus[0] || null;
     source = getSetting("source");
     showDetails = getSetting("details") != "off";
+    showTop = getSetting("top") != "off";
     vramLimit = parseFloat(getSetting("vramAlarm")) || 0;
 }
 
@@ -394,6 +415,7 @@ function rebuild() {
     if (timer) clearInterval(timer);
     if (provider) provider.stop();
     disposeAlarms();
+    if (ui && ui.graph) keepGraph("gpu", ui.graph);
     readSettings();
     provider = pickProvider();
     misses = 0;
@@ -427,31 +449,42 @@ function rebuild() {
             { color: accent, area: true },
             { color: vramColor, area: false }
         ]);
-        percentAxis(root, PAD + ax, y, IW - ax, graphH, interval);
+        ui.graph.span = historySpan(IW - ax, interval);
+        restoreGraph("gpu", ui.graph);
+        ui.graph.tip(interval, ["GPU", "VRAM"], function (s, v) { return Math.round(v) + "%"; });
+        percentAxis(root, PAD + ax, y, IW - ax, graphH, interval * ui.graph.span);
         y += graphH + 4;
         legend(root, PAD, y, accent, "GPU");
-        legend(root, PAD + 50, y, vramColor, "VRAM");
-        y += 20;
+        legend(root, PAD + 46, y, vramColor, "VRAM");
+        // The busiest program on the rest of the legend line when it fits
+        if (showTop && card && IW - 100 - 32 >= 50) ui.top = new TopRow(root, y, PAD + 100);
+        y += 17;
     }
+    if (showTop && card && !ui.top) {
+        ui.top = new TopRow(root, y - 2);
+        y += 18;
+    }
+    topNext = 0;
 
     if (THEME.glass) {
-        var gx = Math.round(IW / 4 - GAUGE_SIZE / 2);
-        ui.gLoad = new Gauge(root, PAD + gx, y, T("gpuLoad"));
-        ui.gTemp = new Gauge(root, PAD + Math.round(IW / 2) + gx, y, T("temperature"));
-        y += GAUGE_SIZE + 18;
+        // A little smaller than the frames, to keep the gadget short
+        var gs = 44, gx = Math.round(IW / 4 - gs / 2);
+        ui.gLoad = new Gauge(root, PAD + gx, y, T("gpuLoad"), gs);
+        ui.gTemp = new Gauge(root, PAD + Math.round(IW / 2) + gx, y, T("temperature"), gs);
+        y += gs + 16;
     }
 
     ui.vram = meterRow(root, y, T("vram"), "ram");
     // Its percentage blinks while video memory is nearly full
     ui.vramAlarm = new Alarm(root, 0, 0, { el: ui.vram.pct, on: vramLimit > 0, limit: vramLimit, hyst: 3,
         tips: { stop: "vramStop" } });
-    y += 30;
+    y += 28;
     ui.row2 = meterRow(root, y, "", "bus");
-    y += 30;
+    y += 28;
     ui.power = meterRow(root, y, T("power"), "power");
-    y += 30;
+    y += 28;
     ui.fan = meterRow(root, y, T("fan"), "fan");
-    y += 30;
+    y += 29;
 
     if (showDetails) {
         rect(root, PAD, y, IW, 1, THEME.sep);
@@ -466,7 +499,7 @@ function rebuild() {
         }
         y += 16;
         ui.driver = label(root, PAD, y, IW, 10, THEME.faint);
-        y += 24;
+        y += 22;
     } else {
         y += 2;
     }
@@ -522,6 +555,7 @@ function tick() {
     setColor(ui.temp, tempColor(d.temp));
     ui.alarm.update(d.temp);
     if (ui.graph) ui.graph.push([d.usage, vramPct]);
+    try { updateTop(); } catch (e) { }
     if (ui.gLoad) {
         ui.gLoad.set((d.usage || 0) / 100, levelIndex(d.usage || 0, LOAD_STEPS), pctText(d.usage));
         ui.gTemp.set(d.temp == null ? 0 : d.temp / 100, d.temp == null ? 0 : levelIndex(d.temp, TEMP_STEPS),

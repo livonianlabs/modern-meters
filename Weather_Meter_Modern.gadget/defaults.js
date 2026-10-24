@@ -28,7 +28,7 @@ function settingsSpec() {
     var rows = generalRows(false, [
         ["48", { en: "Low", ru: "Низкий" }], ["64", { en: "Medium", ru: "Средний" }],
         ["90", { en: "Tall", ru: "Высокий" }], ["120", { en: "Huge", ru: "Огромный" }]]);
-    rows.pop();   // refresh interval: the forecast updates every 30 minutes by itself
+    rows.splice(-2, 2);   // refresh and history: the forecast updates every 30 minutes by itself
     return rows.concat([
         { key: "wind", label: { en: "Wind", ru: "Ветер" }, options: [
             ["ms", { en: "m/s", ru: "м/с" }], ["kmh", { en: "km/h", ru: "км/ч" }],

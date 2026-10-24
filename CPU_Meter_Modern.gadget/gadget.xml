@@ -2,12 +2,12 @@
 <gadget>
   <name>CPU Meter Modern</name>
   <namespace>ModernMeters</namespace>
-  <version>1.5.0</version>
-  <author name="Silverenio">
+  <version>1.6.0</version>
+  <author name="Silverenio · Livonian Labs">
     <info url="https://github.com/Silverenio/modern-meters" text="github.com/Silverenio/modern-meters" />
     <logo src="icon.png" />
   </author>
-  <copyright>© 2026 Silverenio</copyright>
+  <copyright>© 2026 Livonian Labs</copyright>
   <description>Per-thread CPU load with core temperatures (via Core Temp), clock speed, RAM/commit and a full-width load history graph.</description>
   <icons>
     <icon height="100" width="100" src="icon.png" />

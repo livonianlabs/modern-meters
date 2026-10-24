@@ -54,7 +54,7 @@ var W, IW, accent, upColor, graphH, interval, bytesMode, wanted, showIp, showExt
 var ui = null, timer = null, liveTimer = null, liveRef = null, liveSet = null, liveLast = null;
 var shell, fso, wmi, refresher, netSet;
 var adapter = null, lastAdapter = null, nextScan = 0, last = null, reveal = false, misses = 0;
-var hist = [[], []], liveHist = [[], []], scale = 0;
+var scale = 0;
 var session = { down: 0, up: 0 }, totals = null, nextSave = 0;
 var wlan = { info: null, done: false, launched: 0, next: 0 };
 // Keeps the temp files of several gadget instances apart
@@ -84,7 +84,6 @@ function shutdown() {
     if (ext.req) try { ext.req.abort(); } catch (e) { }
 }
 
-function now() { return new Date().getTime(); }
 
 function tempPath(name) {
     return shell.ExpandEnvironmentStrings("%TEMP%") + "\\net_meter_modern_" + instanceId + "_" + name;
@@ -443,6 +442,7 @@ function rebuild() {
     liveTimer = null;
     liveLast = null;
     if (ui && ui.alarm) ui.alarm.dispose();
+    if (ui && ui.graph) keepGraph("net", ui.graph.hist);
     readSettings();
     nextScan = 0;
     last = null;
@@ -482,12 +482,11 @@ function rebuild() {
             { color: accent, area: true },
             { color: upColor, area: false }
         ], live);
-        ui.scale = label(root, PAD + 3, y + 1, ui.graph.histW - 6, 9, THEME.faint, "right");
-        var ln = ui.graph.live ? ui.graph.live.n : 0;
-        for (var s = 0; s < 2; s++) {
-            hist[s] = fitTo(hist[s], ui.graph.hist.n);
-            liveHist[s] = fitTo(liveHist[s], ln);
-        }
+        ui.scale = cornerLabel(root, PAD + ui.graph.histW - 1, y + 1, 9);
+        var g = ui.graph.hist;
+        g.span = historySpan(g.w, interval);
+        restoreGraph("net", g);
+        g.tip(interval, ["↓", "↑"], function (s, v) { return fmtRate(v); });
         y += graphH + 8;
     }
 
@@ -615,43 +614,19 @@ function showPingValue() {
         .replace("%3", n ? fmt(max) : "–").replace("%4", Math.max(1, Math.round(h.length * PING_EVERY / 60000))) : "";
 }
 
-// Keeps the newest n values, padding with zeros on the left
-function fitTo(a, n) {
-    a = a.slice(-n);
-    while (a.length < n) a.unshift(0);
-    return a;
-}
-
-// One scale for the history and the live zone. On a new scale both are redrawn and true is
-// returned; otherwise the caller pushes just its newest sample.
+// One scale for the history and the live zone, the busiest moment on screen rounded up
 function rescale() {
-    var peak = 0, sets = [hist, liveHist];
-    for (var k = 0; k < 2; k++)
-        for (var s = 0; s < 2; s++)
-            for (var i = 0; i < sets[k][s].length; i++) if (sets[k][s][i] > peak) peak = sets[k][s][i];
-    var sc = niceScale(peak);
-    if (sc == scale) return false;
+    var g = ui.graph, sc = niceScale(Math.max(g.hist.peak(), g.live ? g.live.peak() : 0));
+    if (sc == scale) return;
     scale = sc;
-    ui.graph.hist.load(percents(hist));
-    if (ui.graph.live) ui.graph.live.load(percents(liveHist));
-    setText(ui.scale, fmtRate(sc, true));
-    return true;
-}
-
-function percents(h) {
-    var out = [[], []];
-    for (var s = 0; s < 2; s++) for (var i = 0; i < h[s].length; i++) out[s].push(h[s][i] / scale * 100);
-    return out;
-}
-
-function pushSeries(h, graph, down, up) {
-    h[0].shift(); h[0].push(down);
-    h[1].shift(); h[1].push(up);
-    if (!rescale()) graph.push([down / scale * 100, up / scale * 100]);
+    g.hist.setMax(sc);
+    if (g.live) g.live.setMax(sc);
+    setCorner(ui.scale, fmtRate(sc, true));
 }
 
 function pushGraph(speed) {
-    pushSeries(hist, ui.graph.hist, speed ? speed.down : 0, speed ? speed.up : 0);
+    ui.graph.hist.push([speed ? speed.down : 0, speed ? speed.up : 0]);
+    rescale();
 }
 
 // Live zone: the same adapter counters on their own refresher, 5 times a second
@@ -672,7 +647,8 @@ function liveTick() {
         if (!prev || prev.inst != cur.inst) return;
         var dt = cur.ts - prev.ts, drx = cur.rx - prev.rx, dtx = cur.tx - prev.tx;
         if (!(dt > 0) || drx < 0 || dtx < 0) return;
-        pushSeries(liveHist, ui.graph.live, drx / dt, dtx / dt);
+        ui.graph.live.push([drx / dt, dtx / dt]);
+        rescale();
     } catch (err) { }
 }
 

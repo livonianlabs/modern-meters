@@ -1,6 +1,6 @@
 // CPU Meter Modern: total + per-thread load, clock, core temps, RAM/commit, history graph.
 
-var W, IW, accent, unit, view, graphH, interval, showMem, live, narrow;
+var W, IW, accent, unit, view, graphH, interval, showMem, showTop, live, narrow;
 var ui = null, timer = null, liveTimer = null, liveItem = null;
 
 var wmi, refresher, cpuSet, memObj;
@@ -167,6 +167,7 @@ function readSettings() {
     graphH = parseInt(getSetting("graph"), 10);
     interval = parseInt(getSetting("interval"), 10);
     showMem = getSetting("mem") != "off";
+    showTop = getSetting("top") != "off";
     live = getSetting("live") == "on";
 }
 
@@ -186,6 +187,7 @@ function rebuild() {
     if (liveTimer) clearInterval(liveTimer);
     liveTimer = null;
     if (ui && ui.alarm) ui.alarm.dispose();
+    if (ui && ui.graph) keepGraph("cpu", ui.graph.hist);
     readSettings();
 
     var root = $("root");
@@ -211,13 +213,22 @@ function rebuild() {
     if (graphH > 0) {
         var ax = axisWidth();
         ui.graph = new LiveGraph(root, PAD + ax, y, IW - ax, graphH, [{ color: accent, area: true }], live);
-        percentAxis(root, PAD + ax, y, ui.graph.histW, graphH, interval);
+        var g = ui.graph.hist;
+        g.span = historySpan(g.w, interval);
+        restoreGraph("cpu", g);
+        g.tip(interval, [""], function (s, v) { return Math.round(v) + "%"; });
+        percentAxis(root, PAD + ax, y, ui.graph.histW, graphH, interval * g.span);
         // Shown over the graph while Core Temp isn't running, like the old gadgets did
         ui.ctNote = label(root, PAD + ax, y + Math.round(graphH / 2) - 8, IW - ax, 10, LEVELS[3], "center", true);
         setText(ui.ctNote, T("ctNotRunning"));
         setHint(ui.ctNote, T("ctStart"), startCoreTemp);
         ui.ctNote.style.display = "none";
         y += graphH + 10;
+    }
+    if (showTop) {
+        ui.top = new TopRow(root, y - 4);
+        topNext = 0;
+        y += 18;
     }
     if (showMem) {
         ui.ram = meterRow(root, y, T("ram"), "ram");
@@ -304,7 +315,9 @@ function liveTick() {
 var procs = null;   // the per-process counters while the flyout is open
 
 // The busiest programs by CPU and by memory; the processes of one program are added up
-function processDetails() {
+// Every program's processor load (percent of one logical processor) and private memory, summed
+// over its processes; null on the first call, which only starts the measuring
+function readProcs() {
     if (!procs) {
         var r = new ActiveXObject("WbemScripting.SWbemRefresher");
         procs = { refresher: r, set: r.AddEnum(wmi, "Win32_PerfFormattedData_PerfProc_Process").ObjectSet, first: true };
@@ -321,15 +334,34 @@ function processDetails() {
         r2.mem += parseFloat(p.WorkingSetPrivate) || 0;
     }
     // Load needs two samples, so it shows from the second one on
-    var cpuRows = procs.first ? [] : topRows(list, "cpu", function (v) {
+    var first = procs.first;
+    procs.first = false;
+    return first ? { list: list, first: true } : { list: list };
+}
+
+function processDetails() {
+    var r = readProcs(), list = r.list;
+    var cpuRows = r.first ? [] : topRows(list, "cpu", function (v) {
         v /= nLogical;
         return v >= 0.05 ? v.toFixed(1) + "%" : "";
     });
-    procs.first = false;
     return [
         { title: T("topCpu"), rows: cpuRows },
         { title: T("topRam"), rows: topRows(list, "mem", fmtBytes) }
     ];
+}
+
+// The busiest program, now and then: reading every process costs a little CPU itself
+var topNext = 0;
+
+function updateTop() {
+    if (!ui.top || now() < topNext) return;
+    topNext = now() + TOP_EVERY;
+    var r = readProcs(), best = null;
+    if (r.first) { topNext = now() + 1000; return; }
+    for (var i = 0; i < r.list.length; i++) if (!best || r.list[i].cpu > best.cpu) best = r.list[i];
+    var pct = best ? best.cpu / nLogical : 0;
+    ui.top.set(pct >= 1 ? best.name : null, pct);
 }
 
 // ---- update ---------------------------------------------------------------
@@ -369,6 +401,7 @@ function tick() {
     setColor(ui.temp, maxT == null ? THEME.faint : tempColor(maxT));
     ui.alarm.update(maxT);
     if (ui.graph) ui.graph.push([d.total]);
+    try { updateTop(); } catch (e) { }
 
     if (ui.ram) {
         showMeter(ui.ram, d.ramUsed, totalRam);

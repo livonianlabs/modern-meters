@@ -7,11 +7,13 @@ var DEFAULTS = {
     accent: "green",
     width: "170",
     interval: "1000",
+    history: "auto",
     graph: "64",
     unit: "C",
     gpu: "0",
     source: "auto",
     details: "on",
+    top: "on",
     alarm: "off",
     alarmTemp: "85",
     vramAlarm: "off",
@@ -90,6 +92,7 @@ function settingsSpec() {
         ["off", OPT.onOff[1][1]], ["80", "80%"], ["90", "90%"], ["95", "95%"]] });
     return [].concat(generalRows(), [
         { key: "details", label: { en: "Bottom details", ru: "Нижние строки" }, options: OPT.onOff },
+        { key: "top", label: { en: "Busiest program", ru: "Самая активная программа" }, options: OPT.onOff },
         { section: { en: "Data source", ru: "Источник данных" } },
         { key: "source", label: { en: "Source", ru: "Источник" }, options: [
             ["auto", { en: "Auto", ru: "Авто" }],

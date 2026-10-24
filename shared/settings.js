@@ -22,6 +22,10 @@ var OPT = {
     interval: [
         ["500", { en: "0.5 s", ru: "0.5 с" }], ["1000", { en: "1 s", ru: "1 с" }],
         ["2000", { en: "2 s", ru: "2 с" }], ["3000", { en: "3 s", ru: "3 с" }]],
+    // Minutes the graph covers; auto: a column per refresh
+    history: [
+        ["auto", { en: "Short (by refresh)", ru: "Короткая (по обновлению)" }], ["5", { en: "5 min", ru: "5 мин" }],
+        ["15", { en: "15 min", ru: "15 мин" }], ["60", { en: "1 hour", ru: "1 час" }]],
     volume: [["25", "25%"], ["50", "50%"], ["75", "75%"], ["100", "100%"]],
     repeat: [["once", { en: "Once", ru: "Один раз" }], ["loop", { en: "Until silenced", ru: "Пока не заглушить" }]]
 };
@@ -70,7 +74,8 @@ function generalRows(noTemp, graphOpts) {
         { key: "width", label: { en: "Width", ru: "Ширина" }, options: OPT.width },
         { key: "graph", label: { en: "Graph", ru: "График" }, options: graphOpts || OPT.graph },
         { key: "unit", label: { en: "Temperature", ru: "Температура" }, options: OPT.unit },
-        { key: "interval", label: { en: "Refresh", ru: "Обновление" }, options: OPT.interval }
+        { key: "interval", label: { en: "Refresh", ru: "Обновление" }, options: OPT.interval },
+        { key: "history", label: { en: "Graph history", ru: "История графика" }, options: OPT.history }
     ];
     if (noTemp) rows.splice(9, 1);
     return rows;
@@ -102,6 +107,11 @@ function aboutRows() {
         { key: "updates", label: { en: "New versions", ru: "Новые версии" }, options: [
             ["on", { en: "Let me know", ru: "Сообщать" }],
             ["off", { en: "Don't check", ru: "Не проверять" }]] },
+        { label: { en: "Made by", ru: "Автор" }, info: function () { return MAKER; } },
+        { label: { en: "Feedback", ru: "Связаться" }, buttons: [
+            { label: { en: "✉ Write to us", ru: "✉ Написать нам" }, run: function () {
+                openUrl("mailto:" + MAIL + "?subject=" + encodeURIComponent("Modern Meters " + VERSION));
+            } }] },
         { label: { en: "Like them?", ru: "Нравятся?" }, buttons: [
             { label: { en: "☕ Buy me a coffee", ru: "☕ Угостить кофе" }, run: function () { openUrl(KOFI_URL); } }] }
     ];

@@ -23,6 +23,9 @@ addStrings({
         days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         dry: "No rain expected",
         sunTip: "Sunrise and sunset today",
+        rainIn: "rain in %s min", rainSoon: "rain any minute", rainUntil: "rain until %s",
+        snowIn: "snow in %s min", snowSoon: "snow any minute", snowUntil: "snow until %s",
+        nowTip: "From the 15-minute forecast by Open-Meteo for the next two hours.",
         uvTip: "UV index, today's highest: %s", aqTip: "Air quality index (%s): %s",
         uvLevels: ["low", "moderate", "high", "very high", "extreme"],
         aqLevels: ["good", "fair", "moderate", "poor", "very poor", "extremely poor"],
@@ -44,6 +47,9 @@ addStrings({
         days: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
         dry: "Без осадков",
         sunTip: "Восход и закат сегодня",
+        rainIn: "дождь через %s мин", rainSoon: "вот-вот дождь", rainUntil: "дождь до %s",
+        snowIn: "снег через %s мин", snowSoon: "вот-вот снег", snowUntil: "снег до %s",
+        nowTip: "По 15-минутному прогнозу Open-Meteo на ближайшие два часа.",
         uvTip: "УФ-индекс, сегодня до: %s", aqTip: "Индекс качества воздуха (%s): %s",
         uvLevels: ["низкий", "умеренный", "высокий", "очень высокий", "экстремальный"],
         aqLevels: ["хорошее", "приемлемое", "умеренное", "плохое", "очень плохое", "крайне плохое"],
@@ -90,7 +96,6 @@ function shutdown() {
     stopMapAnim();
 }
 
-function now() { return new Date().getTime(); }
 
 // ---- async HTTP --------------------------------------------------------------
 
@@ -344,13 +349,15 @@ function updateForecast() {
     }
     if (!place || place.src == "cache") return;
     var key = place.lat + ";" + place.lon;
-    if (key == forecastFor && now() - forecastAt < FORECAST_EVERY) return;
+    // Every 15 minutes while rain or snow is near, so its time stays right
+    if (key == forecastFor && now() - forecastAt < (rainNear ? 15 * 60000 : FORECAST_EVERY)) return;
     forecastFor = key;
     forecastAt = now();   // a failed request is retried after the same interval
     http.fc.get("https://api.open-meteo.com/v1/forecast?latitude=" + place.lat + "&longitude=" + place.lon +
         "&current=temperature_2m,apparent_temperature,weather_code,is_day,wind_speed_10m,wind_direction_10m,pressure_msl" +
         "&hourly=temperature_2m,precipitation,precipitation_probability,snowfall,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl" +
         "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset,uv_index_max" +
+        "&minutely_15=precipitation,snowfall&forecast_minutely_15=12" +
         "&timezone=auto&forecast_days=7&wind_speed_unit=ms");
 }
 
@@ -380,6 +387,7 @@ function tick() {
         updateForecast();
         updateAir();
         updateRadar();
+        drawDesc();
     } catch (e) {
         reportError(ui.desc, "tick", e);
     }
@@ -642,13 +650,69 @@ function draw() {
     setText(ui.temp, temp(c.temperature_2m));
     setColor(ui.temp, scale("temp", c.temperature_2m));
     setText(ui.feels, T("feels") + " " + temp(c.apparent_temperature));
-    setText(ui.desc, wxText(c.weather_code));
+    ui.desc._k = null;
+    drawDesc();
     var d = new Date(forecastAt);
     ui.time.title = "Weather data by Open-Meteo.com (CC BY 4.0)  ·  " + T("updated") + " " +
         d.getHours() + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
     drawChart();
     drawDays();
     drawExtra();
+}
+
+// Rain or snow within two hours, from the 15-minute forecast (each value the sum of the 15
+// minutes before its time): { text: "rain in 20 min" / "rain until 14:40" }, or null
+var rainNear = false;
+
+function nowcast(f) {
+    var m = f && f.minutely_15;
+    if (!m || !m.time || !m.precipitation) return null;
+    var off = (f.utc_offset_seconds || 0) * 1000, t = now(), cur = -1, i, j;
+    // Slot times are the place's clock
+    var at = function (k) {
+        var s = String(m.time[k]);
+        return Date.UTC(+s.substr(0, 4), +s.substr(5, 2) - 1, +s.substr(8, 2), +s.substr(11, 2), +s.substr(14, 2)) - off;
+    };
+    var wet = function (k) { return m.precipitation[k] >= 0.1; };
+    var snow = function (k) { return m.snowfall && m.snowfall[k] > 0; };
+    for (i = 0; i < m.time.length; i++) if (at(i) > t) { cur = i; break; }
+    if (cur < 0) return null;
+    if (wet(cur)) {
+        for (j = cur + 1; j < m.time.length; j++) if (!wet(j)) {
+            var end = new Date(at(j - 1) + off), mm = end.getUTCMinutes();
+            return { text: T(snow(cur) ? "snowUntil" : "rainUntil").replace("%s", end.getUTCHours() + ":" + (mm < 10 ? "0" : "") + mm) };
+        }
+        return null;
+    }
+    for (j = cur; j < m.time.length; j++) {
+        var start = at(j) - 15 * 60000;
+        if (start - t > 2 * 3600000) break;
+        if (wet(j)) {
+            var min = Math.max(0, Math.round((start - t) / 300000) * 5);
+            return { text: min < 5 ? T(snow(j) ? "snowSoon" : "rainSoon") : T(snow(j) ? "snowIn" : "rainIn").replace("%s", min) };
+        }
+    }
+    return null;
+}
+
+// The description of the weather now, with the rain to come after it; just the rain when both
+// don't fit
+function drawDesc() {
+    var f = forecast;
+    if (!ui || !f || !f.current) return;
+    var base = wxText(f.current.weather_code), n = nowcast(f), key = base + "|" + (n ? n.text : "");
+    rainNear = n != null;
+    // (setText elsewhere, e.g. an error, leaves _t set)
+    if (ui.desc._k == key && ui.desc._t === null) return;
+    ui.desc._k = key;
+    ui.desc._t = null;
+    var rain = function (s) { return "<span style='color:" + accent + "'>" + esc(s) + "</span>"; };
+    ui.desc.innerHTML = esc(base) + (n ? " · " + rain(n.text) : "");
+    ui.desc.title = n ? T("nowTip") : "";
+    if (n && ui.desc.scrollWidth > ui.desc.clientWidth) {
+        ui.desc.innerHTML = rain(n.text.charAt(0).toUpperCase() + n.text.substr(1));
+        ui.desc.title = base + "\n" + T("nowTip");
+    }
 }
 
 // Levels for the colors: UV after the WHO bands, air quality after the European (0..100+, steps

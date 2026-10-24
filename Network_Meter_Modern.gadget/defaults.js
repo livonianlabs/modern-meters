@@ -7,6 +7,7 @@ var DEFAULTS = {
     accent: "teal",
     width: "170",
     interval: "1000",
+    history: "auto",
     graph: "64",
     rate: "bits",
     adapter: "auto",

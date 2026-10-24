@@ -6,13 +6,13 @@ Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
 
 | Gadget | Shows |
 |---|---|
-| **CPU Meter Modern** | Load of every thread or core (P-cores and E-cores grouped), clock speed, temperature, RAM and commit, history graph, how long Windows has been running. Click the processor's name for the busiest programs by CPU and memory |
-| **GPU Meter Modern** | GPU load, VRAM, memory controller or shared memory, power, fan (RPM and %), clocks, encoder/decoder, temperature, history graph, an alarm when video memory is nearly full. Click the card's name for the programs using its memory and GPU. NVIDIA, AMD and Intel, discrete and integrated, with the same sensors Task Manager uses |
+| **CPU Meter Modern** | Load of every thread or core (P-cores and E-cores grouped), clock speed, temperature, RAM and commit, history graph, how long Windows has been running, the busiest program right now (click it for Task Manager). Click the processor's name for the busiest programs by CPU and memory |
+| **GPU Meter Modern** | GPU load, VRAM, memory controller or shared memory, power, fan (RPM and %), clocks, encoder/decoder, temperature, history graph, the busiest program on the card, an alarm when video memory is nearly full. Click the card's name for the programs using its memory and GPU. NVIDIA, AMD and Intel, discrete and integrated, with the same sensors Task Manager uses |
 | **Network Meter Modern** | Download and upload speed with an auto-scaled graph, Wi-Fi network and signal, IP addresses (hidden until clicked), firewall, ping with a small latency graph, traffic totals |
 | **Drives Meter Modern** | Physical disks with their partitions, SMART health, SSD life left, temperature, read/write speed, activity graph |
-| **Weather Meter Modern** | Current weather and a colored hourly chart of temperature, precipitation, wind or pressure (switched by tabs), a rain radar map of the last 80 minutes, 3 or 5 days ahead, sunrise and sunset, UV index and air quality. Follows you from town to town through Windows location |
+| **Weather Meter Modern** | Current weather and a colored hourly chart of temperature, precipitation, wind or pressure (switched by tabs), a rain radar map of the last 80 minutes, 3 or 5 days ahead, sunrise and sunset, UV index and air quality, and when rain or snow starts or stops within the next two hours ("rain in 20 min"). Follows you from town to town through Windows location |
 
-The CPU and GPU gadgets show the maker (NVIDIA, AMD, Intel, Qualcomm) beside their title. All of them speak 12 languages (English, Українська, Русский, Deutsch, Español, Français, Italiano, Polski, Português, Türkçe, 中文, 日本語) and pick yours from Windows, and have five widths, accent colors, and a five-step color scale for load and temperature. Translations live in `shared/lang/`, one file per language; corrections are welcome.
+The CPU and GPU gadgets show the maker (NVIDIA, AMD, Intel, Qualcomm) beside their title. Hover over a graph to see the value at that moment and its lowest, average and highest; **Graph history** makes a graph cover 5 or 15 minutes or an hour instead of the last minute or two. All of them speak 12 languages (English, Українська, Русский, Deutsch, Español, Français, Italiano, Polski, Português, Türkçe, 中文, 日本語) and pick yours from Windows, and have five widths, accent colors, and a five-step color scale for load and temperature. Translations live in `shared/lang/`, one file per language; corrections are welcome.
 
 Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your accent color: blue, teal, green, purple, orange, pink, red or yellow), **Retro terminal** (a CRT screen with scanlines in your accent color, whose cursor now and then retypes the title), three more terminals (**black and white**, **Norton Commander** blue and the **Ubuntu** terminal), **Windows classic** (gray 95/98 windows with a navy title bar and block progress bars), **Aero** and **Liquid Glass**, and **Auto**, which switches between Light and Glass with Windows' light/dark mode. Aero and Liquid Glass are frosted glass: the gadget shows your wallpaper under it, blurred, through Windows 7's blue or Apple's light or dark glass (picked by how bright the wallpaper is, or as you set it), with **Glass frosting** setting how much; Liquid Glass bends the picture along its edges like a thick lens. They redraw themselves when you move a gadget or change the wallpaper. Panels for the colored styles are drawn once on your PC the first time they're needed. Set **For all gadgets** in any gadget's settings to give every gadget the same style and language (and, if you like, accent color) in one go.
 
@@ -79,9 +79,11 @@ Run `build.ps1` in PowerShell. It draws the images, compiles the small .NET help
 
 The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https://ko-fi.com/silverenio). It's also in every gadget's settings under **About**.
 
+Questions, ideas or a bug to report: open an [issue](https://github.com/Silverenio/modern-meters/issues) or write to livonianlabs@gmail.com. More from us: [livonianlabs.github.io](https://livonianlabs.github.io/).
+
 ## License
 
-[MIT](LICENSE) © 2026 Silverenio
+[MIT](LICENSE) © 2026 Livonian Labs (Silverenio)
 
 ---
 
@@ -91,13 +93,13 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 
 | Гаджет | Что показывает |
 |---|---|
-| **CPU Meter Modern** | Загрузку каждого потока или ядра (P- и E-ядра сгруппированы), частоту, температуру, ОЗУ и выделенную память, график, время работы Windows. Клик по названию процессора покажет самые активные программы по нагрузке и памяти |
-| **GPU Meter Modern** | Загрузку GPU, видеопамять, контроллер памяти или общую память, мощность, вентилятор (обороты и %), частоты, кодер/декодер, температуру, график, сигнал при почти заполненной видеопамяти. Клик по названию карты покажет, какие программы занимают её память и нагружают GPU. NVIDIA, AMD и Intel, дискретные и встроенные, по тем же датчикам, что и Диспетчер задач |
+| **CPU Meter Modern** | Загрузку каждого потока или ядра (P- и E-ядра сгруппированы), частоту, температуру, ОЗУ и выделенную память, график, время работы Windows, самую активную программу прямо сейчас (клик откроет Диспетчер задач). Клик по названию процессора покажет самые активные программы по нагрузке и памяти |
+| **GPU Meter Modern** | Загрузку GPU, видеопамять, контроллер памяти или общую память, мощность, вентилятор (обороты и %), частоты, кодер/декодер, температуру, график, самую активную программу на карте, сигнал при почти заполненной видеопамяти. Клик по названию карты покажет, какие программы занимают её память и нагружают GPU. NVIDIA, AMD и Intel, дискретные и встроенные, по тем же датчикам, что и Диспетчер задач |
 | **Network Meter Modern** | Скорость загрузки и отдачи с автомасштабом графика, Wi-Fi сеть и сигнал, IP-адреса (скрыты, пока не кликнуть), брандмауэр, пинг с маленьким графиком задержки, счётчики трафика |
 | **Drives Meter Modern** | Физические диски с разделами, состояние SMART, остаток ресурса SSD, температуру, скорость чтения/записи, график активности |
-| **Weather Meter Modern** | Погоду сейчас и цветной почасовой график температуры, осадков, ветра или давления (вкладки), радарную карту осадков за последние 80 минут, прогноз на 3 или 5 дней, восход и закат, УФ-индекс и качество воздуха. Следует за вами из города в город через определение местоположения Windows |
+| **Weather Meter Modern** | Погоду сейчас и цветной почасовой график температуры, осадков, ветра или давления (вкладки), радарную карту осадков за последние 80 минут, прогноз на 3 или 5 дней, восход и закат, УФ-индекс и качество воздуха, а также когда начнутся или кончатся дождь или снег в ближайшие два часа («дождь через 20 мин»). Следует за вами из города в город через определение местоположения Windows |
 
-Гаджеты CPU и GPU показывают производителя (NVIDIA, AMD, Intel, Qualcomm) рядом с заголовком. У всех 12 языков (английский, украинский, русский, немецкий, испанский, французский, итальянский, польский, португальский, турецкий, китайский, японский), язык берётся из Windows; пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: светлый, цветное стекло, ретро-терминал, «Стекло» и классический.
+Гаджеты CPU и GPU показывают производителя (NVIDIA, AMD, Intel, Qualcomm) рядом с заголовком. Если навести мышь на график, видно значение в этот момент, а также минимум, среднее и максимум; настройка «История графика» растягивает график на 5 или 15 минут или на час вместо последней минуты-двух. У всех 12 языков (английский, украинский, русский, немецкий, испанский, французский, итальянский, польский, португальский, турецкий, китайский, японский), язык берётся из Windows; пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: светлый, цветное стекло, ретро-терминал, «Стекло» и классический.
 
 Стили: «Стекло», «Классический», «Светлый», «Цветное стекло» (стекло в цвете акцента: голубой, бирюзовый, зелёный, фиолетовый, оранжевый, розовый, красный или жёлтый), «Ретро-терминал» (ЭЛТ-экран со строками развёртки в цвете акцента, курсор которого время от времени перепечатывает заголовок), ещё три терминала (**чёрно-белый**, синий **Norton Commander** и терминал **Ubuntu**), «Классический Windows» (серые окна 95/98 с синим заголовком и прогресс-барами из блоков), **Aero** и **Liquid Glass**, а также «Авто» — переключается между светлым и стеклом вслед за светлым/тёмным режимом Windows. Aero и Liquid Glass — матовое стекло: сквозь гаджет видны размытые обои под ним, в синем стекле Windows 7 или в светлом или тёмном стекле Apple (выбирается по яркости обоев или как вы зададите), а настройка «Матовость стекла» задаёт, насколько оно матовое; Liquid Glass у краёв изгибает картинку, как толстая линза. Когда вы передвигаете гаджет или меняете обои, стекло перерисовывается само. Фон для цветных стилей рисуется один раз на вашем компьютере, когда впервые понадобится. Настройка **Для всех гаджетов** в любом гаджете сразу даёт всем гаджетам один стиль и язык (а при желании и цвет акцента).
 
@@ -142,6 +144,8 @@ The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https
 
 Гаджеты бесплатные. Если они вам нравятся, можно [угостить меня кофе на Ko-fi](https://ko-fi.com/silverenio). Эта же ссылка есть в настройках каждого гаджета, в разделе **О гаджете**.
 
+Вопросы, идеи, ошибки: заведите [issue](https://github.com/Silverenio/modern-meters/issues) или напишите на livonianlabs@gmail.com. Другие наши проекты: [livonianlabs.github.io](https://livonianlabs.github.io/).
+
 ## Лицензия
 
-[MIT](LICENSE) © 2026 Silverenio
+[MIT](LICENSE) © 2026 Livonian Labs (Silverenio)

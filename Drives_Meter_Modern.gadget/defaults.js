@@ -7,6 +7,7 @@ var DEFAULTS = {
     accent: "blue",
     width: "170",
     interval: "1000",
+    history: "auto",
     graph: "36",
     unit: "C",
     volumes: "on"

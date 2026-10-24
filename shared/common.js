@@ -214,6 +214,8 @@ var STRINGS = {
         ram: "RAM", commit: "Commit", base: "base", ctOff: "Core Temp off", up: "up", upTip: "Windows running since %s", upUnits: ["d", "h", "m"],
         threads: "THREADS", cores: "CORES", toCores: "cores ›", toThreads: "threads ›", show: "show ",
         pcores: "P-CORES", ecores: "E-CORES", hdrNet: "NETWORK", hdrDrives: "STORAGE", sec: "s",
+        graphNow: "now", graphStats: "min %1 · avg %2 · max %3",
+        topProc: "Busiest:", topTip: "The program using the most right now, checked every 5 seconds. Click to open Task Manager.",
         gpuLoad: "GPU load", temperature: "Temperature",
         vram: "VRAM", memctl: "Mem controller", shared: "Shared memory", power: "Power", fan: "Fan",
         stopped: "stopped", na: "n/a", mem: "mem", enc: "Enc", dec: "Dec", driver: "Driver",
@@ -244,6 +246,8 @@ var STRINGS = {
         toCores: "ядра ›", toThreads: "потоки ›",
         show: "",
         pcores: "P-ЯДРА", ecores: "E-ЯДРА", hdrNet: "СЕТЬ", hdrDrives: "НАКОПИТЕЛИ", sec: " с",
+        graphNow: "сейчас", graphStats: "мин %1 · ср %2 · макс %3",
+        topProc: "Больше всех:", topTip: "Программа, которая грузит больше всех прямо сейчас (проверка раз в 5 секунд). Клик — Диспетчер задач.",
         gpuLoad: "Загрузка GPU", temperature: "Температура",
         vram: "VRAM", memctl: "Контроллер памяти",
         shared: "Общая память",
@@ -340,6 +344,8 @@ function fmtPair(a, b, unitKey, tight) {
 }
 
 // ---- formatting -----------------------------------------------------------
+
+function now() { return new Date().getTime(); }
 
 function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
 
@@ -541,52 +547,199 @@ function mix(a, b, t) {
 }
 
 // Built from plain divs (one 2px column per sample) because the Sidebar doesn't scale VML
-// with the screen DPI. series: [{color, area}], values 0..100, newest sample on the right.
-// An area series is a filled column with a bright cap; a line series is the cap only.
-// noGrid: no quarter lines (sparklines).
+// with the screen DPI. series: [{color, area}], newest sample on the right, values from 0 to
+// this.max (100 unless setMax says otherwise). An area series is a filled column with a bright
+// cap; a line series is the cap only. noGrid: no quarter lines (sparklines).
+// With span > 1 a column is the average of that many samples, so the graph covers more time;
+// the newest column fills in as its samples come.
 function Graph(parent, x, y, w, h, series, noGrid) {
     this.h = h;
+    this.w = w;
     this.n = Math.floor(w / 2);
     this.series = series;
-    this.data = [];
+    this.max = 100;
+    this.span = 1;
+    this.part = 0;        // samples already in the newest column
+    this.filled = 0;      // columns holding samples, from the right
+    this.data = [];       // column averages
+    this.peaks = [];      // the highest sample of each column
+    this.sums = [];
     this.cols = [];
+    this.parent = parent;
+    this.gx = x;
+    this.gy = y;
 
-    var frame = plotRect(parent, x, y, w, h);
+    var frame = this.frame = plotRect(parent, x, y, w, h);
     if (!noGrid) for (var i = 1; i < 4; i++) rect(frame, 0, Math.round(h * i / 4), w, 1, THEME.grid);
 
-    var x0 = w - this.n * 2;
+    var x0 = this.x0 = w - this.n * 2;
     for (var s = 0; s < series.length; s++) {
-        var hist = [], cols = [], c = series[s].color, dim = mix(THEME.plot, c, 0.3);
+        var hist = [], peaks = [], cols = [], c = series[s].color, dim = mix(THEME.plot, c, 0.3);
         for (var k = 0; k < this.n; k++) {
             hist.push(0);
+            peaks.push(0);
             var fill = series[s].area ? rect(frame, x0 + k * 2, h, 2, 0, dim) : null;
             // Glass: the area fades from a bright top to the plot background
             if (fill && THEME.glass) gradient(fill, mix(THEME.plot, c, 0.55), mix(THEME.plot, c, 0.1));
             cols.push({ fill: fill, cap: rect(frame, x0 + k * 2, h - 2, 2, 2, c), v: -1 });
         }
         this.data.push(hist);
+        this.peaks.push(peaks);
+        this.sums.push(0);
         this.cols.push(cols);
     }
 }
 
 Graph.prototype.push = function (values) {
+    var fresh = this.part == 0, last = this.n - 1;
     for (var s = 0; s < this.series.length; s++) {
-        this.data[s].shift();
-        this.data[s].push(values[s] == null ? 0 : clamp(values[s], 0, 100));
+        var v = values[s] == null ? 0 : Math.max(0, values[s]);
+        if (fresh) {
+            this.data[s].shift(); this.data[s].push(v);
+            this.peaks[s].shift(); this.peaks[s].push(v);
+            this.sums[s] = v;
+        } else {
+            this.sums[s] += v;
+            this.data[s][last] = this.sums[s] / (this.part + 1);
+            this.peaks[s][last] = Math.max(this.peaks[s][last], v);
+        }
     }
+    if (fresh) this.filled = Math.min(this.n, this.filled + 1);
+    this.part = (this.part + 1) % this.span;
     this.draw();
+    if (this.at >= 0) this.showAt(this.at, true);
 };
 
-// Replaces the whole history (one array per series, oldest first), e.g. after a rescale
+// Replaces the whole history (one array per series, oldest first, column averages), e.g.
+// after a rebuild
 Graph.prototype.load = function (values) {
     for (var s = 0; s < this.series.length; s++) {
         var src = values[s], off = src.length - this.n;
         for (var i = 0; i < this.n; i++) {
             var v = src[i + off];
-            this.data[s][i] = v == null ? 0 : clamp(v, 0, 100);
+            this.data[s][i] = this.peaks[s][i] = v == null ? 0 : Math.max(0, v);
         }
     }
+    this.filled = Math.min(this.n, values[0].length);
+    this.part = 0;
     this.draw();
+};
+
+// The value that fills the graph's height, for graphs that rescale
+Graph.prototype.setMax = function (max) {
+    if (max == this.max) return;
+    this.max = max;
+    this.draw();
+};
+
+// The highest column average on screen
+Graph.prototype.peak = function () {
+    var p = 0;
+    for (var s = 0; s < this.series.length; s++)
+        for (var i = 0; i < this.n; i++) if (this.data[s][i] > p) p = this.data[s][i];
+    return p;
+};
+
+// Columns oldest first, without the empty ones on the left (to load into the next graph)
+Graph.prototype.history = function () {
+    var out = [];
+    for (var s = 0; s < this.series.length; s++) out.push(this.data[s].slice(this.n - this.filled));
+    return out;
+};
+
+// How much time a graph of n columns covers, for its corner label: "64 s", "15 m", "1 h"
+function graphSpan(n, ms) {
+    var sec = Math.round(n * ms / 1000), u = T("upUnits"), sep = u[2].length > 1 ? " " : "";
+    if (sec < 120) return sec + T("sec");
+    if (sec < 7200) return Math.round(sec / 60) + sep + u[2];
+    return Math.round(sec / 3600) + (u[1].length > 1 ? " " : "") + u[1];
+}
+
+// Hovering the graph marks a column and shows what it held and how long ago, with the lowest,
+// average and highest of the first series across the whole graph. every: ms per sample;
+// names: a label per series ("" for none); fmt(s, v): a value of series s with its unit.
+Graph.prototype.tip = function (every, names, fmt) {
+    var g = this;
+    g.every = every;
+    g.names = names;
+    g.fmt = fmt;
+    g.at = -1;
+    var pane = g.frame.pane;
+    var inside = function (el) {
+        return el && (g.frame.contains(el) || el == pane);
+    };
+    var move = function () {
+        var e = window.event, x = e.offsetX, el = e.srcElement;
+        if (el != pane) while (el && el != g.frame) { x += el.offsetLeft; el = el.offsetParent; }
+        g.showAt(Math.floor((x - g.x0) / 2));
+    };
+    var out = function () { if (!inside(window.event.toElement)) g.showAt(-1); };
+    g.frame.onmousemove = move;
+    // In case the mouse gets onto it anyway
+    g.hide = function () { g.showAt(-1); };
+    g.frame.onmouseout = out;
+    if (pane) {
+        pane.onmousemove = move;
+        pane.onmouseout = out;
+    }
+};
+
+// i: the column under the mouse, -1 to hide; redraw: the data changed under it
+Graph.prototype.showAt = function (i, redraw) {
+    if (!this.fmt) return;
+    if (i < 0 || !this.filled) {
+        this.at = -1;
+        if (this.pop) this.pop.style.display = this.mark.style.display = "none";
+        return;
+    }
+    i = clamp(i, this.n - this.filled, this.n - 1);
+    if (i == this.at && !redraw) return;
+    this.at = i;
+    if (!this.pop) {
+        this.mark = rect(this.frame, 0, 0, 1, this.h, THEME.dim);
+        this.pop = box(this.parent, 0, 0, null, null, "padding:2px 5px;white-space:nowrap;background-color:" + THEME.panel +
+            ";border:1px solid " + THEME.sep + ";z-index:10;color:" + THEME.text + ";font-size:" + fontSize(10) + "px;line-height:13px;" + fontCss());
+        this.pop.onmouseover = this.hide;
+    }
+    this.mark.style.left = (this.x0 + i * 2) + "px";
+
+    var span = function (t, c) { return "<span style='color:" + c + "'>" + esc(t) + "</span>"; };
+    var ago = Math.round((this.n - 1 - i) * this.span * this.every / 1000), when;
+    if (ago < 1) when = T("graphNow");
+    else if (ago < 60) when = "−" + ago + T("sec");
+    else {
+        var m = Math.floor(ago / 60), pad = function (v) { return (v < 10 ? "0" : "") + v; };
+        when = "−" + (m >= 60 ? Math.floor(m / 60) + ":" + pad(m % 60) : m) + ":" + pad(ago % 60);
+    }
+    var lines = [span(when, THEME.dim)], vals = [];
+    for (var s = 0; s < this.series.length; s++)
+        vals.push((this.names[s] ? span(this.names[s] + " ", this.series[s].color) : "") + esc(this.fmt(s, this.data[s][i])));
+    lines.push(vals.join("&nbsp;&nbsp; "));
+    var lo = Infinity, sum = 0, hi = 0, d = this.data[0], p = this.peaks[0];
+    for (var k = this.n - this.filled; k < this.n; k++) {
+        lo = Math.min(lo, d[k]);
+        sum += d[k];
+        hi = Math.max(hi, p[k]);
+    }
+    lines.push(span((this.names[0] ? this.names[0] + " " : "") + T("graphStats").replace("%1", this.fmt(0, lo))
+        .replace("%2", this.fmt(0, sum / this.filled)).replace("%3", this.fmt(0, hi)), THEME.dim));
+
+    // Over the graph's top edge (under its bottom one near the gadget's top), centered on the
+    // column; never on the graph itself, so the mouse doesn't run into it
+    var pop = this.pop;
+    pop.style.display = this.mark.style.display = "";
+    pop.style.whiteSpace = "nowrap";
+    pop.style.width = "";
+    pop.innerHTML = lines.join("<br>");
+    if (pop.offsetWidth > this.w - 4) {
+        pop.style.whiteSpace = "normal";
+        pop.style.width = (this.w - 4) + "px";
+    }
+    var pw = pop.offsetWidth, ph = pop.offsetHeight, cx = this.gx + this.x0 + i * 2;
+    pop.style.left = clamp(Math.round(cx - pw / 2), this.gx, this.gx + this.w - pw) + "px";
+    var top = this.gy - ph - 3;
+    if (top < 4) top = this.gy + this.h + 3;
+    pop.style.top = top + "px";
 };
 
 Graph.prototype.draw = function () {
@@ -594,7 +747,7 @@ Graph.prototype.draw = function () {
         var hist = this.data[s], cols = this.cols[s];
         var prev = null;
         for (var i = 0; i < this.n; i++) {
-            var px = Math.round(hist[i] * (this.h - 2) / 100), col = cols[i];
+            var px = Math.round(Math.min(100, hist[i] * 100 / this.max) * (this.h - 2) / 100), col = cols[i];
             // The cap spans from the previous sample to this one so the line stays continuous
             var lo = prev == null ? px : Math.min(px, prev), hi = prev == null ? px : Math.max(px, prev);
             prev = px;
@@ -629,6 +782,25 @@ function LiveGraph(parent, x, y, w, h, series, live) {
 LiveGraph.prototype.push = function (values) { this.hist.push(values); };
 
 LiveGraph.prototype.pushLive = function (values) { if (this.live) this.live.push(values); };
+
+// ---- graph history ----------------------------------------------------------
+
+// Samples per graph column for the "history" setting: "auto" one per refresh, else enough for
+// the graph to cover that many minutes
+function historySpan(w, interval) {
+    var min = parseInt(getSetting("history"), 10);
+    return min ? Math.max(1, Math.round(min * 60000 / (Math.floor(w / 2) * interval))) : 1;
+}
+
+// Graph columns kept over a rebuild, per graph name, while the span stays the same
+var graphMemory = {};
+
+function keepGraph(name, g) { if (g) graphMemory[name] = { span: g.span, data: g.history() }; }
+
+function restoreGraph(name, g) {
+    var m = graphMemory[name];
+    if (m && m.span == g.span && m.data[0].length) g.load(m.data);
+}
 
 // ---- gadget frame ---------------------------------------------------------
 
@@ -718,8 +890,12 @@ function paintFrame(w, h) {
 // an empty box (an alpha filter on the box itself would fade what is drawn in it too)
 function plotRect(parent, x, y, w, h) {
     if (!THEME.plotAlpha) return rect(parent, x, y, w, h, THEME.plot);
-    rect(parent, x, y, w, h, THEME.plot).style.filter = "alpha(opacity=" + THEME.plotAlpha + ")";
-    return box(parent, x, y, w, h);
+    var pane = rect(parent, x, y, w, h, THEME.plot);
+    pane.style.filter = "alpha(opacity=" + THEME.plotAlpha + ")";
+    // The empty box lets the mouse through where nothing is drawn, onto the pane
+    var b = box(parent, x, y, w, h);
+    b.pane = pane;
+    return b;
 }
 
 // ---- frosted glass -------------------------------------------------------
@@ -1055,26 +1231,48 @@ function axisWidth() {
 
 // 100 / 50 / 0 (or quarters on tall graphs) left of a percent graph at x..x+w, and the time it
 // spans in its top right corner. Call it after creating the graph so the span is drawn on top.
-function percentAxis(root, x, y, w, h, interval) {
+// A label in a graph's top right corner (right: its right edge), on a patch of the plot color
+// so the bars don't hide it; set with setCorner
+function cornerLabel(root, right, y, size) {
+    var el = label(root, right - 10, y, 10, size, THEME.faint, "center");
+    el.style.height = el.style.lineHeight = (size + 4) + "px";
+    if (!THEME.plotAlpha) el.style.backgroundColor = THEME.plot;
+    el._right = right;
+    el._size = size;
+    return el;
+}
+
+function setCorner(el, s) {
+    if (el._t === s) return;
+    setText(el, s);
+    var w = textWidth(s, el._size) + 6;
+    el.style.left = (el._right - w) + "px";
+    el.style.width = w + "px";
+}
+
+// ms: time per graph column
+function percentAxis(root, x, y, w, h, ms) {
     if (!THEME.glass) return;
     var marks = h >= 80 ? [100, 75, 50, 25, 0] : [100, 50, 0];
     for (var i = 0; i < marks.length; i++)
         setText(label(root, x - 20, y + Math.round(h * (1 - marks[i] / 100)) - 7, 17, 8, THEME.faint, "right"), String(marks[i]));
-    setText(label(root, x, y + 1, w - 3, 8, THEME.faint, "right"),
-        Math.round(Math.floor(w / 2) * interval / 1000) + T("sec"));
+    setCorner(cornerLabel(root, x + w - 1, y + 1, 8), graphSpan(Math.floor(w / 2), ms));
 }
 
 // Ring gauge from pre-rendered frames: img/gauge_<level>.png holds 51 frames (0..100% in 2%
 // steps) of 52px, one level color per file. Value text in the middle, caption underneath.
 var GAUGE_SIZE = 52;
 
-function Gauge(parent, x, y, caption) {
-    this.size = GAUGE_SIZE;
+// size: drawn smaller than the frames, scaled down
+function Gauge(parent, x, y, caption, size) {
+    this.size = size || GAUGE_SIZE;
     var clip = box(parent, x, y, this.size, this.size, "");
     this.img = document.createElement("img");
-    this.img.style.cssText = "position:absolute;left:0;top:0;width:" + this.size + "px;height:" + (this.size * 51) + "px;";
+    this.img.style.cssText = "position:absolute;left:0;top:0;width:" + this.size + "px;height:" + (this.size * 51) + "px;" +
+        "-ms-interpolation-mode:bicubic;";
     clip.appendChild(this.img);
-    this.val = label(parent, x, y + 17, this.size, 12, THEME.text, "center", true);
+    var fs = this.size < GAUGE_SIZE ? 11 : 12;
+    this.val = label(parent, x, y + Math.round(this.size / 2) - Math.round(fs / 2) - 3, this.size, fs, THEME.text, "center", true);
     this.cap = label(parent, x - 20, y + this.size - 2, this.size + 40, 9, THEME.dim, "center");
     setText(this.cap, caption);
     this.src = null;
@@ -1251,6 +1449,38 @@ function flyoutPage(sections) {
 
 var flyoutTimer = null;
 
+// A row naming the program that loads the processor (or the graphics card) most right now.
+// Clicking it opens Task Manager.
+var TOP_EVERY = 5000;
+
+// x: start further right, on a line shared with something else, without the "Busiest:" (it is
+// in the tooltip then)
+function TopRow(root, y, x) {
+    this.compact = x != null;
+    x = x || PAD;
+    var vw = this.compact ? 32 : 40;
+    this.name = label(root, x, y, W - PAD - vw - x, this.compact ? 10 : 11, THEME.dim, this.compact ? "right" : "left");
+    this.name.style.textOverflow = "ellipsis";
+    this.val = label(root, W - PAD - vw, y, vw, this.compact ? 10 : 11, THEME.text, "right", true);
+    this.name.style.cursor = this.val.style.cursor = "hand";
+    this.name.title = this.val.title = T("topTip");
+    this.name.onclick = this.val.onclick = function () { openUrl("taskmgr.exe"); };
+    this.key = null;
+    this.set(null, 0);
+}
+
+// name null: nothing busy (or not measured yet)
+TopRow.prototype.set = function (name, pct) {
+    var key = name + "|" + THEME.text;
+    if (key != this.key) {
+        this.key = key;
+        this.name.innerHTML = (this.compact ? "" : esc(T("topProc")) + "&nbsp; ") +
+            "<span style='color:" + THEME.text + "'>" + esc(name == null ? (this.compact ? "" : "–") : name) + "</span>";
+    }
+    setText(this.val, name == null ? "" : Math.round(pct) + "%");
+    setColor(this.val, pctColor(pct));
+};
+
 // [label, value] rows of the TOP_N biggest of [{ name, n (processes), <key> }] by `key`; fmt
 // formats a value and returns "" to leave the item out
 var TOP_N = 6;
@@ -1297,9 +1527,10 @@ function cimDate(s) {
 // %APPDATA%\ModernMeters\update.txt, where the others pick it up. A newer version shows a badge;
 // only a click on it downloads the release and installs it (update.ps1).
 
-var VERSION = "1.5.0";   // set by build.ps1
+var VERSION = "1.6.0";   // set by build.ps1
 var REPO = "Silverenio/modern-meters";
 var KOFI_URL = "https://ko-fi.com/silverenio";
+var MAKER = "Silverenio · Livonian Labs", MAIL = "livonianlabs@gmail.com";
 var UPDATE_EVERY = 24 * 3600 * 1000;
 var updates = { timer: null, req: null, sent: 0, shown: false, state: "", onChange: null, blink: null, root: null, badge: null };
 var INSTALL_TIMEOUT = 5 * 60 * 1000;

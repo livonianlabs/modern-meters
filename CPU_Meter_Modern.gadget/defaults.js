@@ -7,10 +7,12 @@ var DEFAULTS = {
     accent: "blue",
     width: "170",
     interval: "1000",
+    history: "auto",
     graph: "64",
     unit: "C",
     view: "threads",
     mem: "on",
+    top: "on",
     live: "off",
     alarm: "off",
     alarmTemp: "90",
@@ -26,7 +28,8 @@ function settingsSpec() {
         { key: "view", label: { en: "Per-core list", ru: "Список" }, options: [
             ["threads", { en: "All threads", ru: "Все потоки" }],
             ["cores", { en: "Cores (P/E)", ru: "Ядра (P/E)" }]] },
-        { key: "mem", label: { en: "RAM / Commit", ru: "ОЗУ / Выделено" }, options: OPT.onOff }
+        { key: "mem", label: { en: "RAM / Commit", ru: "ОЗУ / Выделено" }, options: OPT.onOff },
+        { key: "top", label: { en: "Busiest program", ru: "Самая активная программа" }, options: OPT.onOff }
     ], alarmRows());
 }
 
