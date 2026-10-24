@@ -303,7 +303,7 @@ function T(key) {
 // the settings page phrases, keyed by their English text ("Alarm %d": %d stands for a number).
 // A string a file leaves out shows in English.
 var LANGUAGES = [["en", "English"], ["ru", "Русский"]];
-var LANG_FILES = ["uk", "de", "es", "fr", "it", "pl", "pt", "tr", "zh", "ja"];
+var LANG_FILES = ["uk", "de", "es", "fr", "it", "lv", "pl", "pt", "tr", "zh", "ja"];
 var PHRASES = {};
 
 function addLanguage(code, name, strings, phrases) {
@@ -1527,7 +1527,7 @@ function cimDate(s) {
 // %APPDATA%\ModernMeters\update.txt, where the others pick it up. A newer version shows a badge;
 // only a click on it downloads the release and installs it (update.ps1).
 
-var VERSION = "1.6.2";   // set by build.ps1
+var VERSION = "1.7.0";   // set by build.ps1
 var REPO = "livonianlabs/modern-meters";
 var KOFI_URL = "https://ko-fi.com/silverenio";
 var MAKER = "Livonian Labs", MAIL = "livonianlabs@gmail.com";
