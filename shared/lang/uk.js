@@ -68,7 +68,7 @@ addLanguage("uk", "Українська", {
 }, {
     "Language": "Мова", "Auto (as Windows)": "Авто (як у Windows)", "Display": "Вигляд", "Style": "Стиль",
     "Classic (flat)": "Класичний", "Glass": "Скло", "Colored glass": "Кольорове скло", "Light": "Світлий", "Retro terminal": "Ретро-термінал", "Accent color": "Колір акценту",
-    "Terminal: black and white": "Термінал: чорно-білий", "Terminal: Norton Commander": "Термінал: Norton Commander", "Terminal: Ubuntu": "Термінал: Ubuntu", "Windows classic": "Класичний Windows", "Glass frosting": "Матовість скла", "Glass tint": "Відтінок скла", "By wallpaper": "За шпалерами", "Dark": "Темне",
+    "Terminal: black and white": "Термінал: чорно-білий", "Terminal: blue commander": "Термінал: синій коммандер", "Terminal: aubergine": "Термінал: баклажан", "Gray 90s": "Сірий з 90-х", "Glass frosting": "Матовість скла", "Glass tint": "Відтінок скла", "By wallpaper": "За шпалерами", "Dark": "Темне",
     "For all gadgets": "Для всіх гаджетів", "Only this one": "Лише для цього", "Style and language": "Стиль і мова", "Style, color, language": "Стиль, колір і мова", "Alarms": "Сигнали", "VRAM above": "VRAM більше",
     "Blue": "Блакитний", "Teal": "Бірюзовий", "Green": "Зелений", "Purple": "Фіолетовий", "Orange": "Помаранчевий", "Pink": "Рожевий", "Red": "Червоний", "Yellow": "Жовтий",
     "Width": "Ширина", "Classic (%d)": "Як старі (%d)", "Medium (%d)": "Середній (%d)", "Wide (%d)": "Широкий (%d)",
@@ -80,7 +80,7 @@ addLanguage("uk", "Українська", {
     "Exclamation": "Оклик", "Battery critical": "Батарея розряджена", "Volume": "Гучність", "Repeat": "Повтор",
     "Once": "Один раз", "Until silenced": "Поки не приглушити", "Play": "Прослухати",
     "About": "Про гаджет", "Version": "Версія", "New versions": "Нові версії", "Let me know": "Повідомляти",
-    "Don't check": "Не перевіряти", "Made by": "Автор", "Feedback": "Зв’язатися", "✉ Write to us": "✉ Написати нам", "Graph history": "Історія графіка", "Short (by refresh)": "Коротка (за оновленням)", "%d min": "%d хв", "1 hour": "1 година", "Busiest program": "Найактивніша програма", "Like them?": "Подобаються?", "☕ Buy me a coffee": "☕ Пригостити кавою",
+    "Don't check": "Не перевіряти", "Made by": "Автор", "Feedback": "Зв’язатися", "✉ Write to us": "✉ Написати нам", "Graph history": "Історія графіка", "Short (by refresh)": "Коротка (за оновленням)", "%d min": "%d хв", "1 hour": "1 година", "Busiest program": "Найактивніша програма", "Lens glass": "Скло-лінза", "Sky glass": "Небесне скло", "Like them?": "Подобаються?", "☕ Buy me a coffee": "☕ Пригостити кавою",
     "Live zone": "Плавна зона", "Per-core list": "Список", "All threads": "Усі потоки", "Cores (P/E)": "Ядра (P/E)",
     "RAM / Commit": "ОЗП / Виділено",
     "Bottom details": "Нижні рядки", "Data source": "Джерело даних", "Source": "Джерело", "Auto": "Авто",

@@ -1,6 +1,6 @@
 # Modern Meters
 
-[![Support us on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/livonianlabs)
+[![Support us on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/silverenio)
 
 Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
 
@@ -14,13 +14,13 @@ Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
 
 The CPU and GPU gadgets show the maker (NVIDIA, AMD, Intel, Qualcomm) beside their title. Hover over a graph to see the value at that moment and its lowest, average and highest; **Graph history** makes a graph cover 5 or 15 minutes or an hour instead of the last minute or two. All of them speak 12 languages (English, Українська, Русский, Deutsch, Español, Français, Italiano, Polski, Português, Türkçe, 中文, 日本語) and pick yours from Windows, and have five widths, accent colors, and a five-step color scale for load and temperature. Translations live in `shared/lang/`, one file per language; corrections are welcome.
 
-Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your accent color: blue, teal, green, purple, orange, pink, red or yellow), **Retro terminal** (a CRT screen with scanlines in your accent color, whose cursor now and then retypes the title), three more terminals (**black and white**, **Norton Commander** blue and the **Ubuntu** terminal), **Windows classic** (gray 95/98 windows with a navy title bar and block progress bars), **Aero** and **Liquid Glass**, and **Auto**, which switches between Light and Glass with Windows' light/dark mode. Aero and Liquid Glass are frosted glass: the gadget shows your wallpaper under it, blurred, through Windows 7's blue or Apple's light or dark glass (picked by how bright the wallpaper is, or as you set it), with **Glass frosting** setting how much; Liquid Glass bends the picture along its edges like a thick lens. They redraw themselves when you move a gadget or change the wallpaper. Panels for the colored styles are drawn once on your PC the first time they're needed. Set **For all gadgets** in any gadget's settings to give every gadget the same style and language (and, if you like, accent color) in one go.
+Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your accent color: blue, teal, green, purple, orange, pink, red or yellow), **Retro terminal** (a CRT screen with scanlines in your accent color, whose cursor now and then retypes the title), three more terminals (**black and white**, **blue commander** after the old DOS file managers, and **aubergine** after the Ubuntu terminal), **Gray 90s** (gray Windows 95/98-style windows with a navy title bar and block progress bars), **Sky glass** and **Lens glass**, and **Auto**, which switches between Light and Glass with Windows' light/dark mode. Sky glass and Lens glass are frosted glass, inspired by Windows 7's Aero and Apple's Liquid Glass: the gadget shows your wallpaper under it, blurred, through blue glass or through light or dark glass (picked by how bright the wallpaper is, or as you set it), with **Glass frosting** setting how much; Lens glass bends the picture along its edges like a thick lens. They redraw themselves when you move a gadget or change the wallpaper. Panels for the colored styles are drawn once on your PC the first time they're needed. Set **For all gadgets** in any gadget's settings to give every gadget the same style and language (and, if you like, accent color) in one go.
 
 <img src="docs/themes.png" width="660" alt="Light, colored glass and retro terminal styles">
 
-<img src="docs/themes-retro.png" width="660" alt="Black and white terminal, Norton Commander, Ubuntu terminal and Windows classic styles">
+<img src="docs/themes-retro.png" width="660" alt="Black and white terminal, blue commander, aubergine terminal and Gray 90s styles">
 
-<img src="docs/themes-glass.png" width="440" alt="Liquid Glass light, Aero and Liquid Glass dark over a wallpaper">
+<img src="docs/themes-glass.png" width="440" alt="Lens glass light, Sky glass and Lens glass dark over a wallpaper">
 
 ### Glass style
 
@@ -77,9 +77,13 @@ Run `build.ps1` in PowerShell. It draws the images, compiles the small .NET help
 
 ## Support
 
-The gadgets are free. If you like them, you can [buy us a coffee on Ko-fi](https://ko-fi.com/livonianlabs). It's also in every gadget's settings under **About**.
+The gadgets are free. If you like them, you can [buy us a coffee on Ko-fi](https://ko-fi.com/silverenio). It's also in every gadget's settings under **About**.
 
 Questions, ideas or a bug to report: open an [issue](https://github.com/livonianlabs/modern-meters/issues) or write to livonianlabs@gmail.com. More from us: [livonianlabs.github.io](https://livonianlabs.github.io/).
+
+## Trademarks
+
+Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel and Qualcomm are trademarks of their owners. They are named here only to describe what a style recalls or which hardware is shown; Modern Meters is not affiliated with or endorsed by them.
 
 ## License
 
@@ -101,11 +105,11 @@ Questions, ideas or a bug to report: open an [issue](https://github.com/livonian
 
 Гаджеты CPU и GPU показывают производителя (NVIDIA, AMD, Intel, Qualcomm) рядом с заголовком. Если навести мышь на график, видно значение в этот момент, а также минимум, среднее и максимум; настройка «История графика» растягивает график на 5 или 15 минут или на час вместо последней минуты-двух. У всех 12 языков (английский, украинский, русский, немецкий, испанский, французский, итальянский, польский, португальский, турецкий, китайский, японский), язык берётся из Windows; пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: светлый, цветное стекло, ретро-терминал, «Стекло» и классический.
 
-Стили: «Стекло», «Классический», «Светлый», «Цветное стекло» (стекло в цвете акцента: голубой, бирюзовый, зелёный, фиолетовый, оранжевый, розовый, красный или жёлтый), «Ретро-терминал» (ЭЛТ-экран со строками развёртки в цвете акцента, курсор которого время от времени перепечатывает заголовок), ещё три терминала (**чёрно-белый**, синий **Norton Commander** и терминал **Ubuntu**), «Классический Windows» (серые окна 95/98 с синим заголовком и прогресс-барами из блоков), **Aero** и **Liquid Glass**, а также «Авто» — переключается между светлым и стеклом вслед за светлым/тёмным режимом Windows. Aero и Liquid Glass — матовое стекло: сквозь гаджет видны размытые обои под ним, в синем стекле Windows 7 или в светлом или тёмном стекле Apple (выбирается по яркости обоев или как вы зададите), а настройка «Матовость стекла» задаёт, насколько оно матовое; Liquid Glass у краёв изгибает картинку, как толстая линза. Когда вы передвигаете гаджет или меняете обои, стекло перерисовывается само. Фон для цветных стилей рисуется один раз на вашем компьютере, когда впервые понадобится. Настройка **Для всех гаджетов** в любом гаджете сразу даёт всем гаджетам один стиль и язык (а при желании и цвет акцента).
+Стили: «Стекло», «Классический», «Светлый», «Цветное стекло» (стекло в цвете акцента: голубой, бирюзовый, зелёный, фиолетовый, оранжевый, розовый, красный или жёлтый), «Ретро-терминал» (ЭЛТ-экран со строками развёртки в цвете акцента, курсор которого время от времени перепечатывает заголовок), ещё три терминала (**чёрно-белый**, **синий коммандер** в духе старых файловых менеджеров DOS и **баклажан** в духе терминала Ubuntu), «Серый из 90-х» (серые окна в духе Windows 95/98 с синим заголовком и прогресс-барами из блоков), «Небесное стекло» и «Стекло-линза», а также «Авто» — переключается между светлым и стеклом вслед за светлым/тёмным режимом Windows. «Небесное стекло» и «Стекло-линза» — матовое стекло по мотивам Aero из Windows 7 и Liquid Glass от Apple: сквозь гаджет видны размытые обои под ним, в синем стекле или в светлом или тёмном (выбирается по яркости обоев или как вы зададите), а настройка «Матовость стекла» задаёт, насколько оно матовое; «Стекло-линза» у краёв изгибает картинку, как толстая линза. Когда вы передвигаете гаджет или меняете обои, стекло перерисовывается само. Фон для цветных стилей рисуется один раз на вашем компьютере, когда впервые понадобится. Настройка **Для всех гаджетов** в любом гаджете сразу даёт всем гаджетам один стиль и язык (а при желании и цвет акцента).
 
-<img src="docs/themes-retro.png" width="660" alt="Чёрно-белый терминал, Norton Commander, терминал Ubuntu и классический Windows">
+<img src="docs/themes-retro.png" width="660" alt="Чёрно-белый терминал, синий коммандер, баклажан и «Серый из 90-х»">
 
-<img src="docs/themes-glass.png" width="440" alt="Светлое Liquid Glass, Aero и тёмное Liquid Glass поверх обоев">
+<img src="docs/themes-glass.png" width="440" alt="Светлое стекло-линза, небесное стекло и тёмное стекло-линза поверх обоев">
 
 ## Установка
 
@@ -142,9 +146,13 @@ Questions, ideas or a bug to report: open an [issue](https://github.com/livonian
 
 ## Поддержать
 
-Гаджеты бесплатные. Если они вам нравятся, можно [угостить нас кофе на Ko-fi](https://ko-fi.com/livonianlabs). Эта же ссылка есть в настройках каждого гаджета, в разделе **О гаджете**.
+Гаджеты бесплатные. Если они вам нравятся, можно [угостить нас кофе на Ko-fi](https://ko-fi.com/silverenio). Эта же ссылка есть в настройках каждого гаджета, в разделе **О гаджете**.
 
 Вопросы, идеи, ошибки: заведите [issue](https://github.com/livonianlabs/modern-meters/issues) или напишите на livonianlabs@gmail.com. Другие наши проекты: [livonianlabs.github.io](https://livonianlabs.github.io/).
+
+## Товарные знаки
+
+Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel и Qualcomm — товарные знаки их владельцев. Они упомянуты только для того, чтобы описать, что напоминает стиль или какое оборудование показано; Modern Meters с ними не связан и ими не одобрен.
 
 ## Лицензия
 

@@ -68,7 +68,7 @@ addLanguage("ja", "日本語", {
 }, {
     "Language": "言語", "Auto (as Windows)": "自動（Windows と同じ）", "Display": "表示", "Style": "スタイル",
     "Classic (flat)": "クラシック（フラット）", "Glass": "ガラス", "Colored glass": "カラーガラス", "Light": "ライト", "Retro terminal": "レトロ端末", "Accent color": "アクセントカラー",
-    "Terminal: black and white": "ターミナル：白黒", "Terminal: Norton Commander": "ターミナル：Norton Commander", "Terminal: Ubuntu": "ターミナル：Ubuntu", "Windows classic": "Windows クラシック", "Glass frosting": "ガラスのすりガラス度", "Glass tint": "ガラスの色合い", "By wallpaper": "壁紙に合わせる", "Dark": "ダーク",
+    "Terminal: black and white": "ターミナル：白黒", "Terminal: blue commander": "ターミナル：青いコマンダー", "Terminal: aubergine": "ターミナル：なす紺", "Gray 90s": "90 年代グレー", "Glass frosting": "ガラスのすりガラス度", "Glass tint": "ガラスの色合い", "By wallpaper": "壁紙に合わせる", "Dark": "ダーク",
     "For all gadgets": "すべてのガジェットに適用", "Only this one": "このガジェットのみ", "Style and language": "スタイルと言語", "Style, color, language": "スタイル・色・言語", "Alarms": "アラーム", "VRAM above": "VRAM が次を超えたら",
     "Blue": "ブルー", "Teal": "ティール", "Green": "グリーン", "Purple": "パープル", "Orange": "オレンジ", "Pink": "ピンク", "Red": "レッド", "Yellow": "イエロー",
     "Width": "幅", "Classic (%d)": "クラシック (%d)", "Medium (%d)": "中 (%d)", "Wide (%d)": "広い (%d)",
@@ -80,7 +80,7 @@ addLanguage("ja", "日本語", {
     "Exclamation": "感嘆符", "Battery critical": "バッテリ残量わずか", "Volume": "音量", "Repeat": "繰り返し",
     "Once": "1 回", "Until silenced": "消音するまで", "Play": "再生",
     "About": "このガジェットについて", "Version": "バージョン", "New versions": "新しいバージョン", "Let me know": "知らせる",
-    "Don't check": "確認しない", "Made by": "作者", "Feedback": "フィードバック", "✉ Write to us": "✉ メールする", "Graph history": "グラフの期間", "Short (by refresh)": "短い（更新ごと）", "%d min": "%d 分", "1 hour": "1 時間", "Busiest program": "最も負荷の高いプログラム", "Like them?": "気に入りましたか？", "☕ Buy me a coffee": "☕ コーヒーをおごる",
+    "Don't check": "確認しない", "Made by": "作者", "Feedback": "フィードバック", "✉ Write to us": "✉ メールする", "Graph history": "グラフの期間", "Short (by refresh)": "短い（更新ごと）", "%d min": "%d 分", "1 hour": "1 時間", "Busiest program": "最も負荷の高いプログラム", "Lens glass": "レンズガラス", "Sky glass": "スカイガラス", "Like them?": "気に入りましたか？", "☕ Buy me a coffee": "☕ コーヒーをおごる",
     "Live zone": "ライブゾーン", "Per-core list": "一覧", "All threads": "すべてのスレッド", "Cores (P/E)": "コア (P/E)",
     "RAM / Commit": "メモリ / コミット",
     "Bottom details": "下部の詳細", "Data source": "データソース", "Source": "ソース", "Auto": "自動",

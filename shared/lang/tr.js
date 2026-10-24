@@ -68,7 +68,7 @@ addLanguage("tr", "Türkçe", {
 }, {
     "Language": "Dil", "Auto (as Windows)": "Otomatik (Windows gibi)", "Display": "Görünüm", "Style": "Stil",
     "Classic (flat)": "Klasik (düz)", "Glass": "Cam", "Colored glass": "Renkli cam", "Light": "Açık", "Retro terminal": "Retro terminal", "Accent color": "Vurgu rengi",
-    "Terminal: black and white": "Terminal: siyah beyaz", "Terminal: Norton Commander": "Terminal: Norton Commander", "Terminal: Ubuntu": "Terminal: Ubuntu", "Windows classic": "Klasik Windows", "Glass frosting": "Cam buzluluğu", "Glass tint": "Cam tonu", "By wallpaper": "Duvar kâğıdına göre", "Dark": "Koyu",
+    "Terminal: black and white": "Terminal: siyah beyaz", "Terminal: blue commander": "Terminal: mavi commander", "Terminal: aubergine": "Terminal: patlıcan", "Gray 90s": "90'ların grisi", "Glass frosting": "Cam buzluluğu", "Glass tint": "Cam tonu", "By wallpaper": "Duvar kâğıdına göre", "Dark": "Koyu",
     "For all gadgets": "Tüm gadget'lar için", "Only this one": "Yalnızca bu", "Style and language": "Stil ve dil", "Style, color, language": "Stil, renk, dil", "Alarms": "Alarmlar", "VRAM above": "VRAM üstü",
     "Blue": "Mavi", "Teal": "Turkuaz", "Green": "Yeşil", "Purple": "Mor", "Orange": "Turuncu", "Pink": "Pembe", "Red": "Kırmızı", "Yellow": "Sarı",
     "Width": "Genişlik", "Classic (%d)": "Klasik (%d)", "Medium (%d)": "Orta (%d)", "Wide (%d)": "Geniş (%d)",
@@ -80,7 +80,7 @@ addLanguage("tr", "Türkçe", {
     "Exclamation": "Ünlem", "Battery critical": "Pil kritik", "Volume": "Ses düzeyi", "Repeat": "Tekrar",
     "Once": "Bir kez", "Until silenced": "Susturulana kadar", "Play": "Çal",
     "About": "Hakkında", "Version": "Sürüm", "New versions": "Yeni sürümler", "Let me know": "Bildir",
-    "Don't check": "Denetleme", "Made by": "Yapımcı", "Feedback": "Geri bildirim", "✉ Write to us": "✉ Bize yazın", "Graph history": "Grafik geçmişi", "Short (by refresh)": "Kısa (yenilemeye göre)", "%d min": "%d dk", "1 hour": "1 saat", "Busiest program": "En yoğun program", "Like them?": "Beğendiniz mi?", "☕ Buy me a coffee": "☕ Bana bir kahve ısmarla",
+    "Don't check": "Denetleme", "Made by": "Yapımcı", "Feedback": "Geri bildirim", "✉ Write to us": "✉ Bize yazın", "Graph history": "Grafik geçmişi", "Short (by refresh)": "Kısa (yenilemeye göre)", "%d min": "%d dk", "1 hour": "1 saat", "Busiest program": "En yoğun program", "Lens glass": "Mercek cam", "Sky glass": "Gök cam", "Like them?": "Beğendiniz mi?", "☕ Buy me a coffee": "☕ Bana bir kahve ısmarla",
     "Live zone": "Canlı bölge", "Per-core list": "Liste", "All threads": "Tüm iş parçacıkları", "Cores (P/E)": "Çekirdekler (P/E)",
     "RAM / Commit": "RAM / Ayrılan",
     "Bottom details": "Alt satırlar", "Data source": "Veri kaynağı", "Source": "Kaynak", "Auto": "Otomatik",

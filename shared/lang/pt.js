@@ -68,7 +68,7 @@ addLanguage("pt", "Português", {
 }, {
     "Language": "Idioma", "Auto (as Windows)": "Auto (como o Windows)", "Display": "Aparência", "Style": "Estilo",
     "Classic (flat)": "Clássico (plano)", "Glass": "Vidro", "Colored glass": "Vidro colorido", "Light": "Claro", "Retro terminal": "Terminal retrô", "Accent color": "Cor de destaque",
-    "Terminal: black and white": "Terminal: preto e branco", "Terminal: Norton Commander": "Terminal: Norton Commander", "Terminal: Ubuntu": "Terminal: Ubuntu", "Windows classic": "Windows clássico", "Glass frosting": "Fosco do vidro", "Glass tint": "Tom do vidro", "By wallpaper": "Pelo papel de parede", "Dark": "Escuro",
+    "Terminal: black and white": "Terminal: preto e branco", "Terminal: blue commander": "Terminal: commander azul", "Terminal: aubergine": "Terminal: berinjela", "Gray 90s": "Cinza dos anos 90", "Glass frosting": "Fosco do vidro", "Glass tint": "Tom do vidro", "By wallpaper": "Pelo papel de parede", "Dark": "Escuro",
     "For all gadgets": "Para todos os gadgets", "Only this one": "Só este", "Style and language": "Estilo e idioma", "Style, color, language": "Estilo, cor, idioma", "Alarms": "Alarmes", "VRAM above": "VRAM acima de",
     "Blue": "Azul", "Teal": "Turquesa", "Green": "Verde", "Purple": "Roxo", "Orange": "Laranja", "Pink": "Rosa", "Red": "Vermelho", "Yellow": "Amarelo",
     "Width": "Largura", "Classic (%d)": "Clássica (%d)", "Medium (%d)": "Média (%d)", "Wide (%d)": "Larga (%d)",
@@ -80,7 +80,7 @@ addLanguage("pt", "Português", {
     "Exclamation": "Exclamação", "Battery critical": "Bateria crítica", "Volume": "Volume", "Repeat": "Repetir",
     "Once": "Uma vez", "Until silenced": "Até silenciar", "Play": "Ouvir",
     "About": "Sobre", "Version": "Versão", "New versions": "Novas versões", "Let me know": "Avisar",
-    "Don't check": "Não verificar", "Made by": "Autor", "Feedback": "Contato", "✉ Write to us": "✉ Escreva-nos", "Graph history": "Histórico do gráfico", "Short (by refresh)": "Curto (por atualização)", "%d min": "%d min", "1 hour": "1 hora", "Busiest program": "Programa mais ativo", "Like them?": "Gostou?", "☕ Buy me a coffee": "☕ Me pague um café",
+    "Don't check": "Não verificar", "Made by": "Autor", "Feedback": "Contato", "✉ Write to us": "✉ Escreva-nos", "Graph history": "Histórico do gráfico", "Short (by refresh)": "Curto (por atualização)", "%d min": "%d min", "1 hour": "1 hora", "Busiest program": "Programa mais ativo", "Lens glass": "Vidro lente", "Sky glass": "Vidro céu", "Like them?": "Gostou?", "☕ Buy me a coffee": "☕ Me pague um café",
     "Live zone": "Zona ao vivo", "Per-core list": "Lista", "All threads": "Todas as threads", "Cores (P/E)": "Núcleos (P/E)",
     "RAM / Commit": "RAM / Confirmada",
     "Bottom details": "Linhas inferiores", "Data source": "Fonte de dados", "Source": "Fonte", "Auto": "Auto",

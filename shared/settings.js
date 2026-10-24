@@ -52,16 +52,18 @@ function generalRows(noTemp, graphOpts) {
             ["auto", OPT.lang[0][1]],
             ["classic", { en: "Classic (flat)", ru: "Классический" }], ["tinted", { en: "Colored glass", ru: "Цветное стекло" }],
             ["glass", { en: "Glass", ru: "Стекло" }], ["light", { en: "Light", ru: "Светлый" }],
-            ["aero", { en: "Aero (Windows 7)", ru: "Aero (Windows 7)" }],
-            ["liquid", { en: "Liquid Glass (Apple)", ru: "Liquid Glass (Apple)" }],
+            // Own names: the originals (Apple's Liquid Glass, Windows 7 Aero, Norton Commander, the
+            // Ubuntu terminal, Windows classic) are other companies' marks, named only in the README
+            ["liquid", { en: "Lens glass", ru: "Стекло-линза" }],
+            ["aero", { en: "Sky glass", ru: "Небесное стекло" }],
             ["terminal", { en: "Retro terminal", ru: "Ретро-терминал" }],
+            ["ubuntu", { en: "Terminal: aubergine", ru: "Терминал: баклажан" }],
             ["mono", { en: "Terminal: black and white", ru: "Терминал: чёрно-белый" }],
-            ["norton", { en: "Terminal: Norton Commander", ru: "Терминал: Norton Commander" }],
-            ["ubuntu", { en: "Terminal: Ubuntu", ru: "Терминал: Ubuntu" }],
-            ["win98", { en: "Windows classic", ru: "Классический Windows" }]] },
+            ["norton", { en: "Terminal: blue commander", ru: "Терминал: синий коммандер" }],
+            ["win98", { en: "Gray 90s", ru: "Серый из 90-х" }]] },
         { key: "accent", label: { en: "Accent color", ru: "Цвет акцента" }, options: OPT.accent },
-        // Liquid Glass and Aero: how much tint over the blurred wallpaper; light or dark only in
-        // Liquid Glass. Shown only with those styles picked.
+        // Lens and Sky glass: how much tint over the blurred wallpaper; light or dark only in
+        // Lens glass. Shown only with those styles picked.
         { key: "frost", label: { en: "Glass frosting", ru: "Матовость стекла" }, showWith: ["theme", ["aero", "liquid"]], options: [
             ["15", "15%"], ["25", "25%"], ["40", "40%"], ["55", "55%"], ["70", "70%"]] },
         { key: "glass", label: { en: "Glass tint", ru: "Оттенок стекла" }, showWith: ["theme", ["liquid"]], options: [

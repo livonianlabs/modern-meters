@@ -68,7 +68,7 @@ addLanguage("zh", "中文", {
 }, {
     "Language": "语言", "Auto (as Windows)": "自动（同 Windows）", "Display": "外观", "Style": "样式",
     "Classic (flat)": "经典（扁平）", "Glass": "玻璃", "Colored glass": "彩色玻璃", "Light": "浅色", "Retro terminal": "复古终端", "Accent color": "强调色",
-    "Terminal: black and white": "终端：黑白", "Terminal: Norton Commander": "终端：Norton Commander", "Terminal: Ubuntu": "终端：Ubuntu", "Windows classic": "Windows 经典", "Glass frosting": "玻璃磨砂度", "Glass tint": "玻璃色调", "By wallpaper": "根据壁纸", "Dark": "深色",
+    "Terminal: black and white": "终端：黑白", "Terminal: blue commander": "终端：蓝色指挥官", "Terminal: aubergine": "终端：茄紫", "Gray 90s": "90 年代灰", "Glass frosting": "玻璃磨砂度", "Glass tint": "玻璃色调", "By wallpaper": "根据壁纸", "Dark": "深色",
     "For all gadgets": "应用于所有小工具", "Only this one": "仅此小工具", "Style and language": "样式和语言", "Style, color, language": "样式、颜色和语言", "Alarms": "警报", "VRAM above": "显存高于",
     "Blue": "蓝色", "Teal": "青色", "Green": "绿色", "Purple": "紫色", "Orange": "橙色", "Pink": "粉色", "Red": "红色", "Yellow": "黄色",
     "Width": "宽度", "Classic (%d)": "经典 (%d)", "Medium (%d)": "中等 (%d)", "Wide (%d)": "宽 (%d)",
@@ -80,7 +80,7 @@ addLanguage("zh", "中文", {
     "Exclamation": "感叹", "Battery critical": "电量严重不足", "Volume": "音量", "Repeat": "重复",
     "Once": "一次", "Until silenced": "直到静音", "Play": "试听",
     "About": "关于", "Version": "版本", "New versions": "新版本", "Let me know": "通知我",
-    "Don't check": "不检查", "Made by": "作者", "Feedback": "反馈", "✉ Write to us": "✉ 给我们写信", "Graph history": "图表时长", "Short (by refresh)": "短（按刷新）", "%d min": "%d 分钟", "1 hour": "1 小时", "Busiest program": "最忙的程序", "Like them?": "喜欢吗？", "☕ Buy me a coffee": "☕ 请我喝杯咖啡",
+    "Don't check": "不检查", "Made by": "作者", "Feedback": "反馈", "✉ Write to us": "✉ 给我们写信", "Graph history": "图表时长", "Short (by refresh)": "短（按刷新）", "%d min": "%d 分钟", "1 hour": "1 小时", "Busiest program": "最忙的程序", "Lens glass": "透镜玻璃", "Sky glass": "天空玻璃", "Like them?": "喜欢吗？", "☕ Buy me a coffee": "☕ 请我喝杯咖啡",
     "Live zone": "实时区域", "Per-core list": "列表", "All threads": "全部线程", "Cores (P/E)": "核心 (P/E)",
     "RAM / Commit": "内存 / 已提交",
     "Bottom details": "底部详情", "Data source": "数据来源", "Source": "来源", "Auto": "自动",
