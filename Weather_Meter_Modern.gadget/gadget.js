@@ -106,7 +106,7 @@ Http.prototype.get = function (url) {
         var r = new ActiveXObject("MSXML2.ServerXMLHTTP.6.0");
         r.open("GET", url, true);
         // Nominatim's usage policy asks every app to identify itself
-        r.setRequestHeader("User-Agent", "ModernMeters/" + VERSION + " (github.com/silverenio/modern-meters)");
+        r.setRequestHeader("User-Agent", "ModernMeters/" + VERSION + " (github.com/livonianlabs/modern-meters)");
         r.send();
         this.r = r;
         this.sent = now();

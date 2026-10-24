@@ -31,7 +31,7 @@ try {
     # Everything is downloaded and checked before anything is replaced
     foreach ($n in $installed) {
         $zip = Join-Path $work ($n -replace '\.gadget$', '.zip')
-        Invoke-WebRequest -UseBasicParsing "https://github.com/Silverenio/modern-meters/releases/download/$Tag/$n" -OutFile $zip
+        Invoke-WebRequest -UseBasicParsing "https://github.com/livonianlabs/modern-meters/releases/download/$Tag/$n" -OutFile $zip
         $dir = Join-Path $work $n
         [IO.Compression.ZipFile]::ExtractToDirectory($zip, $dir)
         if (-not (Test-Path (Join-Path $dir 'gadget.xml')) -or -not (Test-Path (Join-Path $dir 'common.js'))) { throw "$n is incomplete" }

@@ -1,6 +1,6 @@
 # Modern Meters
 
-[![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/silverenio)
+[![Support us on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/livonianlabs)
 
 Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
 
@@ -45,7 +45,7 @@ Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your acce
 ## Install
 
 1. Install [8GadgetPack](https://8gadgetpack.net/) if you don't have the Sidebar yet.
-2. Download the `.gadget` files from [Releases](https://github.com/Silverenio/modern-meters/releases/latest) and double-click each one you want. You don't need all five.
+2. Download the `.gadget` files from [Releases](https://github.com/livonianlabs/modern-meters/releases/latest) and double-click each one you want. You don't need all five.
 3. Right-click the desktop → **Gadgets**, and drag the gadget onto the desktop.
 4. Settings: hover over the gadget and click the wrench icon.
 
@@ -77,13 +77,13 @@ Run `build.ps1` in PowerShell. It draws the images, compiles the small .NET help
 
 ## Support
 
-The gadgets are free. If you like them, you can [buy me a coffee on Ko-fi](https://ko-fi.com/silverenio). It's also in every gadget's settings under **About**.
+The gadgets are free. If you like them, you can [buy us a coffee on Ko-fi](https://ko-fi.com/livonianlabs). It's also in every gadget's settings under **About**.
 
-Questions, ideas or a bug to report: open an [issue](https://github.com/Silverenio/modern-meters/issues) or write to livonianlabs@gmail.com. More from us: [livonianlabs.github.io](https://livonianlabs.github.io/).
+Questions, ideas or a bug to report: open an [issue](https://github.com/livonianlabs/modern-meters/issues) or write to livonianlabs@gmail.com. More from us: [livonianlabs.github.io](https://livonianlabs.github.io/).
 
 ## License
 
-[MIT](LICENSE) © 2026 Livonian Labs (Silverenio)
+[MIT](LICENSE) © 2026 Livonian Labs
 
 ---
 
@@ -110,7 +110,7 @@ Questions, ideas or a bug to report: open an [issue](https://github.com/Silveren
 ## Установка
 
 1. Установите [8GadgetPack](https://8gadgetpack.net/), если боковой панели ещё нет.
-2. Скачайте `.gadget`-файлы со страницы [Releases](https://github.com/Silverenio/modern-meters/releases/latest) и дважды щёлкните каждый нужный. Ставить все пять не обязательно.
+2. Скачайте `.gadget`-файлы со страницы [Releases](https://github.com/livonianlabs/modern-meters/releases/latest) и дважды щёлкните каждый нужный. Ставить все пять не обязательно.
 3. Правый клик по рабочему столу → **Гаджеты**, перетащите гаджет на рабочий стол.
 4. Настройки: наведите мышь на гаджет и нажмите на значок гаечного ключа.
 
@@ -142,10 +142,10 @@ Questions, ideas or a bug to report: open an [issue](https://github.com/Silveren
 
 ## Поддержать
 
-Гаджеты бесплатные. Если они вам нравятся, можно [угостить меня кофе на Ko-fi](https://ko-fi.com/silverenio). Эта же ссылка есть в настройках каждого гаджета, в разделе **О гаджете**.
+Гаджеты бесплатные. Если они вам нравятся, можно [угостить нас кофе на Ko-fi](https://ko-fi.com/livonianlabs). Эта же ссылка есть в настройках каждого гаджета, в разделе **О гаджете**.
 
-Вопросы, идеи, ошибки: заведите [issue](https://github.com/Silverenio/modern-meters/issues) или напишите на livonianlabs@gmail.com. Другие наши проекты: [livonianlabs.github.io](https://livonianlabs.github.io/).
+Вопросы, идеи, ошибки: заведите [issue](https://github.com/livonianlabs/modern-meters/issues) или напишите на livonianlabs@gmail.com. Другие наши проекты: [livonianlabs.github.io](https://livonianlabs.github.io/).
 
 ## Лицензия
 
-[MIT](LICENSE) © 2026 Livonian Labs (Silverenio)
+[MIT](LICENSE) © 2026 Livonian Labs
