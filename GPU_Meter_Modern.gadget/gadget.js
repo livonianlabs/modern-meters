@@ -604,10 +604,14 @@ function extraCard(root, y, c) {
     extras.push(x);
     rect(root, PAD, y - 6, IW, 1, THEME.sep);
     y += 2;
-    // "UHD 770" when "UHD Graphics 770" doesn't fit
-    var full = c.name.replace(/^(NVIDIA|AMD|Intel\(R\))\s+/i, ""), w = IW - 44;
+    // "UHD 770" when "UHD Graphics 770" doesn't fit, and short like the main card's name when
+    // that one is ("GTX 770M" under "GTX 770M", not "GeForce GTX 770M")
+    var strip = function (s) { return s.replace(/^(NVIDIA|AMD|Intel\(R\))\s+/i, ""); };
+    var full = strip(c.name), w = IW - 44;
+    // (setLinkText shrinks the font down to 85% before it shortens)
+    var mainShort = card && textWidth(strip(card.name) + " ›", narrow ? 12 : 13, true) * 0.85 > IW - 58;
     x.ui.name = label(root, PAD, y, w, 11, THEME.text, "left", true);
-    setText(x.ui.name, textWidth(full, 11, true) <= w ? full :
+    setText(x.ui.name, !mainShort && textWidth(full, 11, true) <= w ? full :
         full.replace(/^(GeForce|Radeon|Arc)\s+/i, "").replace(/\s+Graphics\b/i, ""));
     x.ui.name.title = c.name;
     x.ui.usage = label(root, W - PAD - 40, y - 2, 40, 13, accent, "right", true);

@@ -282,7 +282,7 @@ var STRINGS = {
         threads: "ПОТОКИ", cores: "ЯДРА",
         toCores: "ядра ›", toThreads: "потоки ›",
         show: "",
-        pcores: "P-ЯДРА", ecores: "E-ЯДРА", hdrNet: "СЕТЬ", hdrDrives: "НАКОПИТЕЛИ", sec: " с",
+        pcores: "P-ЯДРА", ecores: "E-ЯДРА", hdrNet: "СЕТЬ", hdrDrives: "НАКОПИТЕЛИ", sec: " сек",
         graphNow: "сейчас", graphStats: "мин %1 · ср %2 · макс %3",
         topProc: "Больше всех:", topTip: "Программа, которая грузит больше всех прямо сейчас (проверка раз в 5 секунд). Клик — Диспетчер задач.",
         gpuLoad: "Загрузка GPU", temperature: "Температура",
@@ -1594,7 +1594,7 @@ function cimDate(s) {
 // %APPDATA%\ModernMeters\update.txt, where the others pick it up. A newer version shows a badge;
 // only a click on it downloads the release and installs it (update.ps1).
 
-var VERSION = "1.9.1";   // set by build.ps1
+var VERSION = "1.9.2";   // set by build.ps1
 var REPO = "livonianlabs/modern-meters";
 var KOFI_URL = "https://ko-fi.com/silverenio";
 var MAKER = "Livonian Labs", MAIL = "livonianlabs@gmail.com";
