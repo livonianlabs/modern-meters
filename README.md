@@ -1,5 +1,9 @@
 # Modern Meters
 
+[![Download the latest release](https://img.shields.io/github/v/release/livonianlabs/modern-meters?label=%E2%AC%87%20Download&style=for-the-badge&color=2ea043)](https://github.com/livonianlabs/modern-meters/releases/latest)
+
+**To install, download the `.gadget` files under _Assets_ on the [latest release](https://github.com/livonianlabs/modern-meters/releases/latest)** and double-click them. The green _Code → Download ZIP_ button gives the source code, not the gadgets. [По-русски ↓](#modern-meters-по-русски)
+
 [![Support us on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/silverenio)
 
 Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
@@ -92,6 +96,10 @@ Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel
 ---
 
 # Modern Meters (по-русски)
+
+[![Скачать последнюю версию](https://img.shields.io/github/v/release/livonianlabs/modern-meters?label=%E2%AC%87%20%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C&style=for-the-badge&color=2ea043)](https://github.com/livonianlabs/modern-meters/releases/latest)
+
+**Чтобы установить, скачайте `.gadget`-файлы из блока _Assets_ на странице [последней версии](https://github.com/livonianlabs/modern-meters/releases/latest)** и дважды щёлкните их. Зелёная кнопка _Code → Download ZIP_ скачивает исходный код, а не гаджеты.
 
 Пять гаджетов для боковой панели Windows из 8GadgetPack:
 
