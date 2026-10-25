@@ -4,7 +4,7 @@
 # compares it with the latest GitHub release.
 param([switch]$Install)
 $ErrorActionPreference = 'Stop'
-$Version = '1.8.0'
+$Version = '1.8.1'
 $root = $PSScriptRoot
 $names = 'CPU_Meter_Modern.gadget', 'GPU_Meter_Modern.gadget', 'Network_Meter_Modern.gadget', 'Drives_Meter_Modern.gadget', 'Weather_Meter_Modern.gadget'
 $utf8 = New-Object System.Text.UTF8Encoding $false
@@ -53,6 +53,11 @@ $dist = Join-Path $root 'dist'
 New-Item -ItemType Directory -Force $dist | Out-Null
 Copy-Item (Join-Path $root 'README.md') $dist -Force
 foreach ($n in $names) {
+    # The Sidebar refuses a package holding an empty file ("not a valid gadget package")
+    Get-ChildItem (Join-Path $root $n) -Recurse -File | Where-Object { $_.Length -eq 0 } | ForEach-Object {
+        Write-Warning "Removing empty file $($_.FullName)"
+        Remove-Item $_.FullName
+    }
     $zip = Join-Path $dist ($n -replace '\.gadget$', '.zip')
     Compress-Archive -Path (Join-Path $root "$n\*") -DestinationPath $zip -Force
     Move-Item $zip (Join-Path $dist $n) -Force
