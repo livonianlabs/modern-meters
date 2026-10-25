@@ -834,8 +834,7 @@ function drawChart() {
         else if (tab == "rain") setText(vl, (h.precipitation_probability ? (h.precipitation_probability[start + i] || 0) : 0) + "%");
         else if (tab == "press") setText(vl, String(pressVal(vals[i])));
         else setText(vl, temp(vals[i]));
-        var hh = String(h.time[start + i]).substring(11, 13);
-        setText(label(box0, lx, rowY + 12, lw, 8, THEME.faint, "center"), hh);
+        setText(label(box0, lx, rowY + 12, lw, 8, THEME.faint, "center"), String(h.time[start + i]).substring(11, 16));
     }
 }
 

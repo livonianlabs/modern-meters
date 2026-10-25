@@ -84,14 +84,19 @@ function findSmi() {
     return null;
 }
 
+// What old drivers still have when they don't know some of SMI_FIELDS
+var SMI_SENSORS = ["temperature.gpu", "fan.speed", "power.draw", "power.limit"];
+
 // Only one nvidia-smi runs at a time. If it doesn't finish (driver reset, out of memory,
 // "unable to start" dialog) it is killed and the next launch waits longer, up to 5 minutes,
 // so a broken driver never piles up processes.
 var SMI_TIMEOUT = 15000, SMI_MAX_WAIT = 300000;
 
-// c: the card (null when the registry lists none), key: file name prefix, "" for the main card
-function SmiProvider(c, key) {
+// c: the card (null when the registry lists none), key: file name prefix, "" for the main card,
+// fields: what to ask for, SMI_FIELDS unless only a few sensors are wanted
+function SmiProvider(c, key, fields) {
     this.card = c;
+    this.fields = fields || SMI_FIELDS;
     this.out = tempPath(key + "smi.csv");
     this.launched = 0;
     this.wait = SMI_TIMEOUT;
@@ -105,7 +110,7 @@ SmiProvider.prototype.start = function () {
     try { fso.DeleteFile(this.out, true); } catch (e) { }
     // nvidia-smi only has the fan in percent; the D3DKMT reader adds its RPM
     this.kmt = null;
-    if (!this.card) return;
+    if (!this.card || this.fields != SMI_FIELDS) return;
     try {
         if (IS_GADGET) registerDotNet("{8c41d7a2-6f0e-4b9d-b3a5-2e7f19c4d860}", "ModernMeters.GpuReader", "ModernMetersGpu");
         var k = new ActiveXObject("ModernMeters.GpuReader");
@@ -154,15 +159,16 @@ SmiProvider.prototype.launch = function () {
     }
     this.launched = now;
     try {
-        shell.Run("\"" + smiPath + "\" -i " + smiIndex(this.card) + " --query-gpu=" + SMI_FIELDS.join(",") +
+        shell.Run("\"" + smiPath + "\" -i " + smiIndex(this.card) + " --query-gpu=" + this.fields.join(",") +
             " --format=csv,noheader,nounits -f \"" + this.out + "\"", 0, false);
     } catch (e) { }
 };
 
-SmiProvider.prototype.poll = function () {
+// The fields of the latest line by name, or null while there is none
+SmiProvider.prototype.read = function () {
     var text = readFile(this.out);
     var parts = text == null ? [] : trim(text).split(",");
-    var ok = parts.length == SMI_FIELDS.length;
+    var ok = parts.length == this.fields.length;
     if (ok || (text != null && this.launched && new Date().getTime() - this.launched > 2000)) {
         // Finished (good or garbage): consume the file and allow the next launch
         try { fso.DeleteFile(this.out, true); } catch (e2) { }
@@ -173,8 +179,13 @@ SmiProvider.prototype.poll = function () {
     this.launch();
     if (!ok) return null;
     var r = {};
-    for (var i = 0; i < SMI_FIELDS.length; i++) r[SMI_FIELDS[i]] = trim(parts[i]);
+    for (var i = 0; i < this.fields.length; i++) r[this.fields[i]] = trim(parts[i]);
+    return r;
+};
 
+SmiProvider.prototype.poll = function () {
+    var r = this.read();
+    if (!r) return null;
     var fan = num(r["fan.speed"]), rpm = this.fanRpm(), clk = mhz(num(r["clocks.gr"])), mclk = mhz(num(r["clocks.mem"]));
     return {
         name: r.name,
@@ -217,6 +228,9 @@ function CounterProvider(c, key) {
     this.out = tempPath(key + "wmi.txt");
     this.hb = tempPath(key + "alive");
     this.driver = driverVersion(c.name);
+    // Old NVIDIA drivers report no temperature to Windows, but nvidia-smi still has it
+    this.smi = c.vendor == "10DE" && smiPath ? new SmiProvider(c, key + "s_", SMI_SENSORS) : null;
+    this.sensors = null;
 }
 
 function driverVersion(name) {
@@ -238,6 +252,7 @@ CounterProvider.prototype.stop = function () {
         }
     } catch (err) { }
     try { fso.DeleteFile(this.hb, true); } catch (err2) { }
+    if (this.smi) this.smi.stop();
 };
 
 CounterProvider.prototype.touch = function () {
@@ -247,6 +262,7 @@ CounterProvider.prototype.touch = function () {
 CounterProvider.prototype.start = function () {
     this.stop();
     this.touch();
+    if (this.smi) this.smi.start();
     // The helper creates the D3DKMT reader through COM; without it it still has the counters
     if (IS_GADGET) try { registerDotNet("{8c41d7a2-6f0e-4b9d-b3a5-2e7f19c4d860}", "ModernMeters.GpuReader", "ModernMetersGpu"); } catch (e) { }
     var script = IS_GADGET ? System.Gadget.path + "\\gpuhelper.js" :
@@ -269,22 +285,30 @@ CounterProvider.prototype.poll = function () {
         mclk == null ? mhz(clk) + " " + T("MHz") :
         narrow ? mhz(clk) + " / " + mhz(mclk) + " " + T("MHz") :
         mhz(clk) + " " + T("MHz") + "  ·  " + T("mem") + " " + mhz(mclk) + " " + T("MHz");
-    var ded = num(r.vram), shared = num(r.shared), temp = num(r.temp);
+    var ded = num(r.vram), shared = num(r.shared), temp = num(r.temp), power = num(r.power), powerLimit = null;
+    // Without a temperature from Windows, nvidia-smi fills in the sensors (and is only run then)
+    var sm = this.smi && temp == null ? this.smi.read() : null, fromSmi = false;
+    if (sm) this.sensors = sm;
+    if (temp == null && (sm = this.sensors)) {
+        if (temp == null && (temp = num(sm["temperature.gpu"])) != null) fromSmi = true;
+        if (power == null) { power = num(sm["power.draw"]); powerLimit = num(sm["power.limit"]); }
+        if (fan == null && rpm == null) fan = num(sm["fan.speed"]);
+    }
     var gb = function (mb) { return (mb / 1024).toFixed(1); };
     var d = {
         name: this.card.name,
         usage: num(r.usage),
         temp: temp,
-        power: num(r.power),
-        powerLimit: null,
+        power: power,
+        powerLimit: powerLimit,
         powerPct: num(r.powerpct),
         fan: fan,
         fanText: rpm != null && rpm == 0 && fan != null ? T("stopped") :
-            rpm != null ? fanRpmText(rpm) : (fan == null ? T("na") : ""),
+            rpm != null ? fanRpmText(rpm) : (fan == null ? T("na") : (fan == 0 ? T("stopped") : "")),
         sub: sub,
         enc: num(r.enc),
         dec: num(r.dec),
-        link: temp == null ? T("noSensors") : T(r.lhm && !r.kmt ? "lhm" : "winSensors"),
+        link: temp == null ? T("noSensors") : fromSmi ? "t°: nvidia-smi" : T(r.lhm && !r.kmt ? "lhm" : "winSensors"),
         footer: T("driver") + " " + this.driver + (narrow ? "" : "  ·  " + T("counters"))
     };
     var sharedLabel = T(narrow ? "sharedShort" : "shared");

@@ -34,7 +34,33 @@ function listDisks() {
             });
         }
     } catch (err) { }
+    if (!out.length) out = listDiskDrives();
     out.sort(function (a, b) { return a.num - b.num; });
+    return out;
+}
+
+// Where the Storage provider doesn't answer: the classic disk list, without the media type and
+// with SMART's own verdict as the health ("OK", "Pred Fail")
+function listDiskDrives() {
+    var out = [];
+    try {
+        var wmi = new ActiveXObject("WbemScripting.SWbemLocator").ConnectServer(".", "root\\cimv2");
+        var e = new Enumerator(wmi.ExecQuery("SELECT Index, Model, InterfaceType, Status, Size FROM Win32_DiskDrive"));
+        for (; !e.atEnd(); e.moveNext()) {
+            var d = e.item(), model = String(d.Model || "Disk " + d.Index), size = parseFloat(d.Size) || 0;
+            var st = String(d.Status || "");
+            out.push({
+                num: parseInt(d.Index, 10),
+                model: model,
+                name: diskName(model, size),
+                media: null,
+                bus: /USB/i.test(String(d.InterfaceType)) ? 7 : null,
+                health: st == "OK" ? 0 : (/Pred Fail/i.test(st) ? 2 : (st ? 1 : null)),
+                size: size,
+                key: "disk_" + model.replace(/[^A-Za-z0-9]+/g, "_")
+            });
+        }
+    } catch (err) { }
     return out;
 }
 

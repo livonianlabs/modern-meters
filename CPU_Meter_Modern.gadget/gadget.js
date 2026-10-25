@@ -401,7 +401,8 @@ function tick() {
         bootTime.getHours() + ":" + pad2(bootTime.getMinutes()));
     var maxT = null;
     if (d.temps) for (var i = 0; i < d.temps.length; i++) if (d.temps[i] != null && (maxT == null || d.temps[i] > maxT)) maxT = d.temps[i];
-    setText(ui.temp, maxT == null ? T("ctOff") : fmtTemp(maxT, unit) + unit);
+    // Without Core Temp the note on the graph says so, and "Core Temp off" would run into the uptime
+    setText(ui.temp, maxT == null ? (ui.ctNote ? "" : T("ctOff")) : fmtTemp(maxT, unit) + unit);
     setHint(ui.temp, T("ctStart"), maxT == null ? startCoreTemp : null);
     if (ui.ctNote) ui.ctNote.style.display = maxT == null ? "" : "none";
     setColor(ui.temp, maxT == null ? THEME.faint : tempColor(maxT));
