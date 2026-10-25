@@ -80,7 +80,7 @@ addLanguage("tr", "Türkçe", {
     "Sound": "Ses", "Alarm %d": "Alarm %d", "Ring %d": "Zil %d", "Critical stop": "Kritik hata",
     "Exclamation": "Ünlem", "Battery critical": "Pil kritik", "Volume": "Ses düzeyi", "Repeat": "Tekrar",
     "Once": "Bir kez", "Until silenced": "Susturulana kadar", "Play": "Çal",
-    "About": "Hakkında", "Version": "Sürüm", "New versions": "Yeni sürümler", "Let me know": "Bildir",
+    "About": "Hakkında", "Version": "Sürüm", "New versions": "Yeni sürümler", "Let me know": "Bildir", "Install by themselves": "Kendileri kursun",
     "Don't check": "Denetleme", "Made by": "Yapımcı", "Feedback": "Geri bildirim", "✉ Write to us": "✉ Bize yazın", "Graph history": "Grafik geçmişi", "Short (by refresh)": "Kısa (yenilemeye göre)", "%d min": "%d dk", "1 hour": "1 saat", "Busiest program": "En yoğun program", "All graphics cards": "Tüm ekran kartları", "Lens glass": "Mercek cam", "Sky glass": "Gök cam", "Carbon": "Karbon", "Rainbow": "Gökkuşağı", "Like them?": "Beğendiniz mi?", "☕ Buy me a coffee": "☕ Bana bir kahve ısmarla",
     "Live zone": "Canlı bölge", "Per-core list": "Liste", "All threads": "Tüm iş parçacıkları", "Cores (P/E)": "Çekirdekler (P/E)",
     "RAM / Commit": "RAM / Ayrılan",

@@ -77,7 +77,7 @@ Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your acce
 3. Right-click the desktop → **Gadgets**, and drag the gadget onto the desktop.
 4. Settings: hover over the gadget and click the wrench icon.
 
-When a new version is out, a blinking **↑ x.y.z** appears in the gadget's corner. Click it, and the gadgets download the release from GitHub, install it over themselves (all Modern Meters gadgets at once) and restart; a spinner on the badge shows how far it got, and a green **✓** the new version once they restarted. Nothing is installed without that click. You can also install the new `.gadget` files over the old ones by hand. Coming from 1.1.0 or older, restart the Sidebar once afterwards (right-click its tray icon → Exit, then start it again).
+When a new version is out, a blinking **↑ x.y.z** appears in the gadget's corner. Click it, and the gadgets download the release from GitHub, install it over themselves (all Modern Meters gadgets at once) and restart; a spinner on the badge shows how far it got, and a green **✓** the new version once they restarted. Nothing is installed without that click, unless you set Settings → **About** → **New versions** → **Install by themselves**: then the gadgets install a new version as soon as they find it. You can also install the new `.gadget` files over the old ones by hand. Coming from 1.1.0 or older, restart the Sidebar once afterwards (right-click its tray icon → Exit, then start it again).
 
 ## If a gadget shows nothing
 
@@ -103,7 +103,7 @@ Everything works without them. They add data that Windows only gives to drivers 
 - Network Meter looks up your external IP at api.ipify.org every 30 minutes and when the network changes. You can switch this off in its settings.
 - Weather Meter gets the forecast from [Open-Meteo](https://open-meteo.com/) every 30 minutes. In Auto mode it asks the Windows location service where you are (Settings → Privacy → Location; if that's off, it uses your IP address via get.geojs.io) and gets the place name from OpenStreetMap. Coordinates are rounded to about 1 km before they leave your PC. Pick a city by clicking the place name to turn all of this off. The radar map loads its tiles from Esri (map) and RainViewer (rain), only while its tab is open; the tab can be turned off in the settings.
 - Core Temp is downloaded from alcpu.com only when you ask for it (on the gadget or in the installer).
-- Once a day one of the gadgets asks GitHub whether a newer release exists. If so, a small "↑ 1.x.x" badge appears in the top right corner of the gadgets and opens the release page when clicked. Nothing is downloaded or installed by itself. Settings → **About** → **New versions** → **Don't check** turns this off.
+- Once a day one of the gadgets asks GitHub whether a newer release exists. If so, a small "↑ 1.x.x" badge appears in the top right corner of the gadgets; clicking it downloads and installs the release from GitHub. Nothing is downloaded or installed by itself unless you pick **Install by themselves** under Settings → **About** → **New versions**; **Don't check** there turns the check off.
 
 ## Building from source
 
@@ -176,7 +176,7 @@ Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel
 3. Правый клик по рабочему столу → **Гаджеты**, перетащите гаджет на рабочий стол.
 4. Настройки: наведите мышь на гаджет и нажмите на значок гаечного ключа.
 
-Когда выходит новая версия, в углу гаджета мигает **↑ x.y.z**. Нажмите на него, и гаджеты скачают выпуск с GitHub, установят его поверх себя (сразу все гаджеты Modern Meters) и перезапустятся; пока это идёт, на значке крутится индикатор с прогрессом, а после перезапуска на несколько секунд появляется зелёная **✓** с новой версией. Без этого клика ничего не устанавливается. Можно и вручную установить новые `.gadget`-файлы поверх старых. При обновлении с 1.1.0 и старше после этого один раз перезапустите боковую панель (правый клик по её значку в трее → Выход, затем запустите снова).
+Когда выходит новая версия, в углу гаджета мигает **↑ x.y.z**. Нажмите на него, и гаджеты скачают выпуск с GitHub, установят его поверх себя (сразу все гаджеты Modern Meters) и перезапустятся; пока это идёт, на значке крутится индикатор с прогрессом, а после перезапуска на несколько секунд появляется зелёная **✓** с новой версией. Без этого клика ничего не устанавливается — если только не выбрать в настройках **О гаджете** → **Новые версии** → **Устанавливать сами**: тогда гаджеты ставят новую версию сами, как только её найдут. Можно и вручную установить новые `.gadget`-файлы поверх старых. При обновлении с 1.1.0 и старше после этого один раз перезапустите боковую панель (правый клик по её значку в трее → Выход, затем запустите снова).
 
 ## Если гаджет ничего не показывает
 
@@ -202,7 +202,7 @@ Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel
 - Network Meter узнаёт внешний IP у api.ipify.org раз в 30 минут и при смене сети. Это отключается в его настройках.
 - Weather Meter раз в 30 минут берёт прогноз у [Open-Meteo](https://open-meteo.com/). В режиме «Авто» он спрашивает у службы местоположения Windows, где вы (Параметры → Конфиденциальность → Расположение; если она выключена — определяет по IP через get.geojs.io), а название места берёт у OpenStreetMap. Координаты перед отправкой округляются примерно до 1 км. Если выбрать город кликом по названию места, всё это отключается. Радарная карта загружает плитки у Esri (карта) и RainViewer (осадки), только пока открыта её вкладка; вкладку можно выключить в настройках.
 - Core Temp скачивается с alcpu.com, только когда вы сами попросите (на гаджете или в установщике).
-- Раз в сутки один из гаджетов спрашивает у GitHub, не вышла ли новая версия. Если вышла, в правом верхнем углу гаджетов появляется маленький значок «↑ 1.x.x», клик по нему открывает страницу выпуска. Сами гаджеты ничего не скачивают и не устанавливают. Отключается в настройках: **О гаджете** → **Новые версии** → **Не проверять**.
+- Раз в сутки один из гаджетов спрашивает у GitHub, не вышла ли новая версия. Если вышла, в правом верхнем углу гаджетов появляется маленький значок «↑ 1.x.x»; клик по нему скачивает и устанавливает её с GitHub. Сами гаджеты ничего не скачивают и не устанавливают, если не выбрать **Устанавливать сами** в настройках **О гаджете** → **Новые версии**; там же **Не проверять** отключает проверку.
 
 ## Сборка из исходников
 

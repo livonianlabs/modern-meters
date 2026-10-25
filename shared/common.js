@@ -1594,7 +1594,7 @@ function cimDate(s) {
 // %APPDATA%\ModernMeters\update.txt, where the others pick it up. A newer version shows a badge;
 // only a click on it downloads the release and installs it (update.ps1).
 
-var VERSION = "1.9.3";   // set by build.ps1
+var VERSION = "1.9.4";   // set by build.ps1
 var REPO = "livonianlabs/modern-meters";
 var KOFI_URL = "https://ko-fi.com/silverenio";
 var MAKER = "Livonian Labs", MAIL = "livonianlabs@gmail.com";
@@ -1936,6 +1936,9 @@ function watchUpdates(onChange) {
         // A new version was installed over this one (by a badge click or by hand)
         if (codeSettled() || setupFinished()) { location.reload(); return; }
         var s = updateAvailable(), st = s ? stateKey(installState(s.latest)) : "";
+        // "Install by themselves": as if the badge were clicked, once per version (a failed try
+        // isn't repeated; the badge then offers the release page)
+        if (s && st == "" && getSetting("updates") == "auto") { installUpdate(s.latest); st = stateKey(installState(s.latest)); }
         if (adoptStyle()) onChange();
         else if (st != updates.state && !redrawBadge()) onChange();
     }, STYLE_POLL);

@@ -80,7 +80,7 @@ addLanguage("it", "Italiano", {
     "Sound": "Suono", "Alarm %d": "Allarme %d", "Ring %d": "Squillo %d", "Critical stop": "Errore critico",
     "Exclamation": "Esclamazione", "Battery critical": "Batteria critica", "Volume": "Volume", "Repeat": "Ripeti",
     "Once": "Una volta", "Until silenced": "Finché silenziato", "Play": "Ascolta",
-    "About": "Informazioni", "Version": "Versione", "New versions": "Nuove versioni", "Let me know": "Avvisami",
+    "About": "Informazioni", "Version": "Versione", "New versions": "Nuove versioni", "Let me know": "Avvisami", "Install by themselves": "Installare da soli",
     "Don't check": "Non controllare", "Made by": "Autore", "Feedback": "Contatti", "✉ Write to us": "✉ Scrivici", "Graph history": "Cronologia grafico", "Short (by refresh)": "Breve (per aggiornamento)", "%d min": "%d min", "1 hour": "1 ora", "Busiest program": "Programma più attivo", "All graphics cards": "Tutte le schede video", "Lens glass": "Vetro lente", "Sky glass": "Vetro cielo", "Carbon": "Carbonio", "Rainbow": "Arcobaleno", "Like them?": "Ti piacciono?", "☕ Buy me a coffee": "☕ Offrimi un caffè",
     "Live zone": "Zona live", "Per-core list": "Elenco", "All threads": "Tutti i thread", "Cores (P/E)": "Core (P/E)",
     "RAM / Commit": "RAM / Impegnata",

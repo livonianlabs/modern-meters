@@ -80,7 +80,7 @@ addLanguage("pl", "Polski", {
     "Sound": "Dźwięk", "Alarm %d": "Alarm %d", "Ring %d": "Dzwonek %d", "Critical stop": "Błąd krytyczny",
     "Exclamation": "Wykrzyknik", "Battery critical": "Bateria krytyczna", "Volume": "Głośność", "Repeat": "Powtarzanie",
     "Once": "Raz", "Until silenced": "Do wyciszenia", "Play": "Odtwórz",
-    "About": "O gadżecie", "Version": "Wersja", "New versions": "Nowe wersje", "Let me know": "Powiadamiaj",
+    "About": "O gadżecie", "Version": "Wersja", "New versions": "Nowe wersje", "Let me know": "Powiadamiaj", "Install by themselves": "Instaluj same",
     "Don't check": "Nie sprawdzaj", "Made by": "Autor", "Feedback": "Kontakt", "✉ Write to us": "✉ Napisz do nas", "Graph history": "Historia wykresu", "Short (by refresh)": "Krótka (co odświeżenie)", "%d min": "%d min", "1 hour": "1 godz.", "Busiest program": "Najaktywniejszy program", "All graphics cards": "Wszystkie karty graficzne", "Lens glass": "Szkło soczewka", "Sky glass": "Szkło niebo", "Carbon": "Karbon", "Rainbow": "Tęcza", "Like them?": "Podobają się?", "☕ Buy me a coffee": "☕ Postaw mi kawę",
     "Live zone": "Strefa na żywo", "Per-core list": "Lista", "All threads": "Wszystkie wątki", "Cores (P/E)": "Rdzenie (P/E)",
     "RAM / Commit": "RAM / Zadeklarowana",

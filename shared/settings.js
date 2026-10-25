@@ -110,6 +110,7 @@ function aboutRows() {
         // A badge on the gadget; the release is installed only when it is clicked
         { key: "updates", label: { en: "New versions", ru: "Новые версии" }, options: [
             ["on", { en: "Let me know", ru: "Сообщать" }],
+            ["auto", { en: "Install by themselves", ru: "Устанавливать сами" }],
             ["off", { en: "Don't check", ru: "Не проверять" }]] },
         { label: { en: "Made by", ru: "Автор" }, info: function () { return MAKER; } },
         { label: { en: "Feedback", ru: "Связаться" }, buttons: [
