@@ -68,8 +68,6 @@ function init() {
     shell = new ActiveXObject("WScript.Shell");
     fso = new ActiveXObject("Scripting.FileSystemObject");
     wmi = new ActiveXObject("WbemScripting.SWbemLocator").ConnectServer(".", "root\\cimv2");
-    refresher = new ActiveXObject("WbemScripting.SWbemRefresher");
-    netSet = refresher.AddEnum(wmi, "Win32_PerfRawData_Tcpip_NetworkInterface").ObjectSet;
     totals = loadTotals();
     hookSettings(rebuild);
     watchUpdates(rebuild);
@@ -170,6 +168,13 @@ function readSecurity(a) {
 
 // Returns {down, up, link} in bytes per second / bits per second, or null on the first sample
 function sampleSpeed() {
+    // Opened here, not at startup: with broken performance counters AddEnum throws, and the
+    // gadget should still show up, report it and try again on the next tick
+    if (!refresher) {
+        var r = new ActiveXObject("WbemScripting.SWbemRefresher");
+        netSet = r.AddEnum(wmi, "Win32_PerfRawData_Tcpip_NetworkInterface").ObjectSet;
+        refresher = r;
+    }
     refresher.Refresh();
     var item = null;
     if (adapter) {

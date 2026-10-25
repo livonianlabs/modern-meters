@@ -62,12 +62,17 @@ function probe() {
     var b = /^(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/.exec(String(e.item().LastBootUpTime || ""));
     if (b) bootTime = new Date(+b[1], b[2] - 1, +b[3], +b[4], +b[5], +b[6]);
 
-    refresher = new ActiveXObject("WbemScripting.SWbemRefresher");
-    cpuSet = refresher.AddEnum(wmi, "Win32_PerfFormattedData_Counters_ProcessorInformation").ObjectSet;
-    memObj = refresher.Add(wmi, "Win32_PerfFormattedData_PerfOS_Memory=@").Object;
-    refresher.Refresh();
-
     coreTemp = openCoreTemp();
+}
+
+// Opened on the first sample, not at startup: with broken performance counters AddEnum throws,
+// and the gadget should still show up, report it and try again on the next tick
+function openCounters() {
+    var r = new ActiveXObject("WbemScripting.SWbemRefresher");
+    cpuSet = r.AddEnum(wmi, "Win32_PerfFormattedData_Counters_ProcessorInformation").ObjectSet;
+    memObj = r.Add(wmi, "Win32_PerfFormattedData_PerfOS_Memory=@").Object;
+    r.Refresh();
+    refresher = r;
 }
 
 // Logical processors are enumerated with SMT siblings first (P-cores on Intel hybrid),
@@ -121,6 +126,7 @@ function cellGroups(pairRows) {
 }
 
 function sample() {
+    if (!refresher) openCounters();
     refresher.Refresh();
     var threads = [], total = 0, clock = baseMHz;
     for (var e = new Enumerator(cpuSet); !e.atEnd(); e.moveNext()) {

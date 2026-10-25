@@ -95,6 +95,9 @@ function SmiProvider(c, key) {
     this.out = tempPath(key + "smi.csv");
     this.launched = 0;
     this.wait = SMI_TIMEOUT;
+    this.bad = 0;       // runs in a row without a usable line
+    this.noUsage = 0;   // lines in a row without the GPU load
+    this.everOk = false;
 }
 
 SmiProvider.prototype.start = function () {
@@ -141,8 +144,11 @@ SmiProvider.prototype.kill = function () {
 SmiProvider.prototype.launch = function () {
     var now = new Date().getTime();
     if (this.launched) {
-        if (now - this.launched < this.wait) return;
+        // An unknown field makes nvidia-smi quit without writing anything, so until it has worked
+        // once a silent run is given up on sooner
+        if (now - this.launched < (this.everOk ? this.wait : Math.min(this.wait, 6000))) return;
         // Previous run never produced output
+        this.bad++;
         this.kill();
         this.wait = Math.min(this.wait * 2, SMI_MAX_WAIT);
     }
@@ -161,7 +167,8 @@ SmiProvider.prototype.poll = function () {
         // Finished (good or garbage): consume the file and allow the next launch
         try { fso.DeleteFile(this.out, true); } catch (e2) { }
         this.launched = 0;
-        if (ok) this.wait = SMI_TIMEOUT;
+        if (ok) { this.wait = SMI_TIMEOUT; this.everOk = true; }
+        this.bad = ok ? 0 : this.bad + 1;
     }
     this.launch();
     if (!ok) return null;
@@ -294,6 +301,21 @@ CounterProvider.prototype.poll = function () {
     }
     return d;
 };
+
+// On Auto, a card nvidia-smi can't read moves to the Windows counters: an old driver may not
+// know a field we ask for and answer nothing, and older mobile cards don't report their load.
+SmiProvider.prototype.failing = function (d) {
+    if (d) this.noUsage = d.usage == null ? this.noUsage + 1 : 0;
+    return this.bad >= (this.everOk ? 2 : 1) || this.noUsage >= 3;
+};
+
+function fallBack(p, c, key, d) {
+    if (source != "auto" || !c || !(p instanceof SmiProvider) || !p.failing(d)) return null;
+    p.stop();
+    var q = new CounterProvider(c, key);
+    q.start();
+    return q;
+}
 
 // key: temp file prefix, "" for the main card. Forcing nvidia-smi leaves the other vendors' extra
 // cards on the counters.
@@ -587,8 +609,10 @@ function tick() {
 }
 
 function tickMain() {
-    var d;
+    var d, q;
     try { d = provider.poll(); } catch (e) { reportError(ui.sub, "poll", e); return; }
+    try { q = fallBack(provider, card, "", d); } catch (e3) { reportError(ui.sub, "start", e3); }
+    if (q) { provider = q; misses = 0; return; }
     if (!d) {
         if (++misses == 5) {
             setText(ui.sub, T("nodata"));
@@ -645,8 +669,10 @@ function tickMain() {
 }
 
 function tickExtra(x) {
-    var d, u = x.ui;
+    var d, q, u = x.ui;
     try { d = x.provider.poll(); } catch (e) { reportError(u.sub, "poll", e); return; }
+    try { q = fallBack(x.provider, x.card, "x" + x.card.index + "_", d); } catch (e3) { reportError(u.sub, "start", e3); }
+    if (q) { x.provider = q; x.misses = 0; return; }
     if (!d) {
         if (++x.misses == 5) {
             setText(u.sub, T("nodata"));

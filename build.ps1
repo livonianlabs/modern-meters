@@ -4,7 +4,7 @@
 # compares it with the latest GitHub release.
 param([switch]$Install)
 $ErrorActionPreference = 'Stop'
-$Version = '1.8.1'
+$Version = '1.8.2'
 $root = $PSScriptRoot
 $names = 'CPU_Meter_Modern.gadget', 'GPU_Meter_Modern.gadget', 'Network_Meter_Modern.gadget', 'Drives_Meter_Modern.gadget', 'Weather_Meter_Modern.gadget'
 $utf8 = New-Object System.Text.UTF8Encoding $false

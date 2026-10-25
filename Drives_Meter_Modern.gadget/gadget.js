@@ -46,8 +46,6 @@ var hw = null, hwRetry = 0, smart = {}, nextSmart = 0, lastVols = {};
 
 function init() {
     wmi = new ActiveXObject("WbemScripting.SWbemLocator").ConnectServer(".", "root\\cimv2");
-    refresher = new ActiveXObject("WbemScripting.SWbemRefresher");
-    perfSet = refresher.AddEnum(wmi, "Win32_PerfFormattedData_PerfDisk_PhysicalDisk").ObjectSet;
     hookSettings(rebuild);
     watchUpdates(rebuild);
     rebuild();
@@ -60,10 +58,23 @@ function shutdown() {
 
 // ---- data -----------------------------------------------------------------
 
-// Counter instances by disk number: { num: {name, letters[], item} }
+// Counter instances by disk number: { num: {name, letters[], item} }. With broken performance
+// counters there are none: the drives still show with their space, without activity, and the
+// counters are tried again on every tick.
 function readPerf() {
-    refresher.Refresh();
-    var out = {}, e = new Enumerator(perfSet);
+    var out = {}, e;
+    try {
+        if (!refresher) {
+            var r = new ActiveXObject("WbemScripting.SWbemRefresher");
+            perfSet = r.AddEnum(wmi, "Win32_PerfFormattedData_PerfDisk_PhysicalDisk").ObjectSet;
+            refresher = r;
+        }
+        refresher.Refresh();
+        e = new Enumerator(perfSet);
+    } catch (err) {
+        refresher = null;
+        return out;
+    }
     for (; !e.atEnd(); e.moveNext()) {
         var it = e.item(), name = String(it.Name), m = /^(\d+)\s*(.*)$/.exec(name);
         if (!m) continue;
