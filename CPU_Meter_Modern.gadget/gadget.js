@@ -216,7 +216,8 @@ function rebuild() {
     ui.alarm = new Alarm(root, W - PAD - 50, y);
     y += 22;
 
-    if (graphH > 0) {
+    // The graph goes under the name, or at the very bottom in a style that wants it there
+    var drawGraph = function (y) {
         var ax = axisWidth();
         ui.graph = new LiveGraph(root, PAD + ax, y, IW - ax, graphH, [{ color: accent, area: true }], live);
         var g = ui.graph.hist;
@@ -229,8 +230,9 @@ function rebuild() {
         setText(ui.ctNote, T("ctNotRunning"));
         setHint(ui.ctNote, T("ctStart"), startCoreTemp);
         ui.ctNote.style.display = "none";
-        y += graphH + 10;
-    }
+        return y + graphH + 10;
+    };
+    if (graphH > 0 && !THEME.graphBottom) y = drawGraph(y);
     if (showTop) {
         ui.top = new TopRow(root, y - 4);
         topNext = 0;
@@ -264,7 +266,8 @@ function rebuild() {
     var lw = 24, pw = 32, tw = coreTemp ? 26 : 0;
     var bw = cw - lw - 6 - pw - tw;
     // Glass: half of the bar's room goes to a sparkline of that core after the percentage
-    var sw = THEME.glass ? Math.round(bw / 2) : 0;
+    // (not with the graph at the bottom: that style keeps to long bars)
+    var sw = THEME.glass && !THEME.graphBottom ? Math.round(bw / 2) : 0;
     if (sw) bw -= sw + 4;
     // Room for four whole blocks in Windows classic, taken from the sparkline
     if (sw && segmentWidth(bw, 4) > bw && sw - (segmentWidth(bw, 4) - bw) >= 16) {
@@ -296,6 +299,10 @@ function rebuild() {
         }
     }
     y += 8;
+    if (graphH > 0 && THEME.graphBottom) {
+        rect(root, PAD, y - 4, IW, 1, THEME.sep);
+        y = drawGraph(y + 4) - 2;
+    }
 
     updateBadge(root);
     paintFrame(W, y);
@@ -383,7 +390,11 @@ function showMeter(r, used, total) {
 
 function tick() {
     var d;
-    try { d = sample(); } catch (e) { reportError(ui.sub, "WMI", e); return; }
+    try { d = sample(); } catch (e) {
+        if (perfCountersBroken()) counterRepairLink(ui.sub);
+        else reportError(ui.sub, "WMI", e);
+        return;
+    }
 
     setText(ui.total, Math.round(d.total) + "%");
     setColor(ui.total, pctColor(d.total));
@@ -405,6 +416,7 @@ function tick() {
     setText(ui.temp, maxT == null ? (ui.ctNote ? "" : T("ctOff")) : fmtTemp(maxT, unit) + unit);
     setHint(ui.temp, T("ctStart"), maxT == null ? startCoreTemp : null);
     if (ui.ctNote) ui.ctNote.style.display = maxT == null ? "" : "none";
+    if (maxT == null) showCoreTempNote();
     setColor(ui.temp, maxT == null ? THEME.faint : tempColor(maxT));
     ui.alarm.update(maxT);
     if (ui.graph) ui.graph.push([d.total]);

@@ -482,7 +482,8 @@ function rebuild() {
         y += 28;
     }
 
-    if (graphH > 0) {
+    // The graph goes under the speeds, or at the very bottom in a style that wants it there
+    var drawGraph = function (y) {
         ui.graph = new LiveGraph(root, PAD, y, IW, graphH, [
             { color: accent, area: true },
             { color: upColor, area: false }
@@ -492,8 +493,9 @@ function rebuild() {
         g.span = historySpan(g.w, interval);
         restoreGraph("net", g);
         g.tip(interval, ["↓", "↑"], function (s, v) { return fmtRate(v); });
-        y += graphH + 8;
-    }
+        return y + graphH + 8;
+    };
+    if (graphH > 0 && !THEME.graphBottom) y = drawGraph(y);
 
     rect(root, PAD, y, IW, 1, THEME.sep);
     y += 7;
@@ -546,6 +548,10 @@ function rebuild() {
         };
         y += 18;
     }
+    if (graphH > 0 && THEME.graphBottom) {
+        rect(root, PAD, y + 2, IW, 1, THEME.sep);
+        y = drawGraph(y + 9) - 6;
+    }
 
     updateBadge(root);
     paintFrame(W, y + 6);
@@ -572,7 +578,8 @@ function tick() {
             nextSave = now() + 60000;
         }
     } catch (e) {
-        reportError(ui.ssid, "tick", e);
+        if (perfCountersBroken()) counterRepairLink(ui.ssid);
+        else reportError(ui.ssid, "tick", e);
         return;
     }
     ui.alarm.update(misses >= 2 ? 1 : 0);

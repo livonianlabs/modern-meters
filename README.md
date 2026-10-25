@@ -2,7 +2,7 @@
 
 [![Download the latest release](https://img.shields.io/github/v/release/livonianlabs/modern-meters?label=%E2%AC%87%20Download&style=for-the-badge&color=2ea043)](https://github.com/livonianlabs/modern-meters/releases/latest)
 
-**To install, download the `.gadget` files under _Assets_ on the [latest release](https://github.com/livonianlabs/modern-meters/releases/latest)** and double-click them. The green _Code → Download ZIP_ button gives the source code, not the gadgets. [По-русски ↓](#modern-meters-по-русски)
+**To install, download `Install-ModernMeters.cmd` under _Assets_ on the [latest release](https://github.com/livonianlabs/modern-meters/releases/latest) and double-click it**, or download the `.gadget` files there and double-click them (see [Install](#install)). The green _Code → Download ZIP_ button gives the source code, not the gadgets. [По-русски ↓](#modern-meters-по-русски)
 
 [![Support us on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/silverenio)
 
@@ -18,7 +18,7 @@ Five desktop gadgets for the Windows Sidebar from 8GadgetPack:
 
 The CPU and GPU gadgets show the maker (NVIDIA, AMD, Intel, Qualcomm) beside their title. Hover over a graph to see the value at that moment and its lowest, average and highest; **Graph history** makes a graph cover 5 or 15 minutes or an hour instead of the last minute or two. All of them speak 13 languages (English, Українська, Русский, Deutsch, Español, Français, Italiano, Latviešu, Polski, Português, Türkçe, 中文, 日本語) and pick yours from Windows, and have five widths, accent colors, and a five-step color scale for load and temperature. Translations live in `shared/lang/`, one file per language; corrections are welcome.
 
-Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your accent color: blue, teal, green, purple, orange, pink, red or yellow), **Retro terminal** (a CRT screen with scanlines in your accent color, whose cursor now and then retypes the title), three more terminals (**black and white**, **blue commander** after the old DOS file managers, and **aubergine** after the Ubuntu terminal), **Gray 90s** (gray Windows 95/98-style windows with a navy title bar and block progress bars), **Sky glass** and **Lens glass**, and **Auto**, which switches between Light and Glass with Windows' light/dark mode. Sky glass and Lens glass are frosted glass, inspired by Windows 7's Aero and Apple's Liquid Glass: the gadget shows your wallpaper under it, blurred, through blue glass or through light or dark glass (picked by how bright the wallpaper is, or as you set it), with **Glass frosting** setting how much; Lens glass bends the picture along its edges like a thick lens. They redraw themselves when you move a gadget or change the wallpaper. Panels for the colored styles are drawn once on your PC the first time they're needed. Set **For all gadgets** in any gadget's settings to give every gadget the same style and language (and, if you like, accent color) in one go.
+Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your accent color: blue, teal, green, purple, orange, pink, red or yellow), **Retro terminal** (a CRT screen with scanlines in your accent color, whose cursor now and then retypes the title), three more terminals (**black and white**, **blue commander** after the old DOS file managers, and **aubergine** after the Ubuntu terminal), **Gray 90s** (gray Windows 95/98-style windows with a navy title bar and block progress bars), **Sky glass** and **Lens glass**, **Carbon** (graphite with a fine carbon weave, glossy bars and a black graph with a green grid, after the desktop meters of the early 2010s such as AddGadgets' All CPU Meter), **Rainbow** (Carbon laid out as those meters were: every row in its own color, label, values and bar alike, running along the rainbow from row to row, long bars and one graph at the very bottom), and **Auto**, which switches between Light and Glass with Windows' light/dark mode. Sky glass and Lens glass are frosted glass, inspired by Windows 7's Aero and Apple's Liquid Glass: the gadget shows your wallpaper under it, blurred, through blue glass or through light or dark glass (picked by how bright the wallpaper is, or as you set it), with **Glass frosting** setting how much; Lens glass bends the picture along its edges like a thick lens. They redraw themselves when you move a gadget or change the wallpaper. Panels for the colored styles are drawn once on your PC the first time they're needed. Set **For all gadgets** in any gadget's settings to give every gadget the same style and language (and, if you like, accent color) in one go.
 
 <img src="docs/themes.png" width="660" alt="Light, colored glass and retro terminal styles">
 
@@ -36,6 +36,26 @@ Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your acce
 <td><img src="docs/weather-glass.png" width="160" alt="Weather Meter, glass"></td>
 </tr></table>
 
+### Carbon style
+
+<table><tr valign="top">
+<td><img src="docs/cpu-carbon.png" width="160" alt="CPU Meter, carbon"></td>
+<td><img src="docs/gpu-carbon.png" width="160" alt="GPU Meter, carbon"></td>
+<td><img src="docs/network-carbon.png" width="160" alt="Network Meter, carbon"></td>
+<td><img src="docs/drives-carbon.png" width="160" alt="Drives Meter, carbon"></td>
+<td><img src="docs/weather-carbon.png" width="160" alt="Weather Meter, carbon"></td>
+</tr></table>
+
+### Rainbow style
+
+<table><tr valign="top">
+<td><img src="docs/cpu-rainbow.png" width="160" alt="CPU Meter, rainbow"></td>
+<td><img src="docs/gpu-rainbow.png" width="160" alt="GPU Meter, rainbow"></td>
+<td><img src="docs/network-rainbow.png" width="160" alt="Network Meter, rainbow"></td>
+<td><img src="docs/drives-rainbow.png" width="160" alt="Drives Meter, rainbow"></td>
+<td><img src="docs/weather-rainbow.png" width="160" alt="Weather Meter, rainbow"></td>
+</tr></table>
+
 ### Classic style
 
 <table><tr valign="top">
@@ -48,12 +68,21 @@ Styles: **Glass**, **Classic**, **Light**, **Colored glass** (glass in your acce
 
 ## Install
 
+**With the installer** (easiest): download `Install-ModernMeters.cmd` from [Releases](https://github.com/livonianlabs/modern-meters/releases/latest) and double-click it. It checks that [8GadgetPack](https://8gadgetpack.net/) is there (and offers its site if not), installs or updates all five gadgets from the latest release, repairs the Windows performance counters if they are broken, offers to set up [Core Temp](https://www.alcpu.com/CoreTemp/) for CPU temperatures, and opens the gadget gallery. Each step that needs administrator rights asks first. The file isn't signed, so Windows may say it "protected your PC": click **More info** → **Run anyway**.
+
+**By hand**:
+
 1. Install [8GadgetPack](https://8gadgetpack.net/) if you don't have the Sidebar yet.
-2. Download the `.gadget` files from [Releases](https://github.com/livonianlabs/modern-meters/releases/latest) and double-click each one you want. You don't need all five.
+2. Download the `.gadget` files from [Releases](https://github.com/livonianlabs/modern-meters/releases/latest) and double-click each one you want. You don't need all five. Windows says it can't verify the publisher, because the gadgets aren't signed: click **Install**.
 3. Right-click the desktop → **Gadgets**, and drag the gadget onto the desktop.
 4. Settings: hover over the gadget and click the wrench icon.
 
-When a new version is out, a blinking **↑ x.y.z** appears in the gadget's corner. Click it, and the gadgets download the release from GitHub, install it over themselves (all Modern Meters gadgets at once) and restart; nothing is installed without that click. You can also install the new `.gadget` files over the old ones by hand. Coming from 1.1.0 or older, restart the Sidebar once afterwards (right-click its tray icon → Exit, then start it again).
+When a new version is out, a blinking **↑ x.y.z** appears in the gadget's corner. Click it, and the gadgets download the release from GitHub, install it over themselves (all Modern Meters gadgets at once) and restart; a spinner on the badge shows how far it got, and a green **✓** the new version once they restarted. Nothing is installed without that click. You can also install the new `.gadget` files over the old ones by hand. Coming from 1.1.0 or older, restart the Sidebar once afterwards (right-click its tray icon → Exit, then start it again).
+
+## If a gadget shows nothing
+
+- **"Windows counters are broken: repair ›"** (or a gadget that stays blank): the Windows performance counters that CPU, Drives, Network and GPU read are damaged, usually by a failed update or a registry cleaner. Click the line and approve the administrator prompt: it rebuilds them (`lodctr /R`, `winmgmt /resyncperf`) and the gadgets restart. The installer does the same.
+- **GPU Meter says "no data" on an older NVIDIA card**: it switches to the Windows counters by itself within seconds, and still takes the temperature from nvidia-smi when Windows doesn't report it.
 
 ## Fitting them on the screen
 
@@ -65,7 +94,7 @@ Everything works without them. They add data that Windows only gives to drivers 
 
 | For | What to do |
 |---|---|
-| CPU temperature | Install [Core Temp](https://www.alcpu.com/CoreTemp/) and keep it running (it can start with Windows). Clicking "Core Temp off" on the gadget starts it, or opens the download page if it isn't installed. |
+| CPU temperature | [Core Temp](https://www.alcpu.com/CoreTemp/), a free program by Arthur Liberman. If it isn't there, click "Core Temp not running ›" on the gadget twice: after the administrator prompt it downloads the standalone Core Temp from alcpu.com (not the installer, which offers extra software) into `%LOCALAPPDATA%\ModernMeters\CoreTemp` and sets it to start minimized with Windows (the scheduled task "Modern Meters - Core Temp"). Core Temp's license doesn't allow passing it on, so it always comes from its author's site. An installed Core Temp is just started. |
 | GPU temperature on integrated graphics, watts on AMD/Intel | Discrete cards report temperature, fan, clocks and power (as % of the limit) by themselves. Integrated graphics often don't report temperature; run [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases) to fill it in. NVIDIA cards don't need it. |
 | SSD life and temperature | Drives Meter settings → **SSD life & temperature** → **Turn on**, then approve the administrator prompt. This adds the scheduled task "ModernMeters Disk Health". It reads SSDs every 5 minutes and leaves hard drives alone so they can sleep. **Turn off** removes it. |
 
@@ -73,6 +102,7 @@ Everything works without them. They add data that Windows only gives to drivers 
 
 - Network Meter looks up your external IP at api.ipify.org every 30 minutes and when the network changes. You can switch this off in its settings.
 - Weather Meter gets the forecast from [Open-Meteo](https://open-meteo.com/) every 30 minutes. In Auto mode it asks the Windows location service where you are (Settings → Privacy → Location; if that's off, it uses your IP address via get.geojs.io) and gets the place name from OpenStreetMap. Coordinates are rounded to about 1 km before they leave your PC. Pick a city by clicking the place name to turn all of this off. The radar map loads its tiles from Esri (map) and RainViewer (rain), only while its tab is open; the tab can be turned off in the settings.
+- Core Temp is downloaded from alcpu.com only when you ask for it (on the gadget or in the installer).
 - Once a day one of the gadgets asks GitHub whether a newer release exists. If so, a small "↑ 1.x.x" badge appears in the top right corner of the gadgets and opens the release page when clicked. Nothing is downloaded or installed by itself. Settings → **About** → **New versions** → **Don't check** turns this off.
 
 ## Building from source
@@ -87,7 +117,7 @@ Questions, ideas or a bug to report: open an [issue](https://github.com/livonian
 
 ## Trademarks
 
-Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel and Qualcomm are trademarks of their owners. They are named here only to describe what a style recalls or which hardware is shown; Modern Meters is not affiliated with or endorsed by them.
+Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel and Qualcomm are trademarks of their owners, and All CPU Meter is AddGadgets'. Core Temp is © Arthur Liberman. They are named here only to describe what a style recalls or which hardware is shown; Modern Meters is not affiliated with or endorsed by them.
 
 ## License
 
@@ -99,7 +129,7 @@ Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel
 
 [![Скачать последнюю версию](https://img.shields.io/github/v/release/livonianlabs/modern-meters?label=%E2%AC%87%20%D0%A1%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C&style=for-the-badge&color=2ea043)](https://github.com/livonianlabs/modern-meters/releases/latest)
 
-**Чтобы установить, скачайте `.gadget`-файлы из блока _Assets_ на странице [последней версии](https://github.com/livonianlabs/modern-meters/releases/latest)** и дважды щёлкните их. Зелёная кнопка _Code → Download ZIP_ скачивает исходный код, а не гаджеты.
+**Чтобы установить, скачайте `Install-ModernMeters.cmd` из блока _Assets_ на странице [последней версии](https://github.com/livonianlabs/modern-meters/releases/latest) и дважды щёлкните его**, или скачайте там `.gadget`-файлы и дважды щёлкните их (см. [Установка](#установка)). Зелёная кнопка _Code → Download ZIP_ скачивает исходный код, а не гаджеты.
 
 Пять гаджетов для боковой панели Windows из 8GadgetPack:
 
@@ -113,20 +143,45 @@ Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel
 
 Гаджеты CPU и GPU показывают производителя (NVIDIA, AMD, Intel, Qualcomm) рядом с заголовком. Если навести мышь на график, видно значение в этот момент, а также минимум, среднее и максимум; настройка «История графика» растягивает график на 5 или 15 минут или на час вместо последней минуты-двух. У всех 13 языков (английский, украинский, русский, немецкий, испанский, французский, итальянский, латышский, польский, португальский, турецкий, китайский, японский), язык берётся из Windows; пять вариантов ширины, цвета акцента и пятиступенчатая цветовая шкала нагрузки и температуры. Как они выглядят, показано на скриншотах выше: светлый, цветное стекло, ретро-терминал, «Стекло» и классический.
 
-Стили: «Стекло», «Классический», «Светлый», «Цветное стекло» (стекло в цвете акцента: голубой, бирюзовый, зелёный, фиолетовый, оранжевый, розовый, красный или жёлтый), «Ретро-терминал» (ЭЛТ-экран со строками развёртки в цвете акцента, курсор которого время от времени перепечатывает заголовок), ещё три терминала (**чёрно-белый**, **синий коммандер** в духе старых файловых менеджеров DOS и **баклажан** в духе терминала Ubuntu), «Серый из 90-х» (серые окна в духе Windows 95/98 с синим заголовком и прогресс-барами из блоков), «Небесное стекло» и «Стекло-линза», а также «Авто» — переключается между светлым и стеклом вслед за светлым/тёмным режимом Windows. «Небесное стекло» и «Стекло-линза» — матовое стекло по мотивам Aero из Windows 7 и Liquid Glass от Apple: сквозь гаджет видны размытые обои под ним, в синем стекле или в светлом или тёмном (выбирается по яркости обоев или как вы зададите), а настройка «Матовость стекла» задаёт, насколько оно матовое; «Стекло-линза» у краёв изгибает картинку, как толстая линза. Когда вы передвигаете гаджет или меняете обои, стекло перерисовывается само. Фон для цветных стилей рисуется один раз на вашем компьютере, когда впервые понадобится. Настройка **Для всех гаджетов** в любом гаджете сразу даёт всем гаджетам один стиль и язык (а при желании и цвет акцента).
+Стили: «Стекло», «Классический», «Светлый», «Цветное стекло» (стекло в цвете акцента: голубой, бирюзовый, зелёный, фиолетовый, оранжевый, розовый, красный или жёлтый), «Ретро-терминал» (ЭЛТ-экран со строками развёртки в цвете акцента, курсор которого время от времени перепечатывает заголовок), ещё три терминала (**чёрно-белый**, **синий коммандер** в духе старых файловых менеджеров DOS и **баклажан** в духе терминала Ubuntu), «Серый из 90-х» (серые окна в духе Windows 95/98 с синим заголовком и прогресс-барами из блоков), «Небесное стекло» и «Стекло-линза», «Карбон» (графит с мелким карбоновым плетением, глянцевые полоски и чёрный график с зелёной сеткой — в духе настольных мониторов начала 2010-х вроде All CPU Meter от AddGadgets), «Радуга» («Карбон» в раскладке тех мониторов: каждая строка своим цветом — подпись, значения и полоска, — цвета идут по радуге от строки к строке, длинные полоски и один график в самом низу), а также «Авто» — переключается между светлым и стеклом вслед за светлым/тёмным режимом Windows. «Небесное стекло» и «Стекло-линза» — матовое стекло по мотивам Aero из Windows 7 и Liquid Glass от Apple: сквозь гаджет видны размытые обои под ним, в синем стекле или в светлом или тёмном (выбирается по яркости обоев или как вы зададите), а настройка «Матовость стекла» задаёт, насколько оно матовое; «Стекло-линза» у краёв изгибает картинку, как толстая линза. Когда вы передвигаете гаджет или меняете обои, стекло перерисовывается само. Фон для цветных стилей рисуется один раз на вашем компьютере, когда впервые понадобится. Настройка **Для всех гаджетов** в любом гаджете сразу даёт всем гаджетам один стиль и язык (а при желании и цвет акцента).
 
 <img src="docs/themes-retro.png" width="660" alt="Чёрно-белый терминал, синий коммандер, баклажан и «Серый из 90-х»">
 
 <img src="docs/themes-glass.png" width="440" alt="Светлое стекло-линза, небесное стекло и тёмное стекло-линза поверх обоев">
 
+<table><tr valign="top">
+<td><img src="docs/cpu-carbon.png" width="160" alt="CPU Meter, карбон"></td>
+<td><img src="docs/gpu-carbon.png" width="160" alt="GPU Meter, карбон"></td>
+<td><img src="docs/network-carbon.png" width="160" alt="Network Meter, карбон"></td>
+<td><img src="docs/drives-carbon.png" width="160" alt="Drives Meter, карбон"></td>
+<td><img src="docs/weather-carbon.png" width="160" alt="Weather Meter, карбон"></td>
+</tr></table>
+
+<table><tr valign="top">
+<td><img src="docs/cpu-rainbow.png" width="160" alt="CPU Meter, радуга"></td>
+<td><img src="docs/gpu-rainbow.png" width="160" alt="GPU Meter, радуга"></td>
+<td><img src="docs/network-rainbow.png" width="160" alt="Network Meter, радуга"></td>
+<td><img src="docs/drives-rainbow.png" width="160" alt="Drives Meter, радуга"></td>
+<td><img src="docs/weather-rainbow.png" width="160" alt="Weather Meter, радуга"></td>
+</tr></table>
+
 ## Установка
 
+**Установщиком** (проще всего): скачайте `Install-ModernMeters.cmd` со страницы [Releases](https://github.com/livonianlabs/modern-meters/releases/latest) и дважды щёлкните его. Он проверит, что [8GadgetPack](https://8gadgetpack.net/) установлен (если нет — предложит открыть его сайт), установит или обновит все пять гаджетов из последней версии, починит счётчики производительности Windows, если они сломаны, предложит настроить [Core Temp](https://www.alcpu.com/CoreTemp/) для температуры процессора и откроет галерею гаджетов. Каждый шаг, которому нужны права администратора, сначала спрашивает. Файл не подписан, поэтому Windows может написать, что «защитила компьютер»: нажмите **Подробнее** → **Выполнить в любом случае**.
+
+**Вручную**:
+
 1. Установите [8GadgetPack](https://8gadgetpack.net/), если боковой панели ещё нет.
-2. Скачайте `.gadget`-файлы со страницы [Releases](https://github.com/livonianlabs/modern-meters/releases/latest) и дважды щёлкните каждый нужный. Ставить все пять не обязательно.
+2. Скачайте `.gadget`-файлы со страницы [Releases](https://github.com/livonianlabs/modern-meters/releases/latest) и дважды щёлкните каждый нужный. Ставить все пять не обязательно. Windows скажет, что не может проверить издателя, — у гаджетов нет цифровой подписи: нажмите **Установить**.
 3. Правый клик по рабочему столу → **Гаджеты**, перетащите гаджет на рабочий стол.
 4. Настройки: наведите мышь на гаджет и нажмите на значок гаечного ключа.
 
-Когда выходит новая версия, в углу гаджета мигает **↑ x.y.z**. Нажмите на него, и гаджеты скачают выпуск с GitHub, установят его поверх себя (сразу все гаджеты Modern Meters) и перезапустятся; без этого клика ничего не устанавливается. Можно и вручную установить новые `.gadget`-файлы поверх старых. При обновлении с 1.1.0 и старше после этого один раз перезапустите боковую панель (правый клик по её значку в трее → Выход, затем запустите снова).
+Когда выходит новая версия, в углу гаджета мигает **↑ x.y.z**. Нажмите на него, и гаджеты скачают выпуск с GitHub, установят его поверх себя (сразу все гаджеты Modern Meters) и перезапустятся; пока это идёт, на значке крутится индикатор с прогрессом, а после перезапуска на несколько секунд появляется зелёная **✓** с новой версией. Без этого клика ничего не устанавливается. Можно и вручную установить новые `.gadget`-файлы поверх старых. При обновлении с 1.1.0 и старше после этого один раз перезапустите боковую панель (правый клик по её значку в трее → Выход, затем запустите снова).
+
+## Если гаджет ничего не показывает
+
+- **«Счётчики Windows сломаны: починить ›»** (или гаджет вообще пустой): повреждены счётчики производительности Windows, которые читают CPU, Drives, Network и GPU, — обычно после неудачного обновления или «чистилки» реестра. Нажмите на строку и подтвердите запрос администратора: счётчики пересоберутся (`lodctr /R`, `winmgmt /resyncperf`), и гаджеты перезапустятся. Установщик делает то же самое.
+- **GPU Meter пишет «нет данных» на старой карте NVIDIA**: через несколько секунд он сам перейдёт на счётчики Windows, а температуру всё равно возьмёт у nvidia-smi, если Windows её не сообщает.
 
 ## Как уместить их на экране
 
@@ -138,7 +193,7 @@ Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel
 
 | Для чего | Что сделать |
 |---|---|
-| Температура процессора | Установите [Core Temp](https://www.alcpu.com/CoreTemp/) и держите запущенным (может стартовать с Windows). Клик по «нет Core Temp» на гаджете запускает его, а если он не установлен — открывает страницу загрузки. |
+| Температура процессора | [Core Temp](https://www.alcpu.com/CoreTemp/) — бесплатная программа Артура Либермана. Если его нет, дважды нажмите «Core Temp не запущен ›» на гаджете: после запроса администратора он скачает портативный Core Temp с alcpu.com (не установщик, который предлагает лишние программы) в `%LOCALAPPDATA%\ModernMeters\CoreTemp` и настроит запуск свёрнутым вместе с Windows (задача Планировщика «Modern Meters - Core Temp»). Лицензия Core Temp не разрешает его распространять, поэтому он всегда берётся с сайта автора. Уже установленный Core Temp просто запускается. |
 | Температура встроенной графики, ватты AMD/Intel | Дискретные видеокарты сами сообщают температуру, вентилятор, частоты и мощность (в % от лимита). Встроенная графика часто не сообщает температуру — её добавит запущенный [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases). Картам NVIDIA он не нужен. |
 | Ресурс и температура SSD | Настройки Drives Meter → **Ресурс и температура SSD** → **Включить**, затем подтвердите запрос администратора. Это добавит задачу Планировщика «ModernMeters Disk Health». Она опрашивает SSD раз в 5 минут, а жёсткие диски не трогает, чтобы они могли спать. **Выключить** удаляет её. |
 
@@ -146,6 +201,7 @@ Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel
 
 - Network Meter узнаёт внешний IP у api.ipify.org раз в 30 минут и при смене сети. Это отключается в его настройках.
 - Weather Meter раз в 30 минут берёт прогноз у [Open-Meteo](https://open-meteo.com/). В режиме «Авто» он спрашивает у службы местоположения Windows, где вы (Параметры → Конфиденциальность → Расположение; если она выключена — определяет по IP через get.geojs.io), а название места берёт у OpenStreetMap. Координаты перед отправкой округляются примерно до 1 км. Если выбрать город кликом по названию места, всё это отключается. Радарная карта загружает плитки у Esri (карта) и RainViewer (осадки), только пока открыта её вкладка; вкладку можно выключить в настройках.
+- Core Temp скачивается с alcpu.com, только когда вы сами попросите (на гаджете или в установщике).
 - Раз в сутки один из гаджетов спрашивает у GitHub, не вышла ли новая версия. Если вышла, в правом верхнем углу гаджетов появляется маленький значок «↑ 1.x.x», клик по нему открывает страницу выпуска. Сами гаджеты ничего не скачивают и не устанавливают. Отключается в настройках: **О гаджете** → **Новые версии** → **Не проверять**.
 
 ## Сборка из исходников
@@ -160,7 +216,7 @@ Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel
 
 ## Товарные знаки
 
-Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel и Qualcomm — товарные знаки их владельцев. Они упомянуты только для того, чтобы описать, что напоминает стиль или какое оборудование показано; Modern Meters с ними не связан и ими не одобрен.
+Windows, Aero, Apple, Liquid Glass, Norton Commander, Ubuntu, NVIDIA, AMD, Intel и Qualcomm — товарные знаки их владельцев, All CPU Meter принадлежит AddGadgets. Core Temp © Артур Либерман. Они упомянуты только для того, чтобы описать, что напоминает стиль или какое оборудование показано; Modern Meters с ними не связан и ими не одобрен.
 
 ## Лицензия
 

@@ -506,12 +506,16 @@ function rebuild() {
     y += 22;
     ui.sub = label(root, PAD, y, IW - 50, 11, THEME.dim);
     setText(ui.sub, T("waiting"));
+    // The cards are found through the performance counters
+    if (!card && perfCountersBroken()) counterRepairLink(ui.sub);
     ui.temp = label(root, W - PAD - 60, y, 60, 11, THEME.dim, "right", true);
     ui.alarm = new Alarm(root, W - PAD - 50, y);
     ui.alarm.update(null);
     y += 22;
 
-    if (graphH > 0) {
+    // The graph and its legend go under the name, or at the very bottom in a style that wants
+    // it there (the busiest program then keeps its own line up here)
+    var drawGraph = function (y, withTop) {
         var ax = axisWidth();
         ui.graph = new Graph(root, PAD + ax, y, IW - ax, graphH, [
             { color: accent, area: true },
@@ -525,9 +529,10 @@ function rebuild() {
         legend(root, PAD, y, accent, "GPU");
         legend(root, PAD + 46, y, vramColor, "VRAM");
         // The busiest program on the rest of the legend line when it fits
-        if (showTop && card && IW - 100 - 32 >= 50) ui.top = new TopRow(root, y, PAD + 100);
-        y += 17;
-    }
+        if (withTop && showTop && card && IW - 100 - 32 >= 50) ui.top = new TopRow(root, y, PAD + 100);
+        return y + 17;
+    };
+    if (graphH > 0 && !THEME.graphBottom) y = drawGraph(y, true);
     if (showTop && card && !ui.top) {
         ui.top = new TopRow(root, y - 2);
         y += 18;
@@ -570,6 +575,10 @@ function rebuild() {
         y += 22;
     } else {
         y += 2;
+    }
+    if (graphH > 0 && THEME.graphBottom) {
+        rect(root, PAD, y - 6, IW, 1, THEME.sep);
+        y = drawGraph(y + 2, false) + 4;
     }
 
     if (showAll) {
@@ -638,6 +647,7 @@ function tickMain() {
     try { q = fallBack(provider, card, "", d); } catch (e3) { reportError(ui.sub, "start", e3); }
     if (q) { provider = q; misses = 0; return; }
     if (!d) {
+        if (!card && perfCountersBroken()) { counterRepairLink(ui.sub); return; }
         if (++misses == 5) {
             setText(ui.sub, T("nodata"));
             if (ui.graph) ui.graph.push([0, 0]);

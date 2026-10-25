@@ -15,26 +15,29 @@ function New-RoundPath([float]$x, [float]$y, [float]$w, [float]$h, [float]$r) {
     $p
 }
 
-function Save-Icon([string]$file, [System.Drawing.Color]$accent, [string]$label) {
+# App icon for the gadget gallery (100px): a rounded square in the gadget's color, lighter at
+# the top left, with a soft gloss over the top half and the gadget's glyph in white
+function Save-Icon([string]$file, [System.Drawing.Color]$accent, [string]$kind) {
     $n = 100
     $bmp = New-Object System.Drawing.Bitmap $n, $n
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.SmoothingMode = 'AntiAlias'
-    $g.TextRenderingHint = 'AntiAliasGridFit'
     $g.Clear([System.Drawing.Color]::Transparent)
-    $g.FillPath((New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 21, 24, 29))), (New-RoundPath 4 4 92 92 16))
-    # area chart
-    $pts = @(
-        (New-Object System.Drawing.PointF 14, 80), (New-Object System.Drawing.PointF 14, 66),
-        (New-Object System.Drawing.PointF 28, 58), (New-Object System.Drawing.PointF 40, 64),
-        (New-Object System.Drawing.PointF 54, 40), (New-Object System.Drawing.PointF 66, 50),
-        (New-Object System.Drawing.PointF 86, 28), (New-Object System.Drawing.PointF 86, 80)
-    )
-    $g.FillPolygon((New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(80, $accent))), $pts)
-    $line = $pts[1..6]
-    $g.DrawLines((New-Object System.Drawing.Pen $accent, 3), [System.Drawing.PointF[]]$line)
-    $font = New-Object System.Drawing.Font 'Segoe UI Semibold', 15
-    $g.DrawString($label, $font, (New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(235, 232, 234, 237))), 12, 9)
+    $mixc = { param($c, $t, $v) [System.Drawing.Color]::FromArgb(255, [int]($c.R + ($v - $c.R) * $t), [int]($c.G + ($v - $c.G) * $t), [int]($c.B + ($v - $c.B) * $t)) }
+    $square = New-RoundPath 6 6 88 88 22
+    $grad = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 6, 6, 88, 88), (& $mixc $accent 0.28 255), (& $mixc $accent 0.45 0), 45
+    $g.FillPath($grad, $square)
+    $g.SetClip($square)
+    $gloss = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.Rectangle 0, 6, 100, 48), ([System.Drawing.Color]::FromArgb(70, 255, 255, 255)), ([System.Drawing.Color]::FromArgb(0, 255, 255, 255)), 90
+    $g.FillRectangle($gloss, 6, 6, 88, 46)
+    $g.ResetClip()
+    $g.DrawPath((New-Object System.Drawing.Pen ([System.Drawing.Color]::FromArgb(60, 255, 255, 255)), 1.5), (New-RoundPath 6.75 6.75 86.5 86.5 21))
+    # The 32px glyph at twice the size, in the middle
+    $g.TranslateTransform(18, 18)
+    $g.ScaleTransform(2, 2)
+    $pen = New-Object System.Drawing.Pen ([System.Drawing.Color]::White), 2.4
+    $pen.StartCap = 'Round'; $pen.EndCap = 'Round'; $pen.LineJoin = 'Round'
+    Draw-Glyph $g $kind $pen (New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::White))
     $g.Dispose()
     $bmp.Save($file, [System.Drawing.Imaging.ImageFormat]::Png)
     $bmp.Dispose()
@@ -93,6 +96,112 @@ function Save-Panels([string]$dir) {
     }
 }
 
+# Glyph `kind` in a 32x32 box with $pen and $brush (line icons of the headers, rows and app
+# icons)
+function Draw-Glyph($g, [string]$kind, $pen, $brush) {
+    $pt = { param($x, $y) New-Object System.Drawing.PointF $x, $y }
+    switch ($kind) {
+        'cpu' {
+            $g.DrawPath($pen, (New-RoundPath 8 8 16 16 3))
+            $g.FillRectangle($brush, 13, 13, 6, 6)
+            foreach ($q in 11, 16, 21) {
+                $g.DrawLine($pen, $q, 3, $q, 7); $g.DrawLine($pen, $q, 25, $q, 29)
+                $g.DrawLine($pen, 3, $q, 7, $q); $g.DrawLine($pen, 25, $q, 29, $q)
+            }
+        }
+        'gpu' {
+            # A graphics card in the manner of the 2020s reference coolers: the bracket on the
+            # left, the fan by it, the frame folding in a V across the middle, fins beyond it, and
+            # the contacts below
+            $g.DrawLine($pen, 3.5, 5, 3.5, 28)
+            $g.DrawPath($pen, (New-RoundPath 7 8 22 14 2.5))
+            $g.DrawEllipse($pen, 9.5, 11, 8, 8)
+            $g.FillEllipse($brush, 12.3, 13.8, 2.4, 2.4)
+            $g.DrawLines($pen, [System.Drawing.PointF[]]@((& $pt 19 8), (& $pt 21.5 15), (& $pt 19 22)))
+            foreach ($fx in 24, 26.5) { $g.DrawLine($pen, $fx, 11.5, $fx, 18.5) }
+            $g.DrawLine($pen, 11, 26, 24, 26)
+        }
+        'net' {
+            foreach ($r in 6, 12, 18) { $g.DrawArc($pen, 16 - $r, 26 - $r, 2 * $r, 2 * $r, 225, 90) }
+            $g.FillEllipse($brush, 13.5, 23.5, 5, 5)
+        }
+        'disk' {
+            $g.DrawEllipse($pen, 6, 3, 20, 7)
+            $g.DrawArc($pen, 6, 12, 20, 7, 0, 180)
+            $g.DrawArc($pen, 6, 21, 20, 7, 0, 180)
+            $g.DrawLine($pen, 6, 6.5, 6, 24.5); $g.DrawLine($pen, 26, 6.5, 26, 24.5)
+        }
+        'ram' {
+            $g.DrawRectangle($pen, 4, 8, 24, 13)
+            foreach ($q in 8, 14, 20) { $g.FillRectangle($brush, $q, 11.5, 4, 6) }
+            foreach ($q in 8, 13, 18, 23) { $g.DrawLine($pen, $q, 22, $q, 26) }
+        }
+        'commit' {
+            # The back sheet stops where the front one covers it
+            $g.SetClip((New-Object System.Drawing.RectangleF 2.5, 10.5, 21, 16), [System.Drawing.Drawing2D.CombineMode]::Exclude)
+            $g.DrawRectangle($pen, 10, 5, 18, 13)
+            $g.ResetClip()
+            $g.DrawRectangle($pen, 4, 12, 18, 13)
+        }
+        'bus' {
+            $g.DrawLine($pen, 4, 11, 27, 11); $g.DrawLine($pen, 22, 6, 27, 11); $g.DrawLine($pen, 22, 16, 27, 11)
+            $g.DrawLine($pen, 28, 22, 5, 22); $g.DrawLine($pen, 10, 17, 5, 22); $g.DrawLine($pen, 10, 27, 5, 22)
+        }
+        'power' {
+            $g.FillPolygon($brush, [System.Drawing.PointF[]]@((& $pt 19 2), (& $pt 7 18), (& $pt 15 18), (& $pt 12 30), (& $pt 25 13), (& $pt 17 13), (& $pt 21 2)))
+        }
+        'fan' {
+            $g.DrawEllipse($pen, 4, 4, 24, 24)
+            $g.FillEllipse($brush, 13, 13, 6, 6)
+            foreach ($ang in 90, 210, 330) {
+                $rad = $ang * [Math]::PI / 180
+                $g.DrawArc($pen, 16 + 9 * [Math]::Cos($rad) - 5, 16 - 9 * [Math]::Sin($rad) - 5, 10, 10, - $ang - 90, 140)
+            }
+        }
+        'ip' {
+            $g.DrawRectangle($pen, 4, 5, 24, 16)
+            $g.DrawLine($pen, 16, 21, 16, 26); $g.DrawLine($pen, 10, 27, 22, 27)
+        }
+        'globe' {
+            $g.DrawEllipse($pen, 4, 4, 24, 24)
+            $g.DrawEllipse($pen, 10.5, 4, 11, 24)
+            $g.DrawLine($pen, 4, 16, 28, 16)
+        }
+        'shield' {
+            $g.DrawPolygon($pen, [System.Drawing.PointF[]]@((& $pt 16 3), (& $pt 27 7), (& $pt 26 17), (& $pt 16 29), (& $pt 6 17), (& $pt 5 7)))
+        }
+        'ping' {
+            # A stopwatch
+            $g.DrawEllipse($pen, 5, 8, 22, 22)
+            $g.DrawLine($pen, 16, 19, 16, 13); $g.DrawLine($pen, 16, 19, 20, 22)
+            $g.DrawLine($pen, 13, 3, 19, 3); $g.DrawLine($pen, 16, 3, 16, 8)
+        }
+        'pulse' {
+            $g.DrawLines($pen, [System.Drawing.PointF[]]@((& $pt 3 17), (& $pt 10 17), (& $pt 13 8), (& $pt 18 26), (& $pt 21 17), (& $pt 29 17)))
+        }
+        'sky' {
+            # Sun peeking out from behind a cloud (the cloud is drawn first only to clip the sun)
+            $cloud = New-Object System.Drawing.Drawing2D.GraphicsPath ([System.Drawing.Drawing2D.FillMode]::Winding)
+            $cloud.AddArc(3, 17, 10, 10, 90, 180)
+            $cloud.AddArc(8, 11, 12, 12, 180, 180)
+            $cloud.AddArc(16, 15, 12, 12, 270, 180)
+            $cloud.CloseFigure()
+            $outline = $cloud.Clone()
+            $outline.Widen((New-Object System.Drawing.Pen ([System.Drawing.Color]::Black), 4))
+            $behind = New-Object System.Drawing.Region $cloud
+            $behind.Union($outline)
+            $g.SetClip($behind, [System.Drawing.Drawing2D.CombineMode]::Exclude)
+            $g.DrawArc($pen, 13, 4, 14, 14, 160, 230)
+            foreach ($ang in 0, 45, 90, 135) {
+                $rad = $ang * [Math]::PI / 180
+                $g.DrawLine($pen, 20 + 10 * [Math]::Cos($rad), 11 - 10 * [Math]::Sin($rad), 20 + 12.5 * [Math]::Cos($rad), 11 - 12.5 * [Math]::Sin($rad))
+            }
+            $g.ResetClip()
+            $g.DrawPath($pen, $cloud)
+        }
+    }
+}
+
 # Glass layout glyphs, drawn at 2x (32px) once per accent color: <prefix>_<kind>_<accent>.png, and with
 # -Light in the light theme's accents as <prefix>l_<kind>_<accent>.png (ACCENT_SETS in common.js).
 # Only strokes and fills in the accent, so they sit on any panel color.
@@ -115,100 +224,7 @@ function Save-Glyphs([string]$dir, [string]$prefix, [string[]]$kinds, [switch]$L
             $pen.StartCap = 'Round'; $pen.EndCap = 'Round'; $pen.LineJoin = 'Round'
             $brush = New-Object System.Drawing.SolidBrush $c
             $pt = { param($x, $y) New-Object System.Drawing.PointF $x, $y }
-            switch ($kind) {
-                'cpu' {
-                    $g.DrawPath($pen, (New-RoundPath 8 8 16 16 3))
-                    $g.FillRectangle($brush, 13, 13, 6, 6)
-                    foreach ($q in 11, 16, 21) {
-                        $g.DrawLine($pen, $q, 3, $q, 7); $g.DrawLine($pen, $q, 25, $q, 29)
-                        $g.DrawLine($pen, 3, $q, 7, $q); $g.DrawLine($pen, 25, $q, 29, $q)
-                    }
-                }
-                'gpu' {
-                    $g.DrawPath($pen, (New-RoundPath 3 8 26 15 2))
-                    $g.DrawEllipse($pen, 7, 11, 9, 9)
-                    $g.FillRectangle($brush, 20, 12, 5, 7)
-                    $g.DrawLine($pen, 7, 23, 7, 27); $g.DrawLine($pen, 7, 27, 18, 27)
-                }
-                'net' {
-                    foreach ($r in 6, 12, 18) { $g.DrawArc($pen, 16 - $r, 26 - $r, 2 * $r, 2 * $r, 225, 90) }
-                    $g.FillEllipse($brush, 13.5, 23.5, 5, 5)
-                }
-                'disk' {
-                    $g.DrawEllipse($pen, 6, 3, 20, 7)
-                    $g.DrawArc($pen, 6, 12, 20, 7, 0, 180)
-                    $g.DrawArc($pen, 6, 21, 20, 7, 0, 180)
-                    $g.DrawLine($pen, 6, 6.5, 6, 24.5); $g.DrawLine($pen, 26, 6.5, 26, 24.5)
-                }
-                'ram' {
-                    $g.DrawRectangle($pen, 4, 8, 24, 13)
-                    foreach ($q in 8, 14, 20) { $g.FillRectangle($brush, $q, 11.5, 4, 6) }
-                    foreach ($q in 8, 13, 18, 23) { $g.DrawLine($pen, $q, 22, $q, 26) }
-                }
-                'commit' {
-                    # The back sheet stops where the front one covers it
-                    $g.SetClip((New-Object System.Drawing.RectangleF 2.5, 10.5, 21, 16), [System.Drawing.Drawing2D.CombineMode]::Exclude)
-                    $g.DrawRectangle($pen, 10, 5, 18, 13)
-                    $g.ResetClip()
-                    $g.DrawRectangle($pen, 4, 12, 18, 13)
-                }
-                'bus' {
-                    $g.DrawLine($pen, 4, 11, 27, 11); $g.DrawLine($pen, 22, 6, 27, 11); $g.DrawLine($pen, 22, 16, 27, 11)
-                    $g.DrawLine($pen, 28, 22, 5, 22); $g.DrawLine($pen, 10, 17, 5, 22); $g.DrawLine($pen, 10, 27, 5, 22)
-                }
-                'power' {
-                    $g.FillPolygon($brush, [System.Drawing.PointF[]]@((& $pt 19 2), (& $pt 7 18), (& $pt 15 18), (& $pt 12 30), (& $pt 25 13), (& $pt 17 13), (& $pt 21 2)))
-                }
-                'fan' {
-                    $g.DrawEllipse($pen, 4, 4, 24, 24)
-                    $g.FillEllipse($brush, 13, 13, 6, 6)
-                    foreach ($ang in 90, 210, 330) {
-                        $rad = $ang * [Math]::PI / 180
-                        $g.DrawArc($pen, 16 + 9 * [Math]::Cos($rad) - 5, 16 - 9 * [Math]::Sin($rad) - 5, 10, 10, - $ang - 90, 140)
-                    }
-                }
-                'ip' {
-                    $g.DrawRectangle($pen, 4, 5, 24, 16)
-                    $g.DrawLine($pen, 16, 21, 16, 26); $g.DrawLine($pen, 10, 27, 22, 27)
-                }
-                'globe' {
-                    $g.DrawEllipse($pen, 4, 4, 24, 24)
-                    $g.DrawEllipse($pen, 10.5, 4, 11, 24)
-                    $g.DrawLine($pen, 4, 16, 28, 16)
-                }
-                'shield' {
-                    $g.DrawPolygon($pen, [System.Drawing.PointF[]]@((& $pt 16 3), (& $pt 27 7), (& $pt 26 17), (& $pt 16 29), (& $pt 6 17), (& $pt 5 7)))
-                }
-                'ping' {
-                    # A stopwatch
-                    $g.DrawEllipse($pen, 5, 8, 22, 22)
-                    $g.DrawLine($pen, 16, 19, 16, 13); $g.DrawLine($pen, 16, 19, 20, 22)
-                    $g.DrawLine($pen, 13, 3, 19, 3); $g.DrawLine($pen, 16, 3, 16, 8)
-                }
-                'pulse' {
-                    $g.DrawLines($pen, [System.Drawing.PointF[]]@((& $pt 3 17), (& $pt 10 17), (& $pt 13 8), (& $pt 18 26), (& $pt 21 17), (& $pt 29 17)))
-                }
-                'sky' {
-                    # Sun peeking out from behind a cloud (the cloud is drawn first only to clip the sun)
-                    $cloud = New-Object System.Drawing.Drawing2D.GraphicsPath ([System.Drawing.Drawing2D.FillMode]::Winding)
-                    $cloud.AddArc(3, 17, 10, 10, 90, 180)
-                    $cloud.AddArc(8, 11, 12, 12, 180, 180)
-                    $cloud.AddArc(16, 15, 12, 12, 270, 180)
-                    $cloud.CloseFigure()
-                    $outline = $cloud.Clone()
-                    $outline.Widen((New-Object System.Drawing.Pen ([System.Drawing.Color]::Black), 4))
-                    $behind = New-Object System.Drawing.Region $cloud
-                    $behind.Union($outline)
-                    $g.SetClip($behind, [System.Drawing.Drawing2D.CombineMode]::Exclude)
-                    $g.DrawArc($pen, 13, 4, 14, 14, 160, 230)
-                    foreach ($ang in 0, 45, 90, 135) {
-                        $rad = $ang * [Math]::PI / 180
-                        $g.DrawLine($pen, 20 + 10 * [Math]::Cos($rad), 11 - 10 * [Math]::Sin($rad), 20 + 12.5 * [Math]::Cos($rad), 11 - 12.5 * [Math]::Sin($rad))
-                    }
-                    $g.ResetClip()
-                    $g.DrawPath($pen, $cloud)
-                }
-            }
+            Draw-Glyph $g $kind $pen $brush
             $g.Dispose()
             $bmp.Save((Join-Path $dir "${prefix}_${kind}_${name}.png"), [System.Drawing.Imaging.ImageFormat]::Png)
             $bmp.Dispose()
@@ -371,6 +387,22 @@ function Save-Scanlines([string]$dir) {
     $bmp.Dispose()
 }
 
+# Carbon theme weave: carbon.png, tiled over the panel; 2x2 checks of a faint light and a dark
+# translucent square
+function Save-Carbon([string]$dir) {
+    $bmp = New-Object System.Drawing.Bitmap 4, 4
+    for ($y = 0; $y -lt 4; $y++) {
+        for ($x = 0; $x -lt 4; $x++) {
+            $light = ([Math]::Floor($x / 2) + [Math]::Floor($y / 2)) % 2 -eq 0
+            # The top left pixel of each check a little brighter, as a woven strand catches light
+            $a = if ($light) { if ($x % 2 -eq 0 -and $y % 2 -eq 0) { 22 } else { 12 } } else { 0 }
+            $bmp.SetPixel($x, $y, $(if ($light) { [System.Drawing.Color]::FromArgb($a, 255, 255, 255) } else { [System.Drawing.Color]::FromArgb(45, 0, 0, 0) }))
+        }
+    }
+    $bmp.Save((Join-Path $dir 'carbon.png'), [System.Drawing.Imaging.ImageFormat]::Png)
+    $bmp.Dispose()
+}
+
 $MinH = 150; $MaxH = 1100   # must match BG_MIN_H / BG_MAX_H in common.js
 $GradH = 300                # must match GLASS_GRADIENT_H in common.js
 # Panels are the same for every gadget: render once, then copy
@@ -384,6 +416,7 @@ foreach ($name in $gadgets.Keys) {
     New-Item -ItemType Directory -Force $dir | Out-Null
     Copy-Item (Join-Path $cache '*') $dir
     Save-Scanlines $dir
+    Save-Carbon $dir
     foreach ($light in $false, $true) {
         Save-Glyphs $dir 'hdr' @($gadgets[$name]) -Light:$light
         Save-Glyphs $dir 'row' @('ram', 'commit', 'bus', 'power', 'fan', 'ip', 'globe', 'shield', 'pulse', 'ping') -Light:$light
@@ -392,9 +425,9 @@ foreach ($name in $gadgets.Keys) {
     if ($name -eq 'Weather_Meter_Modern.gadget') { Save-WeatherIcons $dir; Save-WeatherIcons $dir -Light }
 }
 Remove-Item $cache -Recurse -Force
-Save-Icon (Join-Path $Root 'CPU_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 76, 194, 255)) 'CPU'
-Save-Icon (Join-Path $Root 'GPU_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 118, 185, 0)) 'GPU'
-Save-Icon (Join-Path $Root 'Network_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 46, 230, 197)) 'NET'
-Save-Icon (Join-Path $Root 'Drives_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 177, 140, 255)) 'DISK'
-Save-Icon (Join-Path $Root 'Weather_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 255, 159, 67)) 'SKY'
+Save-Icon (Join-Path $Root 'CPU_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 76, 194, 255)) 'cpu'
+Save-Icon (Join-Path $Root 'GPU_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 118, 185, 0)) 'gpu'
+Save-Icon (Join-Path $Root 'Network_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 46, 230, 197)) 'net'
+Save-Icon (Join-Path $Root 'Drives_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 177, 140, 255)) 'disk'
+Save-Icon (Join-Path $Root 'Weather_Meter_Modern.gadget\icon.png') ([System.Drawing.Color]::FromArgb(255, 255, 159, 67)) 'sky'
 "Images written under $Root"

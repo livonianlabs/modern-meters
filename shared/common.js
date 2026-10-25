@@ -112,8 +112,34 @@ var THEMES = {
         accents: { blue: "#729fcf", teal: "#34e2e2", green: "#8ae234", purple: "#ad7fa8", orange: "#fcaf3e",
             pink: "#f080d0", red: "#ef2929", yellow: "#fce94f" },
         levels: ["#729fcf", "#8ae234", "#fce94f", "#fcaf3e", "#ef2929"]
+    },
+    // Carbon: a graphite panel with a fine carbon weave (texture), a light rim, glossy bars and
+    // black graphs with a green grid, after the desktop meters of the early 2010s
+    carbon: {
+        text: "#ffffff", dim: "#c8c8c8", faint: "#8c8c8c", track: "#303030", grid: "#1e4a1e",
+        plot: "#050505", panel: "#262626", panelTop: "#4a4a4a", panelBottom: "#1a1a1a",
+        sep: "#4c4c4c", hot: "#ff4040", live: "#ffffff", edge: "#9a9a9a", glow: "60,150,40,0", gloss: 16,
+        glass: true, texture: "carbon.png", glossy: true,
+        accents: { blue: "#5ec8f5", teal: "#3fe0c5", green: "#7fe05a", purple: "#b796ff", orange: "#ff9f40",
+            pink: "#ff6fae", red: "#ff5a5a", yellow: "#f2d14b" },
+        levels: ["#5ec8f5", "#7fe05a", "#f2d14b", "#ff9f40", "#ff4040"]
     }
 };
+
+// Rainbow: Carbon laid out as those meters were. Every row in its own color, its label, values and
+// bar alike (rowColors), the colors running along the rainbow from row to row (rainbow: taken in
+// turn by the labels drawn in dim or faint), long bars, and one graph at the very bottom
+// (graphBottom: CPU, GPU and Network draw theirs last).
+THEMES.rainbow = {
+    graphBottom: true, rowColors: true,
+    rainbow: ["#7fe05a", "#b8e24a", "#f2d14b", "#ffb840", "#ff9040", "#ff6a3a", "#ff4a5a", "#ff3f86",
+        "#ff4fb8", "#d26bff", "#8f8cff", "#5ec8f5"]
+};
+for (var ck in THEMES.carbon) if (!(ck in THEMES.rainbow)) THEMES.rainbow[ck] = THEMES.carbon[ck];
+
+// The next of THEME.rainbow's colors, for the label drawn next in dim; header() starts over.
+// rainbow.color and .y: the latest such label's, for the rest of its row (rowColors)
+var rainbowAt = 0, rainbow = { color: null, y: 0 };
 
 var ACCENTS = {}, LEVELS = [];
 
@@ -225,6 +251,17 @@ var STRINGS = {
         ctHint: "CPU temperatures come from Core Temp. Click to download it, then keep it running (it can start with Windows).",
         ctNotRunning: "Core Temp not running ›",
         ctStart: "CPU temperatures come from Core Temp. Click to start it (or to download it if it isn't installed). In Core Temp, Options → Settings → \"Start Core Temp with Windows\" keeps it running.",
+        ctAsk: "Download Core Temp? Click again ›",
+        ctAskTip: "Core Temp, free from its author's site alcpu.com: the standalone version, without the installer's offers. It goes to %LOCALAPPDATA%\\ModernMeters\\CoreTemp and starts minimized, now and with Windows. Windows asks for administrator approval, which Core Temp needs to read the sensors. By downloading it you accept Core Temp's license.",
+        ctGetting: "Getting Core Temp…",
+        ctGettingTip: "Downloading Core Temp from alcpu.com and setting it up to start with Windows.",
+        ctFailed: "The last try failed: %s",
+        perfBroken: "Windows counters are broken: repair",
+        perfBrokenShort: "Repair counters",
+        perfTip: "The Windows performance counters (processor load, disks, network, graphics cards) are damaged, usually by a failed update or a registry cleaner. Click to rebuild them (lodctr /R, winmgmt /resyncperf). Windows asks for administrator approval; the gadgets restart when it's done.",
+        perfFixing: "Repairing…",
+        perfFixingTip: "Rebuilding the Windows performance counters. This takes up to a minute.",
+        perfFailed: "The last try failed: %s",
         lhmHint: "Temperature, fan and power of AMD/Intel cards come from LibreHardwareMonitor. Click to download it, then keep it running.",
         alarmOn: "Overheat alarm is on. Click to turn off.",
         alarmOff: "Overheat alarm is off. Click to turn on.",
@@ -268,6 +305,17 @@ var STRINGS = {
         ctHint: "Температуру процессора даёт Core Temp. Нажмите, чтобы скачать, и держите его запущенным (может стартовать с Windows).",
         ctNotRunning: "Core Temp не запущен ›",
         ctStart: "Температуру процессора даёт Core Temp. Нажмите, чтобы запустить его (или скачать, если он не установлен). В Core Temp: Options → Settings → «Start Core Temp with Windows» — и он будет запускаться сам.",
+        ctAsk: "Скачать Core Temp? Ещё клик ›",
+        ctAskTip: "Core Temp — бесплатно, с сайта автора alcpu.com: портативная версия, без рекламы из установщика. Ставится в %LOCALAPPDATA%\\ModernMeters\\CoreTemp и запускается свёрнутым — сейчас и вместе с Windows. Windows спросит права администратора: они нужны Core Temp, чтобы читать датчики. Скачивая, вы принимаете лицензию Core Temp.",
+        ctGetting: "Скачиваю Core Temp…",
+        ctGettingTip: "Core Temp скачивается с alcpu.com и настраивается на запуск вместе с Windows.",
+        ctFailed: "Прошлая попытка не удалась: %s",
+        perfBroken: "Счётчики Windows сломаны: починить",
+        perfBrokenShort: "Починить счётчики",
+        perfTip: "Счётчики производительности Windows (загрузка процессора, диски, сеть, видеокарты) повреждены — обычно после неудачного обновления или «чистилки» реестра. Нажмите, чтобы пересобрать их (lodctr /R, winmgmt /resyncperf). Windows спросит права администратора; после починки гаджеты перезапустятся.",
+        perfFixing: "Чиню…",
+        perfFixingTip: "Пересобираются счётчики производительности Windows. Это до минуты.",
+        perfFailed: "Прошлая попытка не удалась: %s",
         lhmHint: "Температуру, вентилятор и мощность карт AMD/Intel даёт LibreHardwareMonitor. Нажмите, чтобы скачать, и держите его запущенным.",
         alarmOn: "Сигнал перегрева включён. Нажмите, чтобы выключить.",
         alarmOff: "Сигнал перегрева выключен. Нажмите, чтобы включить.",
@@ -425,9 +473,19 @@ function rect(parent, x, y, w, h, color) {
 }
 
 function label(parent, x, y, w, size, color, align, bold) {
+    var fixed = null, sameRow = THEME.rowColors && rainbow.color && Math.abs(y - rainbow.y) <= 2;
+    if (sameRow && (color == THEME.text || color == THEME.dim || color == THEME.faint)) {
+        // Everything else on a row takes its label's color, and keeps it
+        color = fixed = rainbow.color;
+    } else if (THEME.rainbow && (color == THEME.dim || (THEME.rowColors && color == THEME.faint))) {
+        color = rainbow.color = THEME.rainbow[rainbowAt++ % THEME.rainbow.length];
+        rainbow.y = y;
+        fixed = THEME.rowColors ? color : null;
+    }
     var d = box(parent, x, y, w, size + 6,
         "font-size:" + fontSize(size) + "px;line-height:" + (size + 6) + "px;white-space:nowrap;color:" + color +
         ";text-align:" + (align || "left") + ";" + fontCss(bold));
+    if (fixed) d._fixed = fixed;
     return d;
 }
 
@@ -476,6 +534,7 @@ function setLinkText(el, s, short) {
 }
 
 function setColor(el, c) {
+    if (el._fixed && c != THEME.hot) c = el._fixed;   // a row's color (THEME.rowColors) over the levels
     if (el._c !== c) { el.style.color = c; el._c = c; }
 }
 
@@ -486,6 +545,8 @@ function setColor(el, c) {
 // the page; the bar is cut to a whole number of blocks.
 function Bar(parent, x, y, w, h) {
     this.w = w;
+    // THEME.rowColors: the bar is in its row's color whatever the load
+    this.fixed = THEME.rowColors ? rainbow.color : null;
     // THEME.trackAlpha: a see-through track under an empty box, as plotRect
     if (THEME.trackAlpha) {
         rect(parent, x, y, w, h, THEME.track).style.filter = "alpha(opacity=" + THEME.trackAlpha + ")";
@@ -515,13 +576,16 @@ function segmentWidth(w, min) {
 }
 
 Bar.prototype.set = function (pct, color) {
+    if (this.fixed) color = this.fixed;
     var px = pct == null ? 0 : Math.round(this.w * clamp(pct, 0, 100) / 100), seg = THEME.segments;
     if (pct > 0 && px < 1) px = 1;
     if (seg && px > 0) px = this.ends[Math.min(Math.ceil(clamp(pct, 0, 100) / 100 * this.ends.length), this.ends.length) - 1];
     if (px != this.px) { this.fill.style.width = px + "px"; this.px = px; }
     if (color != this.color) {
         this.fill.style.backgroundColor = color;
-        if (THEME.glass && !seg) gradient(this.fill, mix(THEME.track, color, 0.45), color, true);
+        // Glossy: lit from above, the color deepening downwards
+        if (THEME.glossy) gradient(this.fill, mix(color, "#ffffff", 0.55), mix(color, "#000000", 0.15));
+        else if (THEME.glass && !seg) gradient(this.fill, mix(THEME.track, color, 0.45), color, true);
         this.color = color;
     }
 };
@@ -856,11 +920,12 @@ function paintFrame(w, h) {
         var alpha = function (y) { var v = gloss(y); return "#" + (v < 16 ? "0" : "") + v.toString(16) + "FFFFFF"; };
         gradient(box(panel, r, inset, w - 2 * r, r - inset), alpha(inset), alpha(r));
         gradient(box(panel, inset, r, w - 2 * inset, 70 + inset - r), alpha(r), alpha(70 + inset));
-        // CRT scanlines (img/scan.png, translucent), kept off the bare corners like the gloss
-        if (THEME.terminal) {
+        // CRT scanlines (img/scan.png) or another translucent texture, kept off the bare corners
+        // like the gloss
+        if (THEME.terminal || THEME.texture) {
             // Each piece offsets the pattern by its own top so the lines run on across them
             var scan = function (x, y, wd, ht) {
-                box(panel, x, y, wd, ht, "background-image:url(img/scan.png);background-position:0 " + (-y) + "px;");
+                box(panel, x, y, wd, ht, "background-image:url(img/" + (THEME.texture || "scan.png") + ");background-position:0 " + (-y) + "px;");
             };
             scan(r, inset, w - 2 * r, r - inset);
             scan(inset, r, w - 2 * inset, h - 2 * r);
@@ -1110,6 +1175,8 @@ function glyph(prefix) {
 // (vendorColor): typed along with it in the terminals, white on Windows classic's title bar,
 // and in the top margin in the flat classic style, which has no title
 function header(root, y, kind, title, vendor) {
+    rainbowAt = 0;
+    rainbow.color = null;
     if (cursor.timer) clearInterval(cursor.timer);
     if (cursor.retype) clearTimeout(cursor.retype);
     cursor.timer = cursor.retype = null;
@@ -1527,7 +1594,7 @@ function cimDate(s) {
 // %APPDATA%\ModernMeters\update.txt, where the others pick it up. A newer version shows a badge;
 // only a click on it downloads the release and installs it (update.ps1).
 
-var VERSION = "1.8.3";   // set by build.ps1
+var VERSION = "1.9.0";   // set by build.ps1
 var REPO = "livonianlabs/modern-meters";
 var KOFI_URL = "https://ko-fi.com/silverenio";
 var MAKER = "Livonian Labs", MAIL = "livonianlabs@gmail.com";
@@ -1601,8 +1668,8 @@ function updateBadge(root) {
     updates.badge = null;
     var s = updateAvailable();
     updates.shown = !!s;
-    updates.state = s ? installState(s.latest).state : "";
-    if (!s) return;
+    updates.state = s ? stateKey(installState(s.latest)) : "";
+    if (!s) { justUpdated(root); return; }
     var ver = s.latest.replace(/^v/i, ""), page = s.url || "https://github.com/" + REPO + "/releases/latest";
     var c = THEME.titleBar ? "#ffffff" : ACCENTS[accentName()];
     var l = THEME.glass ? label(root, W - PAD - 40, 10, 40, 9, c, "right", true) :
@@ -1610,12 +1677,20 @@ function updateBadge(root) {
     // Done counts as running until the gadget reloads into the new version
     var st = installState(s.latest), busy = st.state == "running" || st.state == "done";
     var head = T("update").replace("%s", ver).replace(" ›", "") + ". ";
-    setText(l, (busy ? "↻ " : "↑ ") + ver);
+    setText(l, busy ? SPINNER[0] + " " + (st.step || ver) : "↑ " + ver);
     if (busy) setHint(l, head + T("updating"), function () { });
     else if (st.state == "failed") setHint(l, head + T("updateFailed").replace("%s", st.error || "?"), page);
     else setHint(l, head + T("updateHint"), function () { installUpdate(s.latest); });
     updates.badge = l;
-    if (busy) return;
+    if (busy) {
+        // Turning while it downloads and installs, so a click visibly does something
+        var frame = 0;
+        updates.blink = setInterval(function () {
+            frame = (frame + 1) % SPINNER.length;
+            setText(l, SPINNER[frame] + " " + (st.step || ver));
+        }, 150);
+        return;
+    }
     // Not under the mouse: restyling it would take its tip away
     var on = true, hover = false, dim = THEME.titleBar ? THEME.titleBar[1] : THEME.faint;
     l.onmouseenter = function () { hover = true; setColor(l, c); };
@@ -1624,6 +1699,109 @@ function updateBadge(root) {
         on = !on;
         if (!hover) setColor(l, on ? c : dim);
     }, 530);
+}
+
+var SPINNER = ["◐", "◓", "◑", "◒"];
+
+// The install state as far as the badge shows it: a new step redraws it too
+function stateKey(st) {
+    return st.state + (st.step ? " " + st.step : "");
+}
+
+// "✓ x.y.z" for a few seconds after a badge click brought this version
+function justUpdated(root) {
+    var s = readShared("updating.txt");
+    if (s.state != "done" || String(s.tag).replace(/^v/i, "") != VERSION || !(new Date().getTime() - parseFloat(s.at) < 120000)) return;
+    var l = THEME.glass ? label(root, W - PAD - 40, 10, 40, 9, LEVELS[1], "right", true) :
+        label(root, W - PAD - 40, -1, 40, 8, LEVELS[1], "right", true);
+    setText(l, "✓ " + VERSION);
+    if (s.error) l.title = s.error;
+    setTimeout(function () { if (l.parentNode) l.parentNode.removeChild(l); }, 10000);
+}
+
+// ---- system fixes (setup.ps1) ---------------------------------------------
+// Downloading Core Temp and repairing the performance counters need administrator rights:
+// setup.ps1 runs elevated, so Windows asks first, and writes its progress to setup.txt.
+
+var SETUP_TIMEOUT = 5 * 60 * 1000;
+
+// Runs setup.ps1 -Action action elevated; extra: more arguments
+function runSetup(action, extra) {
+    writeShared("setup.txt", { state: "starting", action: action, at: new Date().getTime() });
+    try {
+        var args = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"" + System.Gadget.path + "\\setup.ps1\" -Action " +
+            action + " -Status \"" + sharedPath("setup.txt") + "\"" + (extra || "");
+        new ActiveXObject("Shell.Application").ShellExecute("powershell.exe", args, "", "runas", 0);
+    } catch (e) {
+        writeShared("setup.txt", { state: "failed", action: action, at: new Date().getTime(), error: e.message || "powershell" });
+    }
+}
+
+// { state: ""|starting|running|done|failed, error } of the latest run of action. A run nobody
+// approved (the administrator prompt was declined) never leaves "starting" and is forgotten.
+function setupState(action) {
+    var s = readShared("setup.txt"), age = new Date().getTime() - parseFloat(s.at);
+    if (s.action != action) return { state: "" };
+    if (s.state == "starting" && !(age < 60000)) return { state: "" };
+    if (s.state == "running" && !(age < SETUP_TIMEOUT)) return { state: "failed", error: "timeout" };
+    return s;
+}
+
+function setupBusy(st) {
+    return st.state == "starting" || st.state == "running";
+}
+
+// Shows "<spinner> text" in el while busy() holds, turning; stops by itself afterwards
+function spinText(el, text, busy) {
+    if (el._spin) return;
+    var frame = 0;
+    setText(el, SPINNER[0] + " " + text);
+    el._spin = setInterval(function () {
+        if (!busy()) { clearInterval(el._spin); el._spin = null; return; }
+        frame = (frame + 1) % SPINNER.length;
+        setText(el, SPINNER[frame] + " " + text);
+    }, 150);
+}
+
+// True when the Windows performance counters are gone (a damaged counter registry), checked at
+// most every 30 s
+var perfCheck = { at: 0, broken: false };
+
+function perfCountersBroken() {
+    if (new Date().getTime() - perfCheck.at < 30000) return perfCheck.broken;
+    perfCheck.at = new Date().getTime();
+    try {
+        new ActiveXObject("WbemScripting.SWbemLocator").ConnectServer(".", "root\\cimv2").Get("Win32_PerfRawData_PerfOS_Processor");
+        perfCheck.broken = false;
+    } catch (e) {
+        perfCheck.broken = true;
+    }
+    return perfCheck.broken;
+}
+
+// In el: "Windows counters are broken: repair ›", which repairs them (after the administrator
+// prompt), a spinner meanwhile, the error if it failed. The gadgets reload once it is done.
+function counterRepairLink(el) {
+    var st = setupState("Counters");
+    setColor(el, THEME.hot);
+    if (setupBusy(st)) {
+        el.title = T("perfFixingTip");
+        el.onclick = null;
+        el.style.cursor = "default";
+        spinText(el, T("perfFixing"), function () { return setupBusy(setupState("Counters")); });
+        return;
+    }
+    if (el._spin) { clearInterval(el._spin); el._spin = null; el._t = null; }
+    setLinkText(el, T("perfBroken"), T("perfBrokenShort"));
+    el.title = T("perfTip") + (st.state == "failed" ? "\n\n" + T("perfFailed").replace("%s", st.error || "?") : "");
+    el.style.cursor = "hand";
+    el.onclick = function () { runSetup("Counters"); counterRepairLink(el); };
+}
+
+// Reloads the gadget once a repair finished after it loaded: WMI restarted under it
+function setupFinished() {
+    var s = readShared("setup.txt");
+    return s.action == "Counters" && s.state == "done" && parseFloat(s.at) > LOADED_AT;
 }
 
 // Redraws just the badge, for a change of the install state
@@ -1756,8 +1934,8 @@ function watchUpdates(onChange) {
     adoptStyle();
     setInterval(function () {
         // A new version was installed over this one (by a badge click or by hand)
-        if (codeSettled()) { location.reload(); return; }
-        var s = updateAvailable(), st = s ? installState(s.latest).state : "";
+        if (codeSettled() || setupFinished()) { location.reload(); return; }
+        var s = updateAvailable(), st = s ? stateKey(installState(s.latest)) : "";
         if (adoptStyle()) onChange();
         else if (st != updates.state && !redrawBadge()) onChange();
     }, STYLE_POLL);

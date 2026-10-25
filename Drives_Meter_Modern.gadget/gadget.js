@@ -229,6 +229,13 @@ function rebuild() {
     ui = { disks: [] };
     var y = header(root, 10, "disk", T("hdrDrives"));
 
+    // Without the performance counters there is no activity: a line to repair them
+    if (perfCountersBroken()) {
+        ui.perf = label(root, PAD, y + 2, IW, 11, THEME.hot);
+        counterRepairLink(ui.perf);
+        y += 22;
+    }
+
     if (!disks.length) {
         setText(label(root, PAD, y + 4, IW, 11, THEME.dim), T("noDisks"));
         y += 30;
@@ -307,6 +314,7 @@ function rebuild() {
 function tick(perf) {
     try {
         perf = perf || readPerf();
+        if (ui.perf) counterRepairLink(ui.perf);
         if (perfSignature(perf) != layoutSig) {   // disk added, removed or repartitioned
             rebuild();
             return;

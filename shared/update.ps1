@@ -1,6 +1,7 @@
 # Installs release $Tag over every Modern Meters gadget in $Folder (the folder that holds the
 # installed .gadget folders). Run hidden by a gadget when its new-version badge is clicked.
-# Writes state=running|done|failed (and error=...) to %APPDATA%\ModernMeters\updating.txt.
+# Writes state=running|done|failed (and error=..., and step=<downloaded>/<all> while it runs) to
+# %APPDATA%\ModernMeters\updating.txt.
 # common.js goes in last: its new date is what tells the running gadgets to reload.
 param([string]$Tag, [string]$Folder)
 $ErrorActionPreference = 'Stop'
@@ -9,10 +10,11 @@ $ProgressPreference = 'SilentlyContinue'
 $names = 'CPU_Meter_Modern.gadget', 'GPU_Meter_Modern.gadget', 'Network_Meter_Modern.gadget', 'Drives_Meter_Modern.gadget', 'Weather_Meter_Modern.gadget'
 $statusFile = Join-Path $env:APPDATA 'ModernMeters\updating.txt'
 
-function Set-State($state, $err) {
+function Set-State($state, $err, $step) {
     New-Item -ItemType Directory -Force (Split-Path $statusFile) | Out-Null
     $text = "state=$state`r`ntag=$Tag`r`nat=" + [DateTimeOffset]::Now.ToUnixTimeMilliseconds() + "`r`n"
     if ($err) { $text += 'error=' + ($err -replace '[\r\n]+', ' ') + "`r`n" }
+    if ($step) { $text += "step=$step`r`n" }
     [IO.File]::WriteAllText($statusFile, $text)
 }
 
@@ -29,13 +31,17 @@ try {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
 
     # Everything is downloaded and checked before anything is replaced
+    $done = 0
     foreach ($n in $installed) {
+        Set-State 'running' $null "$done/$($installed.Count)"
         $zip = Join-Path $work ($n -replace '\.gadget$', '.zip')
         Invoke-WebRequest -UseBasicParsing "https://github.com/livonianlabs/modern-meters/releases/download/$Tag/$n" -OutFile $zip
         $dir = Join-Path $work $n
         [IO.Compression.ZipFile]::ExtractToDirectory($zip, $dir)
         if (-not (Test-Path (Join-Path $dir 'gadget.xml')) -or -not (Test-Path (Join-Path $dir 'common.js'))) { throw "$n is incomplete" }
+        $done++
     }
+    Set-State 'running' $null "$done/$($installed.Count)"
 
     # What to copy, decided before anything is replaced. A DLL the Sidebar has loaded can't be
     # replaced, so one that is unchanged is skipped.

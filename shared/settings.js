@@ -56,6 +56,8 @@ function generalRows(noTemp, graphOpts) {
             // Ubuntu terminal, Windows classic) are other companies' marks, named only in the README
             ["liquid", { en: "Lens glass", ru: "Стекло-линза" }],
             ["aero", { en: "Sky glass", ru: "Небесное стекло" }],
+            ["carbon", { en: "Carbon", ru: "Карбон" }],
+            ["rainbow", { en: "Rainbow", ru: "Радуга" }],
             ["terminal", { en: "Retro terminal", ru: "Ретро-терминал" }],
             ["ubuntu", { en: "Terminal: aubergine", ru: "Терминал: баклажан" }],
             ["mono", { en: "Terminal: black and white", ru: "Терминал: чёрно-белый" }],

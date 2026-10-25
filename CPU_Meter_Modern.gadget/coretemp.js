@@ -15,10 +15,17 @@ function openCoreTemp() {
     }
 }
 
-// Starts Core Temp: through its own "Start with Windows" task when there is one (no prompt, the
-// task already runs elevated), else the installed exe (Windows asks for administrator approval),
-// else the download page
+// Where setup.ps1 puts the Core Temp it downloads
+var CT_DIR = "%LOCALAPPDATA%\\ModernMeters\\CoreTemp";
+var ctAskedAt = 0;
+
+// Starts Core Temp: through a "Start with Windows" task when there is one (Core Temp's own or
+// ours; no prompt, the task already runs elevated), else an installed exe (Windows asks for
+// administrator approval). Without either, the first click asks and a second one within a few
+// seconds downloads the standalone Core Temp from its author's site (setup.ps1, elevated), which
+// also sets up the task. Without the note on the graph to ask on, the administrator prompt asks.
 function startCoreTemp() {
+    if (setupBusy(setupState("CoreTemp"))) return;
     try {
         var svc = new ActiveXObject("Schedule.Service");
         svc.Connect();
@@ -28,7 +35,7 @@ function startCoreTemp() {
         }
     } catch (err) { }
     var sh = new ActiveXObject("WScript.Shell"), fso = new ActiveXObject("Scripting.FileSystemObject");
-    var paths = ["%ProgramFiles%\\Core Temp\\Core Temp.exe", "%ProgramFiles(x86)%\\Core Temp\\Core Temp.exe"];
+    var paths = ["%ProgramFiles%\\Core Temp\\Core Temp.exe", "%ProgramFiles(x86)%\\Core Temp\\Core Temp.exe", CT_DIR + "\\Core Temp.exe"];
     for (var i = 0; i < paths.length; i++) {
         var p = sh.ExpandEnvironmentStrings(paths[i]);
         if (fso.FileExists(p)) {
@@ -36,7 +43,35 @@ function startCoreTemp() {
             return;
         }
     }
-    try { sh.Run(CORETEMP_URL); } catch (err3) { }
+    if (ui.ctNote && !(now() - ctAskedAt < 8000)) {
+        ctAskedAt = now();
+        showCoreTempNote();
+        return;
+    }
+    ctAskedAt = 0;
+    runSetup("CoreTemp", " -Dir \"" + sh.ExpandEnvironmentStrings(CT_DIR) + "\" -User \"" +
+        sh.ExpandEnvironmentStrings("%USERDOMAIN%\\%USERNAME%") + "\"");
+    showCoreTempNote();
+}
+
+// The note on the graph while Core Temp isn't running: the link to start it, the question
+// before a download, a spinner during it, or why it failed
+function showCoreTempNote() {
+    var el = ui.ctNote;
+    if (!el) return;
+    var st = setupState("CoreTemp");
+    if (setupBusy(st)) {
+        setColor(el, THEME.dim);
+        el.title = T("ctGettingTip");
+        spinText(el, T("ctGetting"), function () { return setupBusy(setupState("CoreTemp")); });
+        return;
+    }
+    if (el._spin) { clearInterval(el._spin); el._spin = null; }
+    var asking = now() - ctAskedAt < 8000;
+    setColor(el, asking ? THEME.text : LEVELS[3]);
+    setText(el, T(asking ? "ctAsk" : "ctNotRunning"));
+    el.title = asking ? T("ctAskTip") : T("ctStart") +
+        (st.state == "failed" ? "\n\n" + T("ctFailed").replace("%s", st.error || "?") : "");
 }
 
 // Returns per-physical-core temperatures in Celsius, or null when Core Temp isn't running
