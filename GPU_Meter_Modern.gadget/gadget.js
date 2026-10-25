@@ -539,7 +539,8 @@ function rebuild() {
     }
     topNext = 0;
 
-    if (THEME.glass) {
+    // Not in Rainbow, whose meters of old had only rows
+    if (THEME.glass && !THEME.rowColors) {
         // A little smaller than the frames, to keep the gadget short
         var gs = 44, gx = Math.round(IW / 4 - gs / 2);
         ui.gLoad = new Gauge(root, PAD + gx, y, T("gpuLoad"), gs);
