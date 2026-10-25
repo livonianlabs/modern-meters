@@ -2,7 +2,7 @@
 <gadget>
   <name>Weather Meter Modern</name>
   <namespace>ModernMeters</namespace>
-  <version>1.9.2</version>
+  <version>1.9.3</version>
   <author name="Livonian Labs">
     <info url="https://github.com/livonianlabs/modern-meters" text="github.com/livonianlabs/modern-meters" />
     <logo src="icon.png" />

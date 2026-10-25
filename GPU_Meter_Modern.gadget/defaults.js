@@ -12,6 +12,7 @@ var DEFAULTS = {
     unit: "C",
     gpu: "0",
     allCards: "off",
+    smiSkip: "",          // cards nvidia-smi failed on, see smiSkip() in gadget.js
     source: "auto",
     details: "on",
     top: "on",

@@ -335,17 +335,31 @@ SmiProvider.prototype.failing = function (d) {
 
 function fallBack(p, c, key, d) {
     if (source != "auto" || !c || !(p instanceof SmiProvider) || !p.failing(d)) return null;
+    smiSkip(c, true);
     p.stop();
     var q = new CounterProvider(c, key);
     q.start();
     return q;
 }
 
+// Cards nvidia-smi couldn't read, so that a rebuild (a new version's badge, the settings) or a
+// reload doesn't wait for it again: their LUIDs, which Windows hands out anew at every start, so
+// nvidia-smi gets another try after a restart (a new driver, say). With set, marks c.
+function smiSkip(c, set) {
+    var list = String(getSetting("smiSkip") || "");
+    if (!c) return false;
+    if (set) {
+        if (list.indexOf(c.luid) < 0) setSetting("smiSkip", (list ? list + " " : "") + c.luid);
+        return true;
+    }
+    return list.indexOf(c.luid) >= 0;
+}
+
 // key: temp file prefix, "" for the main card. Forcing nvidia-smi leaves the other vendors' extra
 // cards on the counters.
 function pickProvider(c, key) {
     var nvidia = !c || c.vendor == "10DE";
-    if ((source == "smi" && (!key || nvidia)) || (source == "auto" && smiPath && nvidia))
+    if ((source == "smi" && (!key || nvidia)) || (source == "auto" && smiPath && nvidia && !smiSkip(c)))
         return smiPath ? new SmiProvider(c, key) : null;
     return c ? new CounterProvider(c, key) : null;
 }
