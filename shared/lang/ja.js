@@ -80,7 +80,7 @@ addLanguage("ja", "日本語", {
     "Exclamation": "感嘆符", "Battery critical": "バッテリ残量わずか", "Volume": "音量", "Repeat": "繰り返し",
     "Once": "1 回", "Until silenced": "消音するまで", "Play": "再生",
     "About": "このガジェットについて", "Version": "バージョン", "New versions": "新しいバージョン", "Let me know": "知らせる",
-    "Don't check": "確認しない", "Made by": "作者", "Feedback": "フィードバック", "✉ Write to us": "✉ メールする", "Graph history": "グラフの期間", "Short (by refresh)": "短い（更新ごと）", "%d min": "%d 分", "1 hour": "1 時間", "Busiest program": "最も負荷の高いプログラム", "Lens glass": "レンズガラス", "Sky glass": "スカイガラス", "Like them?": "気に入りましたか？", "☕ Buy me a coffee": "☕ コーヒーをおごる",
+    "Don't check": "確認しない", "Made by": "作者", "Feedback": "フィードバック", "✉ Write to us": "✉ メールする", "Graph history": "グラフの期間", "Short (by refresh)": "短い（更新ごと）", "%d min": "%d 分", "1 hour": "1 時間", "Busiest program": "最も負荷の高いプログラム", "All graphics cards": "すべてのグラフィックカード", "Lens glass": "レンズガラス", "Sky glass": "スカイガラス", "Like them?": "気に入りましたか？", "☕ Buy me a coffee": "☕ コーヒーをおごる",
     "Live zone": "ライブゾーン", "Per-core list": "一覧", "All threads": "すべてのスレッド", "Cores (P/E)": "コア (P/E)",
     "RAM / Commit": "メモリ / コミット",
     "Bottom details": "下部の詳細", "Data source": "データソース", "Source": "ソース", "Auto": "自動",

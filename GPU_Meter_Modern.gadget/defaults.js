@@ -11,6 +11,7 @@ var DEFAULTS = {
     graph: "64",
     unit: "C",
     gpu: "0",
+    allCards: "off",
     source: "auto",
     details: "on",
     top: "on",
@@ -99,7 +100,9 @@ function settingsSpec() {
             ["smi", "nvidia-smi"],
             ["wmi", { en: "Windows counters", ru: "Счётчики Windows" }]] },
         { key: "gpu", label: { en: "Graphics card", ru: "Видеокарта" }, options: cards }
-    ], alarms);
+    ], gpus.length > 1 ? [
+        { key: "allCards", label: { en: "All graphics cards", ru: "Все видеокарты" }, options: OPT.onOff }
+    ] : [], alarms);
 }
 
 var SETTINGS_NOTE = {

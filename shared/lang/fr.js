@@ -80,7 +80,7 @@ addLanguage("fr", "Français", {
     "Exclamation": "Exclamation", "Battery critical": "Batterie critique", "Volume": "Volume", "Repeat": "Répéter",
     "Once": "Une fois", "Until silenced": "Jusqu'à arrêt", "Play": "Écouter",
     "About": "À propos", "Version": "Version", "New versions": "Nouvelles versions", "Let me know": "Me prévenir",
-    "Don't check": "Ne pas vérifier", "Made by": "Auteur", "Feedback": "Contact", "✉ Write to us": "✉ Nous écrire", "Graph history": "Historique du graphique", "Short (by refresh)": "Court (par actualisation)", "%d min": "%d min", "1 hour": "1 heure", "Busiest program": "Programme le plus actif", "Lens glass": "Verre lentille", "Sky glass": "Verre ciel", "Like them?": "Ils vous plaisent ?", "☕ Buy me a coffee": "☕ Offrez-moi un café",
+    "Don't check": "Ne pas vérifier", "Made by": "Auteur", "Feedback": "Contact", "✉ Write to us": "✉ Nous écrire", "Graph history": "Historique du graphique", "Short (by refresh)": "Court (par actualisation)", "%d min": "%d min", "1 hour": "1 heure", "Busiest program": "Programme le plus actif", "All graphics cards": "Toutes les cartes graphiques", "Lens glass": "Verre lentille", "Sky glass": "Verre ciel", "Like them?": "Ils vous plaisent ?", "☕ Buy me a coffee": "☕ Offrez-moi un café",
     "Live zone": "Zone en direct", "Per-core list": "Liste", "All threads": "Tous les threads", "Cores (P/E)": "Cœurs (P/E)",
     "RAM / Commit": "RAM / Validée",
     "Bottom details": "Lignes du bas", "Data source": "Source des données", "Source": "Source", "Auto": "Auto",

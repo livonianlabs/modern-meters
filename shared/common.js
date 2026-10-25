@@ -1527,7 +1527,7 @@ function cimDate(s) {
 // %APPDATA%\ModernMeters\update.txt, where the others pick it up. A newer version shows a badge;
 // only a click on it downloads the release and installs it (update.ps1).
 
-var VERSION = "1.7.0";   // set by build.ps1
+var VERSION = "1.8.0";   // set by build.ps1
 var REPO = "livonianlabs/modern-meters";
 var KOFI_URL = "https://ko-fi.com/silverenio";
 var MAKER = "Livonian Labs", MAIL = "livonianlabs@gmail.com";

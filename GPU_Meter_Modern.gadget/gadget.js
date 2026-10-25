@@ -6,10 +6,11 @@
 //    records from the GPU performance counters and D3DKMT (ModernMetersGpu.dll), the sources
 //    Task Manager uses; LibreHardwareMonitor adds what the driver doesn't report if it runs.
 
-var W, IW, accent, unit, graphH, interval, gpuIndex, source, showDetails, showTop, narrow, vramLimit;
+var W, IW, accent, unit, graphH, interval, gpuIndex, source, showDetails, showTop, showAll, narrow, vramLimit;
 var ui = null, timer = null;
 var shell, fso, wmi, smiPath = null, provider = null, misses = 0;
 var gpus = [], card = null;   // listGpus() (defaults.js), and the one picked in the settings
+var extras = [];              // the other cards, when all are shown: { card, provider, ui, misses }
 
 function init() {
     shell = new ActiveXObject("WScript.Shell");
@@ -17,6 +18,7 @@ function init() {
     wmi = new ActiveXObject("WbemScripting.SWbemLocator").ConnectServer(".", "root\\cimv2");
     smiPath = findSmi();
     gpus = listGpus();
+    for (var i = 0; i < gpus.length; i++) gpus[i].index = i;
     hookSettings(rebuild);
     watchUpdates(rebuild);
     if (IS_GADGET) System.Gadget.Flyout.onHide = function () { procs = null; };
@@ -25,8 +27,14 @@ function init() {
 
 function shutdown() {
     if (timer) clearInterval(timer);
-    if (provider) provider.stop();
+    stopProviders();
     disposeAlarms();
+}
+
+function stopProviders() {
+    if (provider) provider.stop();
+    for (var i = 0; i < extras.length; i++) if (extras[i].provider) extras[i].provider.stop();
+    extras = [];
 }
 
 function disposeAlarms() {
@@ -81,8 +89,10 @@ function findSmi() {
 // so a broken driver never piles up processes.
 var SMI_TIMEOUT = 15000, SMI_MAX_WAIT = 300000;
 
-function SmiProvider() {
-    this.out = tempPath("smi.csv");
+// c: the card (null when the registry lists none), key: file name prefix, "" for the main card
+function SmiProvider(c, key) {
+    this.card = c;
+    this.out = tempPath(key + "smi.csv");
     this.launched = 0;
     this.wait = SMI_TIMEOUT;
 }
@@ -92,11 +102,11 @@ SmiProvider.prototype.start = function () {
     try { fso.DeleteFile(this.out, true); } catch (e) { }
     // nvidia-smi only has the fan in percent; the D3DKMT reader adds its RPM
     this.kmt = null;
-    if (!card) return;
+    if (!this.card) return;
     try {
         if (IS_GADGET) registerDotNet("{8c41d7a2-6f0e-4b9d-b3a5-2e7f19c4d860}", "ModernMeters.GpuReader", "ModernMetersGpu");
         var k = new ActiveXObject("ModernMeters.GpuReader");
-        if (k.Open(card.luid)) this.kmt = k;
+        if (k.Open(this.card.luid)) this.kmt = k;
     } catch (e2) { }
 };
 
@@ -138,7 +148,7 @@ SmiProvider.prototype.launch = function () {
     }
     this.launched = now;
     try {
-        shell.Run("\"" + smiPath + "\" -i " + smiIndex() + " --query-gpu=" + SMI_FIELDS.join(",") +
+        shell.Run("\"" + smiPath + "\" -i " + smiIndex(this.card) + " --query-gpu=" + SMI_FIELDS.join(",") +
             " --format=csv,noheader,nounits -f \"" + this.out + "\"", 0, false);
     } catch (e) { }
 };
@@ -186,19 +196,20 @@ function fanRpmText(rpm) {
 }
 
 // nvidia-smi numbers only the NVIDIA cards
-function smiIndex() {
-    if (!card) return gpuIndex;
+function smiIndex(c) {
+    if (!c) return gpuIndex;
     var n = 0;
-    for (var i = 0; i < gpus.length && gpus[i] != card; i++) if (gpus[i].vendor == "10DE") n++;
+    for (var i = 0; i < gpus.length && gpus[i] != c; i++) if (gpus[i].vendor == "10DE") n++;
     return n;
 }
 
 // ---- provider: Windows (gpuhelper.js) -------------------------------------
 
-function CounterProvider() {
-    this.out = tempPath("wmi.txt");
-    this.hb = tempPath("alive");
-    this.driver = driverVersion(card.name);
+function CounterProvider(c, key) {
+    this.card = c;
+    this.out = tempPath(key + "wmi.txt");
+    this.hb = tempPath(key + "alive");
+    this.driver = driverVersion(c.name);
 }
 
 function driverVersion(name) {
@@ -234,7 +245,7 @@ CounterProvider.prototype.start = function () {
     var script = IS_GADGET ? System.Gadget.path + "\\gpuhelper.js" :
         unescape(location.pathname.replace(/^\/+/, "").replace(/[^\\\/]*$/, "")).replace(/\//g, "\\") + "gpuhelper.js";
     shell.Run("wscript.exe //B //Nologo \"" + script + "\" \"" + this.out + "\" \"" + this.hb + "\" " +
-        card.luid + " " + Math.max(interval, 1000) + " " + gpuIndex, 0, false);
+        this.card.luid + " " + Math.max(interval, 1000) + " " + this.card.index, 0, false);
 };
 
 CounterProvider.prototype.poll = function () {
@@ -254,7 +265,7 @@ CounterProvider.prototype.poll = function () {
     var ded = num(r.vram), shared = num(r.shared), temp = num(r.temp);
     var gb = function (mb) { return (mb / 1024).toFixed(1); };
     var d = {
-        name: card.name,
+        name: this.card.name,
         usage: num(r.usage),
         temp: temp,
         power: num(r.power),
@@ -270,24 +281,27 @@ CounterProvider.prototype.poll = function () {
         footer: T("driver") + " " + this.driver + (narrow ? "" : "  ·  " + T("counters"))
     };
     var sharedLabel = T(narrow ? "sharedShort" : "shared");
-    if (card.integrated) {
+    if (this.card.integrated) {
         // Integrated graphics work out of shared system memory; their own carve-out is a footnote
         d.memLabel = sharedLabel;
         d.vramUsed = shared;
-        d.vramTotal = card.sharedMB;
-        d.row2 = { label: T("vram"), val: ded == null ? "" : fmtPair(gb(ded), gb(card.dedicatedMB), "GB", narrow), pct: pctOf(ded, card.dedicatedMB) };
+        d.vramTotal = this.card.sharedMB;
+        d.row2 = { label: T("vram"), val: ded == null ? "" : fmtPair(gb(ded), gb(this.card.dedicatedMB), "GB", narrow), pct: pctOf(ded, this.card.dedicatedMB) };
     } else {
         d.vramUsed = ded;
-        d.vramTotal = card.dedicatedMB;
+        d.vramTotal = this.card.dedicatedMB;
         d.row2 = { label: sharedLabel, val: shared == null ? "" : gb(shared) + " " + T("GB"), pct: null, noPct: true };
     }
     return d;
 };
 
-function pickProvider() {
-    if (source == "smi" || (source == "auto" && smiPath && (!card || card.vendor == "10DE")))
-        return smiPath ? new SmiProvider() : null;
-    return card ? new CounterProvider() : null;
+// key: temp file prefix, "" for the main card. Forcing nvidia-smi leaves the other vendors' extra
+// cards on the counters.
+function pickProvider(c, key) {
+    var nvidia = !c || c.vendor == "10DE";
+    if ((source == "smi" && (!key || nvidia)) || (source == "auto" && smiPath && nvidia))
+        return smiPath ? new SmiProvider(c, key) : null;
+    return c ? new CounterProvider(c, key) : null;
 }
 
 // ---- top processes (flyout) -----------------------------------------------
@@ -327,13 +341,20 @@ function readProcs() {
             q.eng[type] = (q.eng[type] || 0) + u;
         }
     }
-    // Program names by process ID, asked again only for processes not seen before
+    // Program names by process ID, asked again only for processes not seen before. Win32_Process
+    // takes half a second even for one process and the gadget stalls meanwhile; a refresher over
+    // the process counters is several times faster.
     var unknown = false;
     for (var k in pids) if (!procs.names[k]) unknown = true;
     if (unknown) {
         try {
-            for (e = new Enumerator(wmi.ExecQuery("SELECT ProcessId,Name FROM Win32_Process")); !e.atEnd(); e.moveNext())
-                procs.names[e.item().ProcessId] = String(e.item().Name).replace(/\.exe$/i, "");
+            if (!procs.procSet) {
+                procs.procRefresher = new ActiveXObject("WbemScripting.SWbemRefresher");
+                procs.procSet = procs.procRefresher.AddEnum(wmi, "Win32_PerfRawData_PerfProc_Process").ObjectSet;
+            }
+            procs.procRefresher.Refresh();
+            for (e = new Enumerator(procs.procSet); !e.atEnd(); e.moveNext())
+                procs.names[e.item().IDProcess] = String(e.item().Name).replace(/#\d+$/, "");
         } catch (err) { }
     }
     var by = {}, list = [];
@@ -391,6 +412,7 @@ function readSettings() {
     source = getSetting("source");
     showDetails = getSetting("details") != "off";
     showTop = getSetting("top") != "off";
+    showAll = getSetting("allCards") == "on";
     vramLimit = parseFloat(getSetting("vramAlarm")) || 0;
 }
 
@@ -413,11 +435,11 @@ function legend(root, x, y, color, text) {
 
 function rebuild() {
     if (timer) clearInterval(timer);
-    if (provider) provider.stop();
+    stopProviders();
     disposeAlarms();
     if (ui && ui.graph) keepGraph("gpu", ui.graph);
     readSettings();
-    provider = pickProvider();
+    provider = pickProvider(card, "");
     misses = 0;
     var vramColor = getSetting("accent") == "purple" ? ACCENTS.pink : ACCENTS.purple;
 
@@ -504,11 +526,42 @@ function rebuild() {
         y += 2;
     }
 
+    if (showAll) {
+        for (var i = 0; i < gpus.length; i++)
+            if (gpus[i] != card) y = extraCard(root, y, gpus[i]);
+    }
+
     updateBadge(root);
     paintFrame(W, y);
-    if (!provider) return;
-    try { provider.start(); } catch (e) { reportError(ui.sub, "start", e); }
-    timer = setInterval(tick, interval);
+    if (provider) try { provider.start(); } catch (e) { reportError(ui.sub, "start", e); }
+    for (i = 0; i < extras.length; i++) {
+        var x = extras[i];
+        if (x.provider) try { x.provider.start(); } catch (e2) { reportError(x.ui.sub, "start", e2); }
+    }
+    if (provider || extras.length) timer = setInterval(tick, interval);
+}
+
+// Another card, when all are shown: its name and load, clocks and temperature, then its memory.
+// The alarms, graph and busiest program stay with the main card.
+function extraCard(root, y, c) {
+    var x = { card: c, provider: pickProvider(c, "x" + c.index + "_"), misses: 0, ui: {} };
+    extras.push(x);
+    rect(root, PAD, y - 6, IW, 1, THEME.sep);
+    y += 2;
+    // "UHD 770" when "UHD Graphics 770" doesn't fit
+    var full = c.name.replace(/^(NVIDIA|AMD|Intel\(R\))\s+/i, ""), w = IW - 44;
+    x.ui.name = label(root, PAD, y, w, 11, THEME.text, "left", true);
+    setText(x.ui.name, textWidth(full, 11, true) <= w ? full :
+        full.replace(/^(GeForce|Radeon|Arc)\s+/i, "").replace(/\s+Graphics\b/i, ""));
+    x.ui.name.title = c.name;
+    x.ui.usage = label(root, W - PAD - 40, y - 2, 40, 13, accent, "right", true);
+    y += 17;
+    x.ui.sub = label(root, PAD, y, IW - 44, 10, THEME.dim);
+    setText(x.ui.sub, x.provider ? T("waiting") : T("smiMissing"));
+    x.ui.temp = label(root, W - PAD - 44, y, 44, 10, THEME.dim, "right", true);
+    y += 17;
+    x.ui.vram = meterRow(root, y, c.integrated ? T(narrow ? "sharedShort" : "shared") : T("vram"), "ram");
+    return y + 37;
 }
 
 // ---- update ---------------------------------------------------------------
@@ -529,6 +582,11 @@ function pctText(v) {
 }
 
 function tick() {
+    if (provider) tickMain();
+    for (var i = 0; i < extras.length; i++) if (extras[i].provider) tickExtra(extras[i]);
+}
+
+function tickMain() {
     var d;
     try { d = provider.poll(); } catch (e) { reportError(ui.sub, "poll", e); return; }
     if (!d) {
@@ -584,4 +642,26 @@ function tick() {
         setHint(ui.link, T("lhmHint"), d.link == T("noSensors") ? LHM_URL : null);
         setText(ui.driver, d.footer);
     }
+}
+
+function tickExtra(x) {
+    var d, u = x.ui;
+    try { d = x.provider.poll(); } catch (e) { reportError(u.sub, "poll", e); return; }
+    if (!d) {
+        if (++x.misses == 5) {
+            setText(u.sub, T("nodata"));
+            setText(u.vram.pct, "");
+            u.vram.bar.set(0);
+        }
+        return;
+    }
+    x.misses = 0;
+    setColor(u.sub, THEME.dim);
+    setText(u.sub, d.sub);
+    setText(u.usage, pctText(d.usage));
+    setColor(u.usage, pctColor(d.usage));
+    setText(u.temp, d.temp == null ? "" : fmtTemp(d.temp, unit) + unit);
+    setColor(u.temp, tempColor(d.temp));
+    show(u.vram, d.vramUsed == null ? "" :
+        fmtPair((d.vramUsed / 1024).toFixed(1), (d.vramTotal / 1024).toFixed(1), "GB", narrow), pctOf(d.vramUsed, d.vramTotal));
 }

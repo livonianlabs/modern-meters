@@ -80,7 +80,7 @@ addLanguage("pt", "Português", {
     "Exclamation": "Exclamação", "Battery critical": "Bateria crítica", "Volume": "Volume", "Repeat": "Repetir",
     "Once": "Uma vez", "Until silenced": "Até silenciar", "Play": "Ouvir",
     "About": "Sobre", "Version": "Versão", "New versions": "Novas versões", "Let me know": "Avisar",
-    "Don't check": "Não verificar", "Made by": "Autor", "Feedback": "Contato", "✉ Write to us": "✉ Escreva-nos", "Graph history": "Histórico do gráfico", "Short (by refresh)": "Curto (por atualização)", "%d min": "%d min", "1 hour": "1 hora", "Busiest program": "Programa mais ativo", "Lens glass": "Vidro lente", "Sky glass": "Vidro céu", "Like them?": "Gostou?", "☕ Buy me a coffee": "☕ Me pague um café",
+    "Don't check": "Não verificar", "Made by": "Autor", "Feedback": "Contato", "✉ Write to us": "✉ Escreva-nos", "Graph history": "Histórico do gráfico", "Short (by refresh)": "Curto (por atualização)", "%d min": "%d min", "1 hour": "1 hora", "Busiest program": "Programa mais ativo", "All graphics cards": "Todas as placas de vídeo", "Lens glass": "Vidro lente", "Sky glass": "Vidro céu", "Like them?": "Gostou?", "☕ Buy me a coffee": "☕ Me pague um café",
     "Live zone": "Zona ao vivo", "Per-core list": "Lista", "All threads": "Todas as threads", "Cores (P/E)": "Núcleos (P/E)",
     "RAM / Commit": "RAM / Confirmada",
     "Bottom details": "Linhas inferiores", "Data source": "Fonte de dados", "Source": "Fonte", "Auto": "Auto",
