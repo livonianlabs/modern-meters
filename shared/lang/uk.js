@@ -81,7 +81,7 @@ addLanguage("uk", "Українська", {
     "Exclamation": "Оклик", "Battery critical": "Батарея розряджена", "Volume": "Гучність", "Repeat": "Повтор",
     "Once": "Один раз", "Until silenced": "Поки не приглушити", "Play": "Прослухати",
     "About": "Про гаджет", "Version": "Версія", "New versions": "Нові версії", "Let me know": "Повідомляти", "Install by themselves": "Встановлювати самі",
-    "Don't check": "Не перевіряти", "Made by": "Автор", "Feedback": "Зв’язатися", "✉ Write to us": "✉ Написати нам", "Graph history": "Історія графіка", "Short (by refresh)": "Коротка (за оновленням)", "%d min": "%d хв", "1 hour": "1 година", "Busiest program": "Найактивніша програма", "All graphics cards": "Усі відеокарти", "Lens glass": "Скло-лінза", "Sky glass": "Небесне скло", "Carbon": "Карбон", "Rainbow": "Веселка", "Like them?": "Подобаються?", "☕ Buy me a coffee": "☕ Пригостити кавою",
+    "Don't check": "Не перевіряти", "Made by": "Автор", "Feedback": "Зв’язатися", "✉ Write to us": "✉ Написати нам", "Graph history": "Історія графіка", "Short (by refresh)": "Коротка (за оновленням)", "%d min": "%d хв", "1 hour": "1 година", "Busiest program": "Найактивніша програма", "All graphics cards": "Усі відеокарти", "Lens glass": "Скло-лінза", "Sky glass": "Небесне скло", "Carbon": "Карбон", "Rainbow": "Веселка", "Like them?": "Подобаються?", "☕ Buy me a coffee": "☕ Пригостити кавою", "Also as an app": "Є й програма", "Open its page ›": "Відкрити сторінку ›",
     "Live zone": "Плавна зона", "Per-core list": "Список", "All threads": "Усі потоки", "Cores (P/E)": "Ядра (P/E)",
     "RAM / Commit": "ОЗП / Виділено",
     "Bottom details": "Нижні рядки", "Data source": "Джерело даних", "Source": "Джерело", "Auto": "Авто",

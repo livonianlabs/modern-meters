@@ -118,7 +118,10 @@ function aboutRows() {
                 openUrl("mailto:" + MAIL + "?subject=" + encodeURIComponent("Modern Meters " + VERSION));
             } }] },
         { label: { en: "Like them?", ru: "Нравятся?" }, buttons: [
-            { label: { en: "☕ Buy me a coffee", ru: "☕ Угостить кофе" }, run: function () { openUrl(KOFI_URL); } }] }
+            { label: { en: "☕ Buy me a coffee", ru: "☕ Угостить кофе" }, run: function () { openUrl(KOFI_URL); } }] },
+        // The same meters as a program of their own, without 8GadgetPack
+        { label: { en: "Also as an app", ru: "Есть и приложение" }, buttons: [
+            { label: { en: "Open its page ›", ru: "Открыть страницу ›" }, run: function () { openUrl(APP_URL); } }] }
     ];
 }
 

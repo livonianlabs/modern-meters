@@ -81,7 +81,7 @@ addLanguage("zh", "中文", {
     "Exclamation": "感叹", "Battery critical": "电量严重不足", "Volume": "音量", "Repeat": "重复",
     "Once": "一次", "Until silenced": "直到静音", "Play": "试听",
     "About": "关于", "Version": "版本", "New versions": "新版本", "Let me know": "通知我", "Install by themselves": "自动安装",
-    "Don't check": "不检查", "Made by": "作者", "Feedback": "反馈", "✉ Write to us": "✉ 给我们写信", "Graph history": "图表时长", "Short (by refresh)": "短（按刷新）", "%d min": "%d 分钟", "1 hour": "1 小时", "Busiest program": "最忙的程序", "All graphics cards": "所有显卡", "Lens glass": "透镜玻璃", "Sky glass": "天空玻璃", "Carbon": "碳纤维", "Rainbow": "彩虹", "Like them?": "喜欢吗？", "☕ Buy me a coffee": "☕ 请我喝杯咖啡",
+    "Don't check": "不检查", "Made by": "作者", "Feedback": "反馈", "✉ Write to us": "✉ 给我们写信", "Graph history": "图表时长", "Short (by refresh)": "短（按刷新）", "%d min": "%d 分钟", "1 hour": "1 小时", "Busiest program": "最忙的程序", "All graphics cards": "所有显卡", "Lens glass": "透镜玻璃", "Sky glass": "天空玻璃", "Carbon": "碳纤维", "Rainbow": "彩虹", "Like them?": "喜欢吗？", "☕ Buy me a coffee": "☕ 请我喝杯咖啡", "Also as an app": "也有独立应用", "Open its page ›": "打开页面 ›",
     "Live zone": "实时区域", "Per-core list": "列表", "All threads": "全部线程", "Cores (P/E)": "核心 (P/E)",
     "RAM / Commit": "内存 / 已提交",
     "Bottom details": "底部详情", "Data source": "数据来源", "Source": "来源", "Auto": "自动",

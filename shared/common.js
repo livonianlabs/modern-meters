@@ -1597,6 +1597,7 @@ function cimDate(s) {
 var VERSION = "1.9.4";   // set by build.ps1
 var REPO = "livonianlabs/modern-meters";
 var KOFI_URL = "https://ko-fi.com/silverenio";
+var APP_URL = "https://livonianlabs.github.io/modern-meters-app/";
 var MAKER = "Livonian Labs", MAIL = "livonianlabs@gmail.com";
 var UPDATE_EVERY = 24 * 3600 * 1000;
 var updates = { timer: null, req: null, sent: 0, shown: false, state: "", onChange: null, blink: null, root: null, badge: null };

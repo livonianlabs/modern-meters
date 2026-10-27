@@ -81,7 +81,7 @@ addLanguage("de", "Deutsch", {
     "Exclamation": "Hinweis", "Battery critical": "Akku kritisch", "Volume": "Lautstärke", "Repeat": "Wiederholen",
     "Once": "Einmal", "Until silenced": "Bis stumm", "Play": "Abspielen",
     "About": "Info", "Version": "Version", "New versions": "Neue Versionen", "Let me know": "Melden", "Install by themselves": "Selbst installieren",
-    "Don't check": "Nicht prüfen", "Made by": "Von", "Feedback": "Feedback", "✉ Write to us": "✉ Schreib uns", "Graph history": "Verlauf", "Short (by refresh)": "Kurz (je Aktualisierung)", "%d min": "%d Min.", "1 hour": "1 Std.", "Busiest program": "Aktivstes Programm", "All graphics cards": "Alle Grafikkarten", "Lens glass": "Linsenglas", "Sky glass": "Himmelglas", "Carbon": "Carbon", "Rainbow": "Regenbogen", "Like them?": "Gefallen sie?", "☕ Buy me a coffee": "☕ Spendier mir einen Kaffee",
+    "Don't check": "Nicht prüfen", "Made by": "Von", "Feedback": "Feedback", "✉ Write to us": "✉ Schreib uns", "Graph history": "Verlauf", "Short (by refresh)": "Kurz (je Aktualisierung)", "%d min": "%d Min.", "1 hour": "1 Std.", "Busiest program": "Aktivstes Programm", "All graphics cards": "Alle Grafikkarten", "Lens glass": "Linsenglas", "Sky glass": "Himmelglas", "Carbon": "Carbon", "Rainbow": "Regenbogen", "Like them?": "Gefallen sie?", "☕ Buy me a coffee": "☕ Spendier mir einen Kaffee", "Also as an app": "Auch als App", "Open its page ›": "Seite öffnen ›",
     "Live zone": "Live-Bereich", "Per-core list": "Liste", "All threads": "Alle Threads", "Cores (P/E)": "Kerne (P/E)",
     "RAM / Commit": "RAM / Zugesichert",
     "Bottom details": "Untere Zeilen", "Data source": "Datenquelle", "Source": "Quelle", "Auto": "Auto",

@@ -81,7 +81,7 @@ addLanguage("lv", "Latviešu", {
     "Exclamation": "Izsaukums", "Battery critical": "Akumulators kritisks", "Volume": "Skaļums", "Repeat": "Atkārtot",
     "Once": "Vienreiz", "Until silenced": "Līdz apklusināšanai", "Play": "Atskaņot",
     "About": "Par sīkrīku", "Version": "Versija", "New versions": "Jaunas versijas", "Let me know": "Paziņot", "Install by themselves": "Instalēt pašiem",
-    "Don't check": "Nepārbaudīt", "Made by": "Autors", "Feedback": "Saziņa", "✉ Write to us": "✉ Rakstiet mums", "Graph history": "Grafika vēsture", "Short (by refresh)": "Īsa (pēc atjaunināšanas)", "%d min": "%d min", "1 hour": "1 stunda", "Busiest program": "Aktīvākā programma", "All graphics cards": "Visas videokartes", "Lens glass": "Lēcas stikls", "Sky glass": "Debesu stikls", "Carbon": "Karbons", "Rainbow": "Varavīksne", "Like them?": "Patīk?", "☕ Buy me a coffee": "☕ Uzsauc man kafiju",
+    "Don't check": "Nepārbaudīt", "Made by": "Autors", "Feedback": "Saziņa", "✉ Write to us": "✉ Rakstiet mums", "Graph history": "Grafika vēsture", "Short (by refresh)": "Īsa (pēc atjaunināšanas)", "%d min": "%d min", "1 hour": "1 stunda", "Busiest program": "Aktīvākā programma", "All graphics cards": "Visas videokartes", "Lens glass": "Lēcas stikls", "Sky glass": "Debesu stikls", "Carbon": "Karbons", "Rainbow": "Varavīksne", "Like them?": "Patīk?", "☕ Buy me a coffee": "☕ Uzsauc man kafiju", "Also as an app": "Arī kā lietotne", "Open its page ›": "Atvērt lapu ›",
     "Live zone": "Dzīvā zona", "Per-core list": "Saraksts", "All threads": "Visi pavedieni", "Cores (P/E)": "Kodoli (P/E)",
     "RAM / Commit": "RAM / Piešķirtā",
     "Bottom details": "Apakšējās rindas", "Data source": "Datu avots", "Source": "Avots", "Auto": "Auto",
