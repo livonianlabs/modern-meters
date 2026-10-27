@@ -1,12 +1,11 @@
-# Modern Meters
+# Modern Meters for 8GadgetPack
 
 [![Download the latest release](https://img.shields.io/github/v/release/livonianlabs/modern-meters?label=%E2%AC%87%20Download&style=for-the-badge&color=2ea043)](https://github.com/livonianlabs/modern-meters/releases/latest)
 
 **To install, download `Install-ModernMeters.cmd` under _Assets_ on the [latest release](https://github.com/livonianlabs/modern-meters/releases/latest) and double-click it**, or download the `.gadget` files there and double-click them (see [Install](#install)). The green _Code → Download ZIP_ button gives the source code, not the gadgets. [По-русски ↓](#modern-meters-по-русски)
 
-> **New: Modern Meters as an app.** The same gadgets in their own windows, without 8GadgetPack,
-> with more styles, a live zone and updates in a click:
-> [Modern Meters app (beta)](https://github.com/livonianlabs/modern-meters-app-releases).
+> **New: Modern Meters as an app.** The same meters in their own windows, without 8GadgetPack, with 45 styles,
+> a live zone and easter eggs: [Modern Meters app (beta)](https://livonianlabs.github.io/modern-meters-app/).
 
 [![Support us on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/silverenio)
 
