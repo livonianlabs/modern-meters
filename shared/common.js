@@ -1541,8 +1541,10 @@ TopRow.prototype.set = function (name, pct) {
     var key = name + "|" + THEME.text;
     if (key != this.key) {
         this.key = key;
-        this.name.innerHTML = (this.compact ? "" : esc(T("topProc")) + "&nbsp; ") +
-            "<span style='color:" + THEME.text + "'>" + esc(name == null ? (this.compact ? "" : "–") : name) + "</span>";
+        var prog = "<span style='color:" + THEME.text + "'>" + esc(name == null ? (this.compact ? "" : "–") : name) + "</span>";
+        this.name.innerHTML = (this.compact ? "" : esc(T("topProc")) + "&nbsp; ") + prog;
+        // Without room for both, the program keeps it and "Busiest:" goes (it is in the tooltip)
+        if (!this.compact && this.name.scrollWidth > this.name.clientWidth + 1) this.name.innerHTML = prog;
     }
     setText(this.val, name == null ? "" : Math.round(pct) + "%");
     setColor(this.val, pctColor(pct));
@@ -1594,7 +1596,7 @@ function cimDate(s) {
 // %APPDATA%\ModernMeters\update.txt, where the others pick it up. A newer version shows a badge;
 // only a click on it downloads the release and installs it (update.ps1).
 
-var VERSION = "1.9.5";   // set by build.ps1
+var VERSION = "1.9.6";   // set by build.ps1
 var REPO = "livonianlabs/modern-meters";
 var KOFI_URL = "https://ko-fi.com/silverenio";
 var APP_URL = "https://livonianlabs.github.io/modern-meters-app/";

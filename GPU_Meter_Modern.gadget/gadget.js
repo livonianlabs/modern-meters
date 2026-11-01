@@ -702,6 +702,9 @@ function tickMain() {
         fmtPair((d.vramUsed / 1024).toFixed(1), (d.vramTotal / 1024).toFixed(1), "GB", narrow), vramPct);
     ui.vramAlarm.update(vramPct);
     setText(ui.row2.name, d.row2.label);
+    // A long name ("Контроллер памяти") a size smaller when it doesn't fit
+    ui.row2.name.style.fontSize = "";
+    if (ui.row2.name.scrollWidth > ui.row2.name.clientWidth + 1) ui.row2.name.style.fontSize = "10px";
     show(ui.row2, d.row2.val, d.row2.pct, d.row2.noPct);
     if (d.power == null && d.powerPct != null) {
         // The driver reports power as a share of the card's limit, without watts
@@ -718,6 +721,8 @@ function tickMain() {
         setText(ui.link, d.link);
         setHint(ui.link, T("lhmHint"), d.link == T("noSensors") ? LHM_URL : null);
         setText(ui.driver, d.footer);
+        // Without room, the driver version keeps it and the source goes
+        if (ui.driver.scrollWidth > ui.driver.clientWidth + 1) setText(ui.driver, d.footer.split("  ·  ")[0]);
     }
 }
 

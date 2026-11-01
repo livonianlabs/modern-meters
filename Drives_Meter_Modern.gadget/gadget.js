@@ -267,6 +267,7 @@ function rebuild() {
         if (d.media == 3) kind.push("HDD");
         else if (d.media == 4 && d.bus != 17) kind.push("SSD");
         if (d.size && !/\d\s*[TG]B/i.test(d.name)) kind.push(diskSize(d.size));
+        b.kinds = kind;
         setText(b.kind, kind.join(" · "));
         b.health = label(root, W - PAD - 70, y, 70, narrow ? 10 : 11, THEME.dim, "right");
         y += 19;
@@ -336,7 +337,8 @@ function tick(perf) {
             nextTemps = 0;
         }
         if (now() >= nextTemps) {
-            nextTemps = now() + 15000;
+            // the first time again soon: the style's font may come after it, and the kind fitted anew
+            nextTemps = now() + (tempsShown++ ? 15000 : 1500);
             showTemps(readTemps());
         }
     } catch (e) {
@@ -426,11 +428,21 @@ function showVolumesInfo(vols) {
     }
 }
 
+var tempsShown = 0;
+
 function showTemps(temps) {
     for (var i = 0; i < disks.length; i++) {
         var s = smart[disks[i].num], t = s && s.temp ? s.temp : temps[disks[i].model];
         var el = ui.disks[i].temp, has = t != null && !isNaN(t);
         setText(el, has ? " · " + fmtTemp(t, unit) : "");
         setColor(el, levelColor(t == null || isNaN(t) ? null : t, DRIVE_TEMP_STEPS));
+        // The temperature stays whole: without room the bus and kind give way, from the end
+        var b = ui.disks[i], n = b.kinds.length;
+        var over = function () { return b.sub.scrollWidth > b.sub.clientWidth + 1 || b.temp.getBoundingClientRect().right > b.sub.getBoundingClientRect().right + 1; };
+        setText(b.kind, b.kinds.join(" · "));
+        while (n > 0 && over()) setText(b.kind, b.kinds.slice(0, --n).join(" · "));
+        // the kind gone altogether: the temperature without its dot
+        if (!n && has) setText(el, fmtTemp(t, unit));
+        b.kind.title = n < b.kinds.length ? b.kinds.join(" · ") : "";
     }
 }
